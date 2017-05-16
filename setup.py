@@ -16,5 +16,5 @@ setup(
     author_email='fabian.balsiger@istb.unibe.ch',
     url='https://github.com/istb-mia/merlin/tree/tf.rf01',
     license=license,
-    packages=find_packages(exclude=['tests', 'docs'], install_requires=['SimpleITK'])
+    packages=find_packages(exclude=['test', 'docs'], install_requires=['SimpleITK'])
 )
