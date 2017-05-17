@@ -21,3 +21,12 @@ class CSVEvaluatorWriter(IEvaluatorWriter):
 
     def write(self):
         pass
+
+class ConsoleEvaluatorWriter(IEvaluatorWriter):
+
+    def __init__(self):
+        self.precision = 2
+
+
+    def write(self):
+        pass
