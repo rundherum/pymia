@@ -87,7 +87,7 @@ class GradientAnisotropicDiffusion(IFilter):
         self.conductance_scaling_update_interval = conductance_scaling_update_interval
         self.no_iterations = no_iterations
 
-    def execute(self, image: sitk.Image, params: IPreProcessFilterParams=None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: IFilterParams=None) -> sitk.Image:
         """
         Executes a gradient anisotropic diffusion on an image. 
         :param image: The image.
@@ -126,7 +126,7 @@ class RescaleIntensity(IFilter):
         self.min_intensity = min_intensity
         self.max_intensity = max_intensity
 
-    def execute(self, image: sitk.Image, params: IPreProcessFilterParams=None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: IFilterParams=None) -> sitk.Image:
         """
         Executes an intensity rescaling on an image. 
         :param image: The image.
