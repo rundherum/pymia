@@ -1,20 +1,42 @@
 import SimpleITK as sitk
-from preprocessing.IPreProcessFilter import IPreProcessFilter
+from abc import ABCMeta, abstractmethod
 
 
-class PreProcessor:
+class IFilterParams(metaclass=ABCMeta):
     """
-    Represents a pre-processing pipeline, which can be executed on images.
+    Represents a filter parameters interface.
+    """
+
+
+class IFilter(metaclass=ABCMeta):
+    """
+    Filter interface.
+    """
+
+    @abstractmethod
+    def execute(self, image: sitk.Image, params: IFilterParams=None) -> sitk.Image:
+        """
+        Executes a filter on an image. 
+        :param image: The image.
+        :param params: The filter parameters.
+        :return: The filtered image.
+        """
+        raise NotImplementedError()
+
+
+class FilterPipeline:
+    """
+    Represents a filter pipeline, which can be executed on images.
     """
 
     def __init__(self):
         """
-        Initializes a new instance of the PreProcessor class.
+        Initializes a new instance of the `FilterPipeline` class.
         """
-        self.filters = []  # holds the IPreProcessFilters
+        self.filters = []  # holds the `IFilter`s
         self.params = []  # holds image-specific parameters
 
-    def add_filter(self, filter: IPreProcessFilter):
+    def add_filter(self, filter: IFilter):
 
         if filter is None:
             raise ValueError("The parameter filter needs to be specified.")
@@ -32,9 +54,9 @@ class PreProcessor:
 
     def execute(self, image: sitk.Image) -> sitk.Image:
         """
-        Executes the pre-processing pipeline on an image.
+        Executes the filter pipeline on an image.
         :param image: The image.
-        :return: The pre-processed image.
+        :return: The filtered image.
         """
         for param_index, filter in enumerate(self.filters):
             image = filter.execute(image, self.params[param_index])
@@ -43,11 +65,11 @@ class PreProcessor:
 
     def __str__(self):
         """
-        Get a nicely printable string representation.
+        Gets a nicely printable string representation.
         :return: String representation.
         """
 
-        string = 'PreProcessor:\n'
+        string = 'FilterPipeline:\n'
 
         for filter_no, filter in enumerate(self.filters):
             string += " " + str(filter_no + 1) + ". " + "    ".join(str(filter).splitlines(True))
