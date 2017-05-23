@@ -1,5 +1,5 @@
 import SimpleITK as sitk
-from preprocessing.filter import IFilter, IFilterParams
+from filtering.filter import IFilter, IFilterParams
 
 
 class BiasFieldCorrectorParams(IFilterParams):
