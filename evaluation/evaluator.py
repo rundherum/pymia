@@ -1,7 +1,7 @@
 import SimpleITK as sitk
 
 from evaluation.evaluator_writer import IEvaluatorWriter
-from evaluation.metric import IMetric
+from evaluation.metric import IMetric, IConfusionMatrixMetric, ConfusionMatrix
 
 
 class Evaluator:
@@ -37,6 +37,9 @@ class Evaluator:
 
         # calculate the metrics
         for param_index, metric in enumerate(self.metrics):
+            if isinstance(metric, IConfusionMatrixMetric):
+                metric.confusion_matrix = None
+
             self.results.append(metric.calculate(image_arr, ground_truth_arr))
 
         # write the results
