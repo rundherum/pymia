@@ -70,44 +70,30 @@ class NumpySimpleITKImageBridge:
     """
 
     @staticmethod
-    def array_to_image(array, information: ImageProperties) -> sitk.Image:
+    def convert(array, properties: ImageProperties) -> sitk.Image:
         """
         Converts a one-dimensional numpy array to a SimpleITK image.
         :param array: The image as numpy one-dimensional array, e.g. shape=(n,), where n = total number of voxels.
-        :param information: The image information.
+        :param properties: The image information.
         :return: The SimpleITK image. 
         """
 
-        if array.ndim != 1:
+        if not properties.is_vector_image() and array.ndim != 1:
             raise ValueError("array needs to be one-dimensional")
 
-        array = array.reshape((information.size[2], information.size[1], information.size[0]))
-
-        image = sitk.GetImageFromArray(array)
-        image.SetOrigin(information.origin)
-        image.SetSpacing(information.spacing)
-        image.SetDirection(information.direction)
-
-        return image
-
-    @staticmethod
-    def array_to_vector_image(array, information: ImageProperties) -> sitk.Image:
-        """
-        Converts a two-dimensional numpy array to a SimpleITK vector image.
-        :param array: The image as numpy two-dimensional array, e.g. shape=(4181760,2).
-        :param information: The image information.
-        :return: The SimpleITK image. 
-        """
-
-        if array.ndim != 2:
+        if properties.is_vector_image() and array.ndim != 2:
             raise ValueError("array needs to be two-dimensional")
 
-        array = array.reshape((information.size[2], information.size[1], information.size[0], array.shape[1]))
+        # reshape array
+        if not properties.is_vector_image():
+            array = array.reshape(properties.size[::-1])
+        else:
+            array = array.reshape((properties.size[::-1] (properties.number_of_components_per_pixel, )))
 
         image = sitk.GetImageFromArray(array)
-        image.SetOrigin(information.origin)
-        image.SetSpacing(information.spacing)
-        image.SetDirection(information.direction)
+        image.SetOrigin(properties.origin)
+        image.SetSpacing(properties.spacing)
+        image.SetDirection(properties.direction)
 
         return image
 
