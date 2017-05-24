@@ -55,7 +55,8 @@ class CSVEvaluatorWriter(IEvaluatorWriter):
         :type data: list
         """
 
-        self.write_line(data)
+        for evaluation in data:
+            self.write_line(evaluation)
 
     def write_header(self, header: list):
         """
@@ -74,8 +75,7 @@ class CSVEvaluatorWriter(IEvaluatorWriter):
         """
         with open(self.path, 'a', newline='') as file:
             writer = csv.writer(file, delimiter=';')
-            for evaluation in data:
-                writer.writerow(evaluation)
+            writer.writerow(data)
 
 
 class ConsoleEvaluatorWriter(IEvaluatorWriter):

@@ -74,12 +74,23 @@ class Evaluator:
             label_results = [evaluation_id, label_str]
 
             # we set all values equal to label = 1 (positive) and all other = 0 (negative)
-            predictions = image_arr[:]
-            labels = ground_truth_arr[:]
-            predictions[image_arr != label] = 0
-            predictions[image_arr == label] = 1
-            labels[ground_truth_arr != label] = 0
-            labels[ground_truth_arr == label] = 1
+            predictions = image_arr.copy()
+            labels = ground_truth_arr.copy()
+
+            if label != 0:
+                predictions[predictions != label] = 0
+                predictions[predictions == label] = 1
+                labels[labels != label] = 0
+                labels[labels == label] = 1
+            else:
+                max_value = max(predictions.max(), labels.max()) + 1
+                predictions[predictions == label] = max_value
+                predictions[predictions != max_value] = 0
+                predictions[predictions == max_value] = 1
+                labels[labels == label] = max_value
+                labels[labels != max_value] = 0
+                labels[labels == max_value] = 1
+
 
             # calculate the confusion matrix (used for most metrics)
             confusion_matrix = ConfusionMatrix(predictions, labels)
