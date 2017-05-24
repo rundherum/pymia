@@ -1,9 +1,13 @@
+"""
+This module holds classes related to images.
+A strong focus is given to ITK images and numpy arrays.
+"""
 import SimpleITK as sitk
 
 
-class ImageInformation:
+class ImageProperties:
     """
-    Represents an image information.
+    Represents ITK image properties.
     Also refer to itk::simple::Image::CopyInformation.
     """
 
@@ -51,7 +55,7 @@ class NumpySimpleITKImageBridge:
     """
 
     @staticmethod
-    def array_to_image(array, information: ImageInformation) -> sitk.Image:
+    def array_to_image(array, information: ImageProperties) -> sitk.Image:
         """
         Converts a one-dimensional numpy array to a SimpleITK image.
         :param array: The image as numpy one-dimensional array, e.g. shape=(n,), where n = total number of voxels.
@@ -72,7 +76,7 @@ class NumpySimpleITKImageBridge:
         return image
 
     @staticmethod
-    def array_to_vector_image(array, information: ImageInformation) -> sitk.Image:
+    def array_to_vector_image(array, information: ImageProperties) -> sitk.Image:
         """
         Converts a two-dimensional numpy array to a SimpleITK vector image.
         :param array: The image as numpy two-dimensional array, e.g. shape=(4181760,2).
@@ -107,4 +111,4 @@ class SimpleITKNumpyImageBridge:
         :return: (array, info): The image as numpy array and the `ImageInformation`.
         """
 
-        return sitk.GetArrayFromImage(image), ImageInformation(image)
+        return sitk.GetArrayFromImage(image), ImageProperties(image)
