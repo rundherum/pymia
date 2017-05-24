@@ -1,5 +1,4 @@
 import SimpleITK as sitk
-
 from evaluation.evaluator_writer import IEvaluatorWriter
 from evaluation.metric import IMetric, IConfusionMatrixMetric, ConfusionMatrix
 
@@ -108,7 +107,6 @@ class Evaluator:
                 labels[labels == label] = max_value
                 labels[labels != max_value] = 0
                 labels[labels == max_value] = 1
-
 
             # calculate the confusion matrix (used for most metrics)
             confusion_matrix = ConfusionMatrix(predictions, labels)
