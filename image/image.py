@@ -88,7 +88,31 @@ class NumpySimpleITKImageBridge:
         if not properties.is_vector_image():
             array = array.reshape(properties.size[::-1])
         else:
-            array = array.reshape((properties.size[::-1] (properties.number_of_components_per_pixel, )))
+            array = array.reshape((properties.size[::-1](properties.number_of_components_per_pixel, )))
+
+        image = sitk.GetImageFromArray(array)
+        image.SetOrigin(properties.origin)
+        image.SetSpacing(properties.spacing)
+        image.SetDirection(properties.direction)
+
+        return image
+
+    @staticmethod
+    def convert_to_vector_image(array, properties: ImageProperties) -> sitk.Image:
+        """
+        Converts a two-dimensional numpy array to a SimpleITK vector image with the properties of a scalar image.
+        :param array: The image as numpy two-dimensional array, e.g. shape=(4181760,2).
+        :type array: np.array
+        :param properties: The image properties (scalar image; otherwise use convert()).
+        :type properties: ImageProperties
+        :return: The SimpleITK image. 
+        :rtype: sitk.Image
+        """
+
+        if array.ndim != 2:
+            raise ValueError("array needs to be two-dimensional")
+
+        array = array.reshape((properties.size[::-1](array.shape[1], )))
 
         image = sitk.GetImageFromArray(array)
         image.SetOrigin(properties.origin)
