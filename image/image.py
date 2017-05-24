@@ -88,7 +88,7 @@ class NumpySimpleITKImageBridge:
         if not properties.is_vector_image():
             array = array.reshape(properties.size[::-1])
         else:
-            array = array.reshape((properties.size[::-1](properties.number_of_components_per_pixel, )))
+            array = array.reshape((properties.size[::-1] + (properties.number_of_components_per_pixel, )))
 
         image = sitk.GetImageFromArray(array)
         image.SetOrigin(properties.origin)
@@ -112,7 +112,7 @@ class NumpySimpleITKImageBridge:
         if array.ndim != 2:
             raise ValueError("array needs to be two-dimensional")
 
-        array = array.reshape((properties.size[::-1](array.shape[1], )))
+        array = array.reshape((properties.size[::-1] + (array.shape[1], )))
 
         image = sitk.GetImageFromArray(array)
         image.SetOrigin(properties.origin)
