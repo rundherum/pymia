@@ -47,6 +47,21 @@ class ImageProperties:
         """
         return self.number_of_components_per_pixel > 1
 
+    def __str__(self):
+        """
+        Gets a nicely printable string representation.
+        :return: String representation.
+        :rtype: str
+        """
+        return 'ImageProperties:\n' \
+               ' size:                           {self.size}\n' \
+               ' origin:                         {self.origin}\n' \
+               ' spacing:                        {self.spacing}\n' \
+               ' direction:                      {self.direction}\n' \
+               ' dimensions:                     {self.dimensions}\n' \
+               ' number_of_components_per_pixel: {self.number_of_components_per_pixel}\n' \
+            .format(self=self)
+
 
 class NumpySimpleITKImageBridge:
     """
@@ -108,7 +123,7 @@ class SimpleITKNumpyImageBridge:
         """
         Converts 
         :param image: The image. 
-        :return: (array, info): The image as numpy array and the `ImageInformation`.
+        :return: (array, info): The image as numpy array and the ImageProperties.
         """
 
         return sitk.GetArrayFromImage(image), ImageProperties(image)
