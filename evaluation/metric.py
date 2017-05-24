@@ -1,11 +1,6 @@
 import math
+import numpy as np
 from abc import ABCMeta, abstractmethod
-
-
-class IMetricParams(metaclass=ABCMeta):
-    """
-    
-    """
 
 
 class ConfusionMatrix:
@@ -13,17 +8,22 @@ class ConfusionMatrix:
     Represents a confusion matrix (or error matrix).
     """
 
-    def __init__(self):
+    def __init__(self, prediction, label):
         """
         Initializes a new instance of the ConfusionMatrix class.
         """
+
+        # true positive (tp): we predict a label of 1 (positive), and the true label is 1
+        self.tp = np.sum(np.logical_and(prediction == 1, label == 1))
+        # true negative (tn): we predict a label of 0 (negative), and the true label is 0
+        self.tn = np.sum(np.logical_and(prediction == 0, label == 0))
+        # false positive (fp): we predict a label of 1 (positive), but the true label is 0
+        self.fp = np.sum(np.logical_and(prediction == 1, label == 0))
+        # false negative (fn): we predict a label of 0 (negative), but the true label is 1
+        self.fn = np.sum(np.logical_and(prediction == 0, label == 1))
+
         self.condition_positive = 0
         self.condition_negative = 0
-        self.true_positive = 0
-        self.true_negative = 0
-        self.false_positive = 0
-        self.false_negative = 0
-        # self.
 
 
 class IMetric(metaclass=ABCMeta):
@@ -61,7 +61,7 @@ class IConfusionMatrixMetric(IMetric):
         """
         super().__init__()
         self.metric = "IConfusionMatrixMetric"
-        self.confusion_matrix = ConfusionMatrix()
+        self.confusion_matrix = None  # ConfusionMatrix
 
     @abstractmethod
     def calculate(self):
@@ -88,11 +88,10 @@ class Accuracy(IConfusionMatrixMetric):
         Calculates the accuracy.
         """
 
-        sum = self.confusion_matrix.true_positive + self.confusion_matrix.true_negative + \
-              self.confusion_matrix.false_positive + self.confusion_matrix.false_negative
+        sum = self.confusion_matrix.tp + self.confusion_matrix.tn + self.confusion_matrix.fp + self.confusion_matrix.fn
 
         if sum != 0:
-            return (self.confusion_matrix.true_positive + self.confusion_matrix.true_negative) / sum
+            return (self.confusion_matrix.tp + self.confusion_matrix.tn) / sum
         else:
             return 0
 
@@ -113,13 +112,11 @@ class AreaUnderCurve(IConfusionMatrixMetric):
         """
         Calculates the area under the curve.
         """
-        specificity = self.confusion_matrix.true_negative / \
-                      (self.confusion_matrix.true_negative + self.confusion_matrix.false_positive)
+        specificity = self.confusion_matrix.tn / (self.confusion_matrix.tn + self.confusion_matrix.fp)
 
         false_positive_rate =  1 - specificity
 
-        true_positive_rate = self.confusion_matrix.true_positive / \
-                      (self.confusion_matrix.true_positive + self.confusion_matrix.false_negative)
+        true_positive_rate = self.confusion_matrix.tp / (self.confusion_matrix.tp + self.confusion_matrix.fn)
 
         return (true_positive_rate - false_positive_rate + 1) / 2
 
@@ -156,13 +153,13 @@ class CohenKappaMetric(IConfusionMatrixMetric):
         """
         Calculates the Cohen's kappa coefficient.
         """
-        agreement = self.confusion_matrix.true_positive + self.confusion_matrix.true_negative
-        chance0 = (self.confusion_matrix.true_negative + self.confusion_matrix.false_negative) * \
-                  (self.confusion_matrix.true_negative + self.confusion_matrix.false_positive)
-        chance1 = (self.confusion_matrix.false_positive + self.confusion_matrix.true_positive) * \
-                  (self.confusion_matrix.false_negative + self.confusion_matrix.true_positive)
-        sum = self.confusion_matrix.true_positive + self.confusion_matrix.true_negative + \
-              self.confusion_matrix.false_positive + self.confusion_matrix.false_negative
+        agreement = self.confusion_matrix.tp + self.confusion_matrix.tn
+        chance0 = (self.confusion_matrix.tn + self.confusion_matrix.fn) * \
+                  (self.confusion_matrix.tn + self.confusion_matrix.fp)
+        chance1 = (self.confusion_matrix.fp + self.confusion_matrix.tp) * \
+                  (self.confusion_matrix.fn + self.confusion_matrix.tp)
+        sum = self.confusion_matrix.tp + self.confusion_matrix.tn + \
+              self.confusion_matrix.fp + self.confusion_matrix.fn
         chance = (chance0 + chance1) / sum
 
         return (agreement - chance1) / (sum - chance)
@@ -184,9 +181,9 @@ class DiceCoefficient(IConfusionMatrixMetric):
         """
         Calculates the Dice coefficient.
         """
-        return 2 * self.confusion_matrix.true_positive / \
-               (2 * self.confusion_matrix.true_positive +
-                self.confusion_matrix.false_positive + self.confusion_matrix.false_negative)
+        return 2 * self.confusion_matrix.tp / \
+               (2 * self.confusion_matrix.tp +
+                self.confusion_matrix.fp + self.confusion_matrix.fn)
 
 
 class Fallout(IConfusionMatrixMetric):
@@ -206,8 +203,7 @@ class Fallout(IConfusionMatrixMetric):
         Calculates the fallout (false positive rate).
         """
 
-        specificity = self.confusion_matrix.true_negative / \
-                      (self.confusion_matrix.true_negative + self.confusion_matrix.false_positive)
+        specificity = self.confusion_matrix.tn / (self.confusion_matrix.tn + self.confusion_matrix.fp)
         return 1 - specificity
 
 
@@ -248,10 +244,10 @@ class GlobalConsistencyError(IConfusionMatrixMetric):
         """
         Calculates the global consistency error.
         """
-        tp = self.confusion_matrix.true_positive
-        tn = self.confusion_matrix.true_negative
-        fp = self.confusion_matrix.false_positive
-        fn = self.confusion_matrix.false_negative
+        tp = self.confusion_matrix.tp
+        tn = self.confusion_matrix.tn
+        fp = self.confusion_matrix.fp
+        fn = self.confusion_matrix.fn
 
         n = tp + tn + fp + fn
         e1 = (fn * (fn + 2 * tp) / (tp + fn) + fp * (fp + 2 * tn) / (tn + fp)) / n
@@ -308,9 +304,9 @@ class JaccardCoefficient(IConfusionMatrixMetric):
         """
         Calculates the Jaccard coefficient.
         """
-        tp = self.confusion_matrix.true_positive
-        fp = self.confusion_matrix.false_positive
-        fn = self.confusion_matrix.false_negative
+        tp = self.confusion_matrix.tp
+        fp = self.confusion_matrix.fp
+        fn = self.confusion_matrix.fn
 
         return tp / (tp + fp + fn)
 
@@ -364,10 +360,10 @@ class Precision(IConfusionMatrixMetric):
         Calculates the precision.
         """
 
-        sum = self.confusion_matrix.true_positive + self.confusion_matrix.false_positive
+        sum = self.confusion_matrix.tp + self.confusion_matrix.fp
 
         if sum != 0:
-            return self.confusion_matrix.true_positive / sum
+            return self.confusion_matrix.tp / sum
         else:
             return 0
 
@@ -421,10 +417,10 @@ class Recall(IConfusionMatrixMetric):
         Calculates the recall.
         """
 
-        sum = self.confusion_matrix.true_positive + self.confusion_matrix.false_negative
+        sum = self.confusion_matrix.tp + self.confusion_matrix.fn
 
         if sum != 0:
-            return self.confusion_matrix.true_positive / sum
+            return self.confusion_matrix.tp / sum
         else:
             return 0
 
@@ -445,8 +441,7 @@ class Sensitivity(IConfusionMatrixMetric):
         """
         Calculates the sensitivity (true positive rate).
         """
-        return self.confusion_matrix.true_positive / \
-                      (self.confusion_matrix.true_positive + self.confusion_matrix.false_negative)
+        return self.confusion_matrix.tp / (self.confusion_matrix.tp + self.confusion_matrix.fn)
 
 
 class Specificity(IConfusionMatrixMetric):
@@ -465,8 +460,7 @@ class Specificity(IConfusionMatrixMetric):
         """
         Calculates the specificity.
         """
-        return self.confusion_matrix.true_negative / \
-                      (self.confusion_matrix.true_negative + self.confusion_matrix.false_positive)
+        return self.confusion_matrix.tn / (self.confusion_matrix.tn + self.confusion_matrix.fp)
 
 
 class VariationOfInformation(IMetric):
@@ -501,8 +495,8 @@ class VolumeSimilarity(IConfusionMatrixMetric):
         """
         Calculates the volume similarity.
         """
-        tp = self.confusion_matrix.true_positive
-        fp = self.confusion_matrix.false_positive
-        fn = self.confusion_matrix.false_negative
+        tp = self.confusion_matrix.tp
+        fp = self.confusion_matrix.fp
+        fn = self.confusion_matrix.fn
 
         return 1 - abs(fn - fp) / (2 * tp + fn + fp)

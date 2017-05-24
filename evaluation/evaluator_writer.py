@@ -74,7 +74,8 @@ class CSVEvaluatorWriter(IEvaluatorWriter):
         """
         with open(self.path, 'a', newline='') as file:
             writer = csv.writer(file, delimiter=';')
-            writer.writerow(data)
+            for evaluation in data:
+                writer.writerow(evaluation)
 
 
 class ConsoleEvaluatorWriter(IEvaluatorWriter):
@@ -97,19 +98,22 @@ class ConsoleEvaluatorWriter(IEvaluatorWriter):
         """
         Writes the evaluation results.
         :param data: The evaluation data.
-        :type data: list of floats
+        :type data: list of list, e.g. [["PATIENT1", "BACKGROUND", 0.90], ["PATIENT1", "TUMOR", "0.62"]]
         """
 
         # format all floats with given precision to str
-        data = [val if isinstance(val, str) else "{0:.{1}f}".format(val, self.precision) for val in data]
+        out = []
+        for line in data:
+            out += [val if isinstance(val, str) else "{0:.{1}f}".format(val, self.precision) for val in line]
+            out += ["\n"]
 
         # get length for output alignment
-        length = max(len(max(data, key=len)), len(max(self.header, key=len))) + 2
-        print(length)
-        print(",".join("{0:>{1}}".format(val, length) for val in self.header),
+        length = max(len(max(out, key=len)), len(max(self.header, key=len))) + 2
+
+        print("".join("{0:>{1}}".format(val, length) for val in self.header),
               "\n",
-              ",".join("{0:>{1}}".format(val, length) for val in data),
-              sep='')
+              "".join("{0:>{1}}".format(val, length) for val in out),
+              sep='', end='')
 
     def write_header(self, header: list):
         """

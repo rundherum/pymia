@@ -12,15 +12,25 @@ class Evaluator:
     def __init__(self, writer: IEvaluatorWriter):
         """
         Initializes a new instance of the Evaluator class.
-        :param writer: A writer.
+        :param writer: An evaluator writer.
         :type writer: IEvaluatorWriter
         """
 
-        self.metrics = []
-        self.labels = [0, 1]
-        self.label_str = ["Background", "Target"]
-        self.writers = [writer]
+        self.metrics = []  # list of IMetrics
+        self.writers = [writer]  # list of IEvaluatorWriters
+        self.labels = {}  # dictionary of label: label_str
         self.is_header_written = False
+
+    def add_label(self, label: int, description: str):
+        """
+        Adds a label with its description to the evaluation.
+        :param label: The label.
+        :type label: int
+        :param description: The label's description. 
+        :type description: str
+        """
+
+        self.labels[label] = description
 
     def add_metric(self, metric: IMetric):
         """
@@ -41,40 +51,63 @@ class Evaluator:
         self.writers.append(writer)
         self.is_header_written = False  # header changed
 
-    def evaluate(self, image: sitk.Image, ground_truth: sitk.Image):
+    def evaluate(self, image: sitk.Image, ground_truth: sitk.Image, evaluation_id: str):
         """
         Evaluates the metrics on the provided image and ground truth image.
         :param image: The image.
+        :type image: sitk.Image
         :param ground_truth: The ground truth image.
+        :type ground_truth: sitk.Image
+        :param evaluation_id: The identification.
+        :type evaluation_id: str
         """
 
         if not self.is_header_written:
             self.write_header()
 
-        image_arr = sitk.GetArrayFromImage(image)
-        ground_truth_arr = sitk.GetArrayFromImage(ground_truth)
-
-        confusion_matrix = ConfusionMatrix()  # calculate the confusion matrix
+        image_arr = sitk.GetArrayFromImage(image).flatten()
+        ground_truth_arr = sitk.GetArrayFromImage(ground_truth).flatten()
 
         results = []  # clear results
 
-        # calculate the metrics
-        for param_index, metric in enumerate(self.metrics):
-            if isinstance(metric, IConfusionMatrixMetric):
-                metric.confusion_matrix = confusion_matrix
+        for label, label_str in self.labels.items():
+            label_results = [evaluation_id, label_str]
 
-            results.append(metric.calculate(image_arr, ground_truth_arr))
+            # we set all values equal to label = 1 (positive) and all other = 0 (negative)
+            predictions = image_arr[:]
+            labels = ground_truth_arr[:]
+            predictions[image_arr != label] = 0
+            predictions[image_arr == label] = 1
+            labels[ground_truth_arr != label] = 0
+            labels[ground_truth_arr == label] = 1
+
+            # calculate the confusion matrix (used for most metrics)
+            confusion_matrix = ConfusionMatrix(predictions, labels)
+
+            # calculate the metrics
+            for param_index, metric in enumerate(self.metrics):
+                if isinstance(metric, IConfusionMatrixMetric):
+                    metric.confusion_matrix = confusion_matrix
+
+                # TODO add other metric instances
+
+                label_results.append(metric.calculate())
+
+            results.append(label_results)
 
         # write the results
         for writer in self.writers:
             writer.write(results)
 
     def write_header(self):
+        """
+        Writes the header. 
+        """
 
         header = ["ID", "LABEL"]
 
         for metric in self.metrics:
-            pass
+            header.append(str(metric))
 
         for writer in self.writers:
             writer.write_header(header)
