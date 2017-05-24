@@ -14,6 +14,23 @@ class Evaluator:
         Initializes a new instance of the Evaluator class.
         :param writer: An evaluator writer.
         :type writer: IEvaluatorWriter
+        
+        Example usage:
+        >>>evaluator = Evaluator(ConsoleEvaluatorWriter(5))
+        >>>evaluator.add_writer(CSVEvaluatorWriter("/some/path/to/results.csv"))
+        >>>evaluator.add_label(0, "Background")
+        >>>evaluator.add_label(1, "Nerve")
+        >>>evaluator.add_metric(DiceCoefficient())
+        >>>evaluator.add_metric(VolumeSimilarity())
+        >>>evaluator.evaluate(prediction, ground_truth, "Patient1")
+        The console output would be:
+                  ID       LABEL        DICE     VOLSMTY
+            Patient1  Background     0.99955     0.99976  
+            Patient1       Nerve     0.70692     0.84278
+        The results.csv would contain:
+        ID;LABEL;DICE;VOLSMTY
+        Patient1;Background;0.999548418549;0.999757743496
+        Patient1;Nerve;0.70692469107;0.842776093884
         """
 
         self.metrics = []  # list of IMetrics
@@ -40,6 +57,7 @@ class Evaluator:
         """
 
         self.metrics.append(metric)
+        self.is_header_written = False  # header changed due to new metric
 
     def add_writer(self, writer: IEvaluatorWriter):
         """
@@ -49,7 +67,7 @@ class Evaluator:
         """
 
         self.writers.append(writer)
-        self.is_header_written = False  # header changed
+        self.is_header_written = False  # re-write header
 
     def evaluate(self, image: sitk.Image, ground_truth: sitk.Image, evaluation_id: str):
         """
@@ -122,3 +140,5 @@ class Evaluator:
 
         for writer in self.writers:
             writer.write_header(header)
+
+        self.is_header_written = True
