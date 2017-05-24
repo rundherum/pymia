@@ -45,7 +45,7 @@ Usually the subject line (```<type>: <subject>```) is enough. It contains a succ
  - test (when adding missing tests)
  - chore (maintain)
 
-An example would be: ```feature: Dice coefficient```
+An example would be: ```feat: Dice coefficient```
 
 ### Code Documentation
 Please document your code. Each class and function should have a comment.
