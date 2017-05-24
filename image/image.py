@@ -16,15 +16,32 @@ class ImageInformation:
         self.origin = image.GetOrigin()
         self.spacing = image.GetSpacing()
         self.direction = image.GetDirection()
+        self.dimensions = image.GetDimension()
+        self.number_of_components_per_pixel = image.GetNumberOfComponentsPerPixel()
 
     def is_two_dimensional(self) -> bool:
-        return len(self.size) == 2
+        """
+        Determines whether the image is two-dimensional.
+        :return: True if the image is two-dimensional; otherwise, False.
+        :rtype: bool
+        """
+        return self.dimensions == 2
 
     def is_three_dimensional(self) -> bool:
-        return len(self.size) == 3
+        """
+        Determines whether the image is three-dimensional.
+        :return: True if the image is three-dimensional; otherwise, False.
+        :rtype: bool
+        """
+        return self.dimensions == 3
 
-    def is_three_dimensional_vector(self) -> bool:
-        return len(self.size) == 4
+    def is_vector_image(self) -> bool:
+        """
+        Determines whether the image is a vector image.
+        :return: True for vector images; False for scalar images.
+        :rtype: bool
+        """
+        return self.number_of_components_per_pixel > 1
 
 
 class NumpySimpleITKImageBridge:
