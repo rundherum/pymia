@@ -1,5 +1,9 @@
+import sys
 from setuptools import find_packages, setup
 
+
+if not sys.hexversion < 0x03060000:
+    sys.exit("Requires Python 3.6 or higher")
 
 with open('README.md') as f:
     readme = f.read()
@@ -18,7 +22,7 @@ TEST_PACKAGES = [
 
 setup(
     name='PythonCommon',
-    version='0.0.0',
+    version='0.1.0',
     description='PythonCommon helps MIA',
     long_description=readme,
     author='Medical Image Analysis Group',
@@ -41,5 +45,10 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Libraries'
     ],
-    keywords='medical image analysis'
+    keywords=[
+        'medical image analysis',
+        'deep learning',
+        'ITK'
+        'SimpleITK'
+    ]
 )
