@@ -114,7 +114,7 @@ class AreaUnderCurve(IConfusionMatrixMetric):
         """
         specificity = self.confusion_matrix.tn / (self.confusion_matrix.tn + self.confusion_matrix.fp)
 
-        false_positive_rate =  1 - specificity
+        false_positive_rate = 1 - specificity
 
         true_positive_rate = self.confusion_matrix.tp / (self.confusion_matrix.tp + self.confusion_matrix.fn)
 
