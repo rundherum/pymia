@@ -1,9 +1,9 @@
 """
-==============================
-Evaluation (:mod:`evaluation`)
-==============================
+======================================
+Evaluation (:mod:`evaluation` package)
+======================================
 
-The modules described in this chapter provide an easy way to evaluate the performance of your algorithms.
+This package provides an easy way to evaluate the performance of your algorithms.
 
 We provide an :class:`evaluator.Evaluator` and two writers (:class:`evaluator.CSVEvaluatorWriter`
 and :class:`evaluator.ConsoleEvaluatorWriter`), which can be used with a large amount of metrics
