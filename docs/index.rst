@@ -10,6 +10,19 @@ MIA's PythonCommon
 :Date: |today|
 
 PythonCommon contains generic and often used code for medical image analysis.
+It is developed and maintained by the Medical Image Analysis (MIA) group at
+the Institute for Surgical Technologies and Biomechanics, University of Bern.
+
+.. toctree::
+    :maxdepth: 1
+    :caption: Getting started:
+
+    installation
+    pycharm
+    contribution
+    history
+
+
 
 Currently, there exist three main functionalities:
 
@@ -20,14 +33,6 @@ Currently, there exist three main functionalities:
     filtering
     image
 
-Some useful information:
-
-.. toctree::
-    :maxdepth: 1
-
-    installation
-    pycharm
-    history
 
 
 Indices and Tables

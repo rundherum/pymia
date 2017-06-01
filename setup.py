@@ -14,7 +14,8 @@ with open('LICENSE') as f:
 REQUIRED_PACKAGES = [
     'numpy >= 1.12.1',
     'SimpleITK >= 1.0.0',
-    'sphinx >= 1.6'
+    'sphinx >= 1.6',
+    'sphinx_rtd_theme >= 0.2.4'
 ]
 
 TEST_PACKAGES = [
