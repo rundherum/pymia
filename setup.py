@@ -9,7 +9,7 @@ with open('README.md') as f:
     readme = f.read()
 
 with open('LICENSE') as f:
-    license = f.read()
+    license_ = f.read()
 
 REQUIRED_PACKAGES = [
     'numpy >= 1.12.1',
@@ -29,7 +29,7 @@ setup(
     author='Medical Image Analysis Group',
     author_email='fabian.balsiger@istb.unibe.ch',
     url='https://github.com/istb-mia/PythonCommon',
-    license=license,
+    license=license_,
     packages=find_packages(exclude=['test', 'docs']),
     install_requires=REQUIRED_PACKAGES,
     tests_require=REQUIRED_PACKAGES + TEST_PACKAGES,
