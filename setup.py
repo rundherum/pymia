@@ -13,7 +13,8 @@ with open('LICENSE') as f:
 
 REQUIRED_PACKAGES = [
     'numpy >= 1.12.1',
-    'SimpleITK >= 1.0.0'
+    'SimpleITK >= 1.0.0',
+    'sphinx >= 1.6'
 ]
 
 TEST_PACKAGES = [
