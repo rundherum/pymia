@@ -1,7 +1,140 @@
 """Contains evaluation function"""
+import csv
+import os
+from abc import ABCMeta, abstractmethod
 import SimpleITK as sitk
-from evaluation.evaluator_writer import IEvaluatorWriter
 from evaluation.metric import IMetric, IConfusionMatrixMetric, ConfusionMatrix
+
+
+class IEvaluatorWriter(metaclass=ABCMeta):
+    """
+    Represents an evaluator writer interface, which enables to write evaluation results.
+    """
+
+    @abstractmethod
+    def write(self, data: list):
+        """
+        Writes the evaluation results.
+
+        :param data: The evaluation data.
+        :type data: list
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def write_header(self, header: list):
+        """
+        Writes the evaluation header.
+
+        :param header: The evaluation header.
+        :type header: list
+        """
+        raise NotImplementedError
+
+
+class CSVEvaluatorWriter(IEvaluatorWriter):
+    """
+    Represents a CSV evaluator writer.
+    """
+
+    def __init__(self, path: str):
+        """
+        Initializes a new instance of the CSVEvaluatorWriter class.
+
+        :param path: The file path.
+        :type path: str
+        """
+        super().__init__()
+
+        self.path = path
+
+        # check file extension
+        if not self.path.lower().endswith(".csv"):
+            self.path = os.path.join(self.path, ".csv")
+
+        open(self.path, 'w', newline='')  # creates (and overrides an existing) file
+
+    def write(self, data: list):
+        """
+        Writes the evaluation results.
+
+        :param data: The evaluation data.
+        :type data: list
+        """
+
+        for evaluation in data:
+            self.write_line(evaluation)
+
+    def write_header(self, header: list):
+        """
+        Writes the evaluation header.
+
+        :param header: The evaluation header.
+        :type header: list
+        """
+
+        self.write_line(header)
+
+    def write_line(self, data: list):
+        """
+        Writes a line.
+
+        :param data: The data.
+        :type data: list
+        """
+        with open(self.path, 'a', newline='') as file:
+            writer = csv.writer(file, delimiter=';')
+            writer.writerow(data)
+
+
+class ConsoleEvaluatorWriter(IEvaluatorWriter):
+    """
+    Represents a console evaluator writer.
+    """
+
+    def __init__(self, precision: int=3):
+        """
+        Initializes a new instance of the ConsoleEvaluatorWriter class.
+
+        :param precision: The float precision.
+        :type precision: int
+        """
+        super().__init__()
+
+        self.header = None
+        self.precision = precision
+
+    def write(self, data: list):
+        """
+        Writes the evaluation results.
+
+        :param data: The evaluation data.
+        :type data: list of list, e.g. [["PATIENT1", "BACKGROUND", 0.90], ["PATIENT1", "TUMOR", "0.62"]]
+        """
+
+        # format all floats with given precision to str
+        out = []
+        for line in data:
+            out += [val if isinstance(val, str) else "{0:.{1}f}".format(val, self.precision) for val in line]
+            out += ["\n"]
+
+        # get length for output alignment
+        length = max(len(max(out, key=len)), len(max(self.header, key=len))) + 2
+
+        print("".join("{0:>{1}}".format(val, length) for val in self.header),
+              "\n",
+              "".join("{0:>{1}}".format(val, length) for val in out),
+              sep='', end='')
+
+    def write_header(self, header: list):
+        """
+        Writes the evaluation header.
+
+        :param header: The evaluation header.
+        :type header: list of str
+        """
+
+        self.header = header
 
 
 class Evaluator:
@@ -10,14 +143,13 @@ class Evaluator:
 
     Example usage:
 
-    >>>evaluator = Evaluator(ConsoleEvaluatorWriter(5))
-    >>>evaluator.add_writer(CSVEvaluatorWriter("/some/path/to/results.csv"))
-    >>>evaluator.add_label(0, "Background")
-    >>>evaluator.add_label(1, "Nerve")
-    >>>evaluator.add_metric(DiceCoefficient())
-    >>>evaluator.add_metric(VolumeSimilarity())
-    >>>evaluator.evaluate(prediction, ground_truth, "Patient1")
-
+    >>> evaluator = Evaluator(ConsoleEvaluatorWriter(5))
+    >>> evaluator.add_writer(CSVEvaluatorWriter("/some/path/to/results.csv"))
+    >>> evaluator.add_label(0, "Background")
+    >>> evaluator.add_label(1, "Nerve")
+    >>> evaluator.add_metric(DiceCoefficient())
+    >>> evaluator.add_metric(VolumeSimilarity())
+    >>> evaluator.evaluate(prediction, ground_truth, "Patient1")
     The console output would be:
               ID       LABEL        DICE     VOLSMTY
         Patient1  Background     0.99955     0.99976
