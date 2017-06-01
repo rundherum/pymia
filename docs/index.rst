@@ -19,8 +19,6 @@ PythonCommon contains generic and often used code for medical image analysis.
 
 Currently, there exist three
 
-
-
 Indices and tables
 ==================
 
