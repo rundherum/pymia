@@ -3,23 +3,34 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to MIA's PythonCommon
-=============================
+MIA's PythonCommon
+==================
+
+:Release: |release|
+:Date: |today|
 
 PythonCommon contains generic and often used code for medical image analysis.
 
+Currently, there exist three main functionalities:
 
 .. toctree::
-    :maxdepth: 2
-    :caption: Contents:
+    :maxdepth: 1
 
     evaluation
+    filtering
+    image
+
+Some useful information:
+
+.. toctree::
+    :maxdepth: 1
+
     installation
+    pycharm
     history
 
-Currently, there exist three
 
-Indices and tables
+Indices and Tables
 ==================
 
 * :ref:`genindex`

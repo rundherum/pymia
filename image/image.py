@@ -109,7 +109,7 @@ class NumpySimpleITKImageBridge:
         Converts a two-dimensional numpy array to a SimpleITK vector image with the properties of a scalar image.
 
         :param array: The image as numpy two-dimensional array, e.g. shape=(4181760,2).
-        :type array: np.array
+        :type array: np.ndarray
         :param properties: The image properties (scalar image; otherwise use convert()).
         :type properties: ImageProperties
         :return: The SimpleITK image. 

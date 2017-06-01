@@ -2,5 +2,3 @@ Installation
 ============
 
 
-Usage PyCharm
-=============

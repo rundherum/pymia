@@ -1,3 +1,4 @@
+"""metric description"""
 import math
 import numpy as np
 from abc import ABCMeta, abstractmethod
