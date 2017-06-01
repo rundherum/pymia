@@ -7,14 +7,18 @@ Welcome to MIA's PythonCommon
 =============================
 
 PythonCommon contains generic and often used code for medical image analysis.
-bla
+
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
+    :caption: Contents:
 
-.. automodule::evaluator
-    .. autoclass::evaluator.Evaluator
+    evaluation
+    installation
+    history
+
+Currently, there exist three
+
 
 
 Indices and tables
