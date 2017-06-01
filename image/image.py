@@ -14,6 +14,7 @@ class ImageProperties:
     def __init__(self, image: sitk.Image):
         """
         Initializes a new instance of the ImageInformation class.
+
         :param image: The image.
         """
         self.size = image.GetSize()
@@ -26,6 +27,7 @@ class ImageProperties:
     def is_two_dimensional(self) -> bool:
         """
         Determines whether the image is two-dimensional.
+
         :return: True if the image is two-dimensional; otherwise, False.
         :rtype: bool
         """
@@ -34,6 +36,7 @@ class ImageProperties:
     def is_three_dimensional(self) -> bool:
         """
         Determines whether the image is three-dimensional.
+
         :return: True if the image is three-dimensional; otherwise, False.
         :rtype: bool
         """
@@ -42,6 +45,7 @@ class ImageProperties:
     def is_vector_image(self) -> bool:
         """
         Determines whether the image is a vector image.
+
         :return: True for vector images; False for scalar images.
         :rtype: bool
         """
@@ -50,6 +54,7 @@ class ImageProperties:
     def __str__(self):
         """
         Gets a nicely printable string representation.
+
         :return: String representation.
         :rtype: str
         """
@@ -73,6 +78,7 @@ class NumpySimpleITKImageBridge:
     def convert(array, properties: ImageProperties) -> sitk.Image:
         """
         Converts a one-dimensional numpy array to a SimpleITK image.
+
         :param array: The image as numpy one-dimensional array, e.g. shape=(n,), where n = total number of voxels.
         :param properties: The image information.
         :return: The SimpleITK image. 
@@ -101,6 +107,7 @@ class NumpySimpleITKImageBridge:
     def convert_to_vector_image(array, properties: ImageProperties) -> sitk.Image:
         """
         Converts a two-dimensional numpy array to a SimpleITK vector image with the properties of a scalar image.
+
         :param array: The image as numpy two-dimensional array, e.g. shape=(4181760,2).
         :type array: np.array
         :param properties: The image properties (scalar image; otherwise use convert()).
@@ -131,9 +138,10 @@ class SimpleITKNumpyImageBridge:
     @staticmethod
     def convert(image: sitk.Image):
         """
-        Converts 
+        Converts
+
         :param image: The image. 
         :return: (array, info): The image as numpy array and the ImageProperties.
         """
-
+        # todo comment
         return sitk.GetArrayFromImage(image), ImageProperties(image)

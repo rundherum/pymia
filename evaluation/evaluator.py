@@ -1,3 +1,4 @@
+"""Contains evaluation function"""
 import SimpleITK as sitk
 from evaluation.evaluator_writer import IEvaluatorWriter
 from evaluation.metric import IMetric, IConfusionMatrixMetric, ConfusionMatrix
@@ -6,30 +7,33 @@ from evaluation.metric import IMetric, IConfusionMatrixMetric, ConfusionMatrix
 class Evaluator:
     """
     Represents a metric evaluator.
+
+    Example usage:
+
+    >>>evaluator = Evaluator(ConsoleEvaluatorWriter(5))
+    >>>evaluator.add_writer(CSVEvaluatorWriter("/some/path/to/results.csv"))
+    >>>evaluator.add_label(0, "Background")
+    >>>evaluator.add_label(1, "Nerve")
+    >>>evaluator.add_metric(DiceCoefficient())
+    >>>evaluator.add_metric(VolumeSimilarity())
+    >>>evaluator.evaluate(prediction, ground_truth, "Patient1")
+
+    The console output would be:
+              ID       LABEL        DICE     VOLSMTY
+        Patient1  Background     0.99955     0.99976
+        Patient1       Nerve     0.70692     0.84278
+    The results.csv would contain:
+    ID;LABEL;DICE;VOLSMTY
+    Patient1;Background;0.999548418549;0.999757743496
+    Patient1;Nerve;0.70692469107;0.842776093884
     """
 
     def __init__(self, writer: IEvaluatorWriter):
         """
         Initializes a new instance of the Evaluator class.
+
         :param writer: An evaluator writer.
         :type writer: IEvaluatorWriter
-        
-        Example usage:
-        >>>evaluator = Evaluator(ConsoleEvaluatorWriter(5))
-        >>>evaluator.add_writer(CSVEvaluatorWriter("/some/path/to/results.csv"))
-        >>>evaluator.add_label(0, "Background")
-        >>>evaluator.add_label(1, "Nerve")
-        >>>evaluator.add_metric(DiceCoefficient())
-        >>>evaluator.add_metric(VolumeSimilarity())
-        >>>evaluator.evaluate(prediction, ground_truth, "Patient1")
-        The console output would be:
-                  ID       LABEL        DICE     VOLSMTY
-            Patient1  Background     0.99955     0.99976  
-            Patient1       Nerve     0.70692     0.84278
-        The results.csv would contain:
-        ID;LABEL;DICE;VOLSMTY
-        Patient1;Background;0.999548418549;0.999757743496
-        Patient1;Nerve;0.70692469107;0.842776093884
         """
 
         self.metrics = []  # list of IMetrics
@@ -40,9 +44,10 @@ class Evaluator:
     def add_label(self, label: int, description: str):
         """
         Adds a label with its description to the evaluation.
+
         :param label: The label.
         :type label: int
-        :param description: The label's description. 
+        :param description: The label's description.
         :type description: str
         """
 
@@ -51,6 +56,7 @@ class Evaluator:
     def add_metric(self, metric: IMetric):
         """
         Adds a metric to the evaluation.
+
         :param metric: The metric.
         :type metric: IMetric
         """
@@ -61,6 +67,7 @@ class Evaluator:
     def add_writer(self, writer: IEvaluatorWriter):
         """
         Adds a writer to the evaluation.
+
         :param writer: The writer.
         :type writer: IEvaluatorWriter
         """
@@ -71,6 +78,7 @@ class Evaluator:
     def evaluate(self, image: sitk.Image, ground_truth: sitk.Image, evaluation_id: str):
         """
         Evaluates the metrics on the provided image and ground truth image.
+
         :param image: The image.
         :type image: sitk.Image
         :param ground_truth: The ground truth image.
@@ -116,7 +124,7 @@ class Evaluator:
                 if isinstance(metric, IConfusionMatrixMetric):
                     metric.confusion_matrix = confusion_matrix
 
-                # TODO add other metric instances
+                # todo add other metric instances
 
                 label_results.append(metric.calculate())
 

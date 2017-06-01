@@ -16,7 +16,8 @@ class IFilter(metaclass=ABCMeta):
     @abstractmethod
     def execute(self, image: sitk.Image, params: IFilterParams=None) -> sitk.Image:
         """
-        Executes a filter on an image. 
+        Executes a filter on an image.
+
         :param image: The image.
         :param params: The filter parameters.
         :return: The filtered image.
@@ -47,6 +48,7 @@ class FilterPipeline:
     def set_param(self, params, filter_index):
         """
         Sets an image-specific parameter for a filter.
+
         :param params: The parameter(s).
         :param filter_index: The filter's index.
         """
@@ -55,6 +57,7 @@ class FilterPipeline:
     def execute(self, image: sitk.Image) -> sitk.Image:
         """
         Executes the filter pipeline on an image.
+
         :param image: The image.
         :return: The filtered image.
         """
@@ -66,6 +69,7 @@ class FilterPipeline:
     def __str__(self):
         """
         Gets a nicely printable string representation.
+
         :return: String representation.
         """
 

@@ -10,6 +10,7 @@ class BiasFieldCorrectorParams(IFilterParams):
     def __init__(self, mask):
         """
         Initializes a new instance of the BiasFieldCorrectorParams class.
+
         :param mask: A mask image (0=background; 1=mask).
 
         Example:
@@ -26,6 +27,7 @@ class BiasFieldCorrector(IFilter):
     def __init__(self, shrink_factor=4, number_of_iterations=4, number_of_fitting_levels=3):
         """
         Initializes a new instance of the BiasFieldCorrector class.
+
         :param shrink_factor: 
         :param number_of_iterations: 
         :param number_of_fitting_levels: 
@@ -36,7 +38,8 @@ class BiasFieldCorrector(IFilter):
 
     def execute(self, image: sitk.Image, params: BiasFieldCorrectorParams=None) -> sitk.Image:
         """
-        Executes a bias field correction on an image. 
+        Executes a bias field correction on an image.
+
         :param image: The image.
         :param params: The bias field correction filter parameters.
         :return: The bias field corrected image.
@@ -58,6 +61,7 @@ class BiasFieldCorrector(IFilter):
     def __str__(self):
         """
         Gets a nicely printable string representation.
+
         :return: String representation.
         """
         return 'BiasFieldCorrector:\n' \
@@ -77,6 +81,8 @@ class GradientAnisotropicDiffusion(IFilter):
                  conductance_scaling_update_interval: int=1,
                  no_iterations: int=5):
         """
+        Initializes a new instance of the GradientAnisotropicDiffusion class.
+
         :param time_step: 
         :param conductance: (the higher the smoother the edges).
         :param conductance_scaling_update_interval: 
@@ -89,7 +95,8 @@ class GradientAnisotropicDiffusion(IFilter):
 
     def execute(self, image: sitk.Image, params: IFilterParams=None) -> sitk.Image:
         """
-        Executes a gradient anisotropic diffusion on an image. 
+        Executes a gradient anisotropic diffusion on an image.
+
         :param image: The image.
         :param params: The gradient anisotropic diffusion filter parameters.
         :return: The smoothed image.
@@ -103,6 +110,7 @@ class GradientAnisotropicDiffusion(IFilter):
     def __str__(self):
         """
         Gets a nicely printable string representation.
+
         :return: String representation.
         """
         return 'GradientAnisotropicDiffusion:\n' \
@@ -120,6 +128,7 @@ class RescaleIntensity(IFilter):
     def __init__(self, min_intensity, max_intensity):
         """
         Initializes a new instance of the RescaleIntensity class.
+
         :param min_intensity: The min intensity value.
         :param max_intensity: The max intensity value.
         """
@@ -128,7 +137,8 @@ class RescaleIntensity(IFilter):
 
     def execute(self, image: sitk.Image, params: IFilterParams=None) -> sitk.Image:
         """
-        Executes an intensity rescaling on an image. 
+        Executes an intensity rescaling on an image.
+
         :param image: The image.
         :param params: The intensity rescaling filter parameters (None since no parameters are used).
         :return: The intensity rescaled image.
@@ -139,6 +149,7 @@ class RescaleIntensity(IFilter):
     def __str__(self):
         """
         Gets a nicely printable string representation.
+
         :return: String representation.
         """
         return 'RescaleIntensity:\n' \

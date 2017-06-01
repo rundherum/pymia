@@ -44,6 +44,7 @@ class IMetric(metaclass=ABCMeta):
     def __str__(self):
         """
         Gets a nicely printable string representation.
+
         :return: String representation.
         """
         return '{self.metric}' \

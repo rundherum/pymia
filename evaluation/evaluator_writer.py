@@ -12,6 +12,7 @@ class IEvaluatorWriter(metaclass=ABCMeta):
     def write(self, data: list):
         """
         Writes the evaluation results.
+
         :param data: The evaluation data.
         :type data: list
         """
@@ -21,6 +22,7 @@ class IEvaluatorWriter(metaclass=ABCMeta):
     def write_header(self, header: list):
         """
         Writes the evaluation header.
+
         :param header: The evaluation header.
         :type header: list
         """
@@ -35,6 +37,7 @@ class CSVEvaluatorWriter(IEvaluatorWriter):
     def __init__(self, path: str):
         """
         Initializes a new instance of the CSVEvaluatorWriter class.
+
         :param path: The file path.
         :type path: str
         """
@@ -51,6 +54,7 @@ class CSVEvaluatorWriter(IEvaluatorWriter):
     def write(self, data: list):
         """
         Writes the evaluation results.
+
         :param data: The evaluation data.
         :type data: list
         """
@@ -61,6 +65,7 @@ class CSVEvaluatorWriter(IEvaluatorWriter):
     def write_header(self, header: list):
         """
         Writes the evaluation header.
+
         :param header: The evaluation header.
         :type header: list
         """
@@ -70,6 +75,7 @@ class CSVEvaluatorWriter(IEvaluatorWriter):
     def write_line(self, data: list):
         """
         Writes a line.
+
         :param data: The data.
         :type data: list
         """
@@ -86,6 +92,7 @@ class ConsoleEvaluatorWriter(IEvaluatorWriter):
     def __init__(self, precision: int=3):
         """
         Initializes a new instance of the ConsoleEvaluatorWriter class.
+
         :param precision: The float precision.
         :type precision: int
         """
@@ -97,6 +104,7 @@ class ConsoleEvaluatorWriter(IEvaluatorWriter):
     def write(self, data: list):
         """
         Writes the evaluation results.
+
         :param data: The evaluation data.
         :type data: list of list, e.g. [["PATIENT1", "BACKGROUND", 0.90], ["PATIENT1", "TUMOR", "0.62"]]
         """
@@ -118,6 +126,7 @@ class ConsoleEvaluatorWriter(IEvaluatorWriter):
     def write_header(self, header: list):
         """
         Writes the evaluation header.
+
         :param header: The evaluation header.
         :type header: list of str
         """

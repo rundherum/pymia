@@ -11,6 +11,7 @@ class LeaveOneOutCrossValidator:
     def __init__(self, n: int):
         """
         Initializes a new instance of the LeaveOneOutCrossValidator class.
+
         :param n: The number of samples.
         :type n: int
         """
@@ -20,6 +21,7 @@ class LeaveOneOutCrossValidator:
     def __iter__(self):
         """
         Gets an iterator object.
+
         :return: self
         :rtype: LeaveOneOutCrossValidator
         """
@@ -28,6 +30,7 @@ class LeaveOneOutCrossValidator:
     def __next__(self):
         """
         Generates the next training and testing indices.
+
         :return: (train, test) the training and testing indices.
         """
         if self.i < self.n:
@@ -42,6 +45,7 @@ class LeaveOneOutCrossValidator:
     def __str__(self):
         """
         Gets a nicely printable string representation.
+
         :return: String representation.
         """
         return 'LeaveOneOutCrossValidator:\n' \
