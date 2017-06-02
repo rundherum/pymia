@@ -53,8 +53,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'PythonCommon'
-copyright = '2017, Fabian Balsiger'
+project = 'miapy'
+copyright = '2017, MIA group, ISTB, University of Bern'
 author = 'Fabian Balsiger'
 
 # The version info for the project you're documenting, acts as replacement for
