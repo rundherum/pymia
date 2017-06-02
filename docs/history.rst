@@ -1,7 +1,13 @@
+=======
 History
 =======
 
-0.1.0 (2017-06)
-+++++++++++++++
+miapy is being actively developed since June 2017.
 
- * First release
+0.1.0 (2017-06-02)
+------------------
+
+ * Initial release with the packages
+    * evaluation
+    * filtering
+    * image
