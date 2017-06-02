@@ -2,8 +2,10 @@
 import csv
 import os
 from abc import ABCMeta, abstractmethod
+
 import SimpleITK as sitk
-from evaluation.metric import IMetric, IConfusionMatrixMetric, ConfusionMatrix
+
+from miapy.evaluation.metric import IMetric, IConfusionMatrixMetric, ConfusionMatrix
 
 
 class IEvaluatorWriter(metaclass=ABCMeta):

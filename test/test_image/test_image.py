@@ -1,6 +1,8 @@
-import SimpleITK as sitk
 from unittest import TestCase
-from image.image import ImageProperties
+
+import SimpleITK as sitk
+
+from miapy.image.image import ImageProperties
 
 
 class TestImageProperties(TestCase):
