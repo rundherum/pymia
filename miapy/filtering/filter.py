@@ -37,12 +37,12 @@ class FilterPipeline:
         self.filters = []  # holds the `IFilter`s
         self.params = []  # holds image-specific parameters
 
-    def add_filter(self, filter: IFilter):
+    def add_filter(self, filter_: IFilter):
 
-        if filter is None:
+        if filter_ is None:
             raise ValueError("The parameter filter needs to be specified.")
 
-        self.filters.append(filter)
+        self.filters.append(filter_)
         self.params.append(None)  # params must have the same length as filters
 
     def set_param(self, params, filter_index):
@@ -61,8 +61,8 @@ class FilterPipeline:
         :param image: The image.
         :return: The filtered image.
         """
-        for param_index, filter in enumerate(self.filters):
-            image = filter.execute(image, self.params[param_index])
+        for param_index, filter_ in enumerate(self.filters):
+            image = filter_.execute(image, self.params[param_index])
 
         return image
 
@@ -75,7 +75,7 @@ class FilterPipeline:
 
         string = 'FilterPipeline:\n'
 
-        for filter_no, filter in enumerate(self.filters):
-            string += " " + str(filter_no + 1) + ". " + "    ".join(str(filter).splitlines(True))
+        for filter_no, filter_ in enumerate(self.filters):
+            string += " " + str(filter_no + 1) + ". " + "    ".join(str(filter_).splitlines(True))
 
         return string.format(self=self)
