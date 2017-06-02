@@ -5,8 +5,8 @@ Evaluation (:mod:`evaluation` package)
 
 This package provides an easy way to evaluate the performance of your algorithms.
 
-We provide an :class:`evaluator.Evaluator` and two writers (:class:`evaluator.CSVEvaluatorWriter`
-and :class:`evaluator.ConsoleEvaluatorWriter`), which can be used with a large amount of metrics
+We provide an :class:`evaluator.Evaluator` and two writers (:class:`evaluator.CSVEvaluatorWriter`)
+and (:class:`evaluator.ConsoleEvaluatorWriter`), which can be used with a large amount of metrics
 (see :mod:`evaluation.metric`).
 
 
@@ -20,6 +20,9 @@ The evaluator module (:mod:`evaluation.evaluator`)
 .. autoclass:: evaluation.evaluator.Evaluator
 
 .. autoclass:: evaluation.evaluator.CSVEvaluatorWriter
+
+.. autoclass:: evaluation.evaluator.ConsoleEvaluatorWriter
+
 
 The metric module (:mod:`evaluation.metric`)
 ********************************************
