@@ -22,7 +22,7 @@ import sys
 import os
 
 sys.path.insert(0, os.path.abspath('.'))  # docs directory
-sys.path.insert(0, os.path.abspath('..'))  # root directory of project
+sys.path.insert(0, os.path.abspath('../miapy'))  # root directory of project
 
 # -- General configuration ------------------------------------------------
 
