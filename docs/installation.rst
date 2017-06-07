@@ -92,3 +92,6 @@ To finish the configuration press *c* again and then generate the make file by p
 
     sudo make -j<number-of-your-processors>
     sudo make install
+
+
+https://itk.org/ITKSoftwareGuide/html/Book1/ITKSoftwareGuide-Book1ch3.html#x32-420003.7
