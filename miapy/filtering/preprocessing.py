@@ -44,7 +44,10 @@ class BiasFieldCorrector(IFilter):
         :param params: The bias field correction filter parameters.
         :return: The bias field corrected image.
         """
-        sitk.N4BiasFieldCorrection()
+
+        if params is None:
+            raise ValueError("params need to be provided")
+
         return sitk.N4BiasFieldCorrection(image,
                                           params.mask, self.shrink_factor,
                                           self.number_of_iterations,
