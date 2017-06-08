@@ -1,6 +1,5 @@
 import SimpleITK as sitk
-
-from miapy.filtering import IFilter, IFilterParams
+from miapy.filtering.filter import IFilter, IFilterParams
 
 
 class BiasFieldCorrectorParams(IFilterParams):
