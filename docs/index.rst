@@ -21,6 +21,7 @@
     evaluation
     filtering
     image
+    plotting
 
 Indices and Tables
 ==================
