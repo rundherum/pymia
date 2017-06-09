@@ -12,6 +12,7 @@ with open('LICENSE') as f:
     license_ = f.read()
 
 REQUIRED_PACKAGES = [
+    'matplotlib >= 2.0.2',
     'numpy >= 1.12.1',
     'SimpleITK >= 1.0.0',
     'sphinx >= 1.6',
