@@ -23,9 +23,8 @@
     image
     plotting
 
-Indices and Tables
-==================
+Indices
+=======
 
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`

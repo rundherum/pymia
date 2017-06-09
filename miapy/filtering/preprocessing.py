@@ -1,3 +1,4 @@
+"""Enables the enhancement of images before their use with other algorithms."""
 import SimpleITK as sitk
 from miapy.filtering.filter import IFilter, IFilterParams
 
@@ -159,3 +160,7 @@ class RescaleIntensity(IFilter):
                ' min_intensity: {self.min_intensity}\n' \
                ' max_intensity: {self.max_intensity}\n' \
             .format(self=self)
+
+
+class HistogramMatcher:
+    """A learning method to align the intensity ranges of images."""

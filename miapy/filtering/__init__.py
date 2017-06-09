@@ -6,24 +6,21 @@ Image filtering and manipulation (:mod:`filtering` package)
 This package contains various image filters and image manipulation functions.
 
 Filter pipeline (:mod:`filtering.filter`)
-=========================================
+-----------------------------------------
 
-We provide an easy way to set up a filtering pipeline.
+.. automodule:: filtering.filter
+    :members:
 
+Pre-processing (:mod:`filtering.preprocessing`)
+-----------------------------------------------
 
-Pre-processing filters (:mod:`filtering.preprocessing`)
-=======================================================
+.. automodule:: filtering.preprocessing
+    :members:
 
-Contains various filters that can be used for pre-processing.
+Registration (:mod:`filtering.registration`)
+--------------------------------------------
 
+.. automodule:: filtering.registration
+    :members:
 
-
-Intensity range standardization :mod:`medpy.filter.IntensityRangeStandardization`
-=================================================================================
-A learning method to align the intensity ranges of images.
-.. module:: medpy.filter.IntensityRangeStandardization
-.. autosummary::
-    :toctree: generated/
-
-    IntensityRangeStandardization
 """

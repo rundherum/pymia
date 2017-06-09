@@ -1,3 +1,4 @@
+"""We provide an easy way to set up a filtering pipeline. All modules in this package implement..."""
 import SimpleITK as sitk
 from abc import ABCMeta, abstractmethod
 

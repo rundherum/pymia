@@ -13,7 +13,7 @@ Before you use PyCharm, ensure that you have been added
 and specify the parent directory and directory name (miapy)
 
 Use miapy in another project
------------------------------
+----------------------------
 
 If you have a existing project and you would like to use miapy, you can add it as additional project.
 

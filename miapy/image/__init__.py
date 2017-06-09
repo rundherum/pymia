@@ -5,11 +5,10 @@ Image conversion (:mod:`image` package)
 
 This package provides functionalities for converting images, as well as the handling of image properties.
 
-Reading the image properties
-============================
-.. module:: image.image
-.. autosummary::
+SimpleITK <> numpy (:mod:`image.image`)
+---------------------------------------
 
-    ImageProperties
+.. automodule:: image.image
+    :members:
 
 """

@@ -1,3 +1,4 @@
+"""Some doc about registration"""
 import SimpleITK as sitk
 from miapy.filtering.filter import IFilter, IFilterParams
 
