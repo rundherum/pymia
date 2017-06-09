@@ -5,6 +5,20 @@ Contribution
 You can contribute to this repository your own code and improve the existing one.
 Please read this chapter carefully to hold a certain standard in code quality.
 
+Code Style
+----------
+We follow the `PEP 8 -- Style Guide for Python Code <https://www.python.org/dev/peps/pep-0008/>`_.
+
+Code Documentation
+------------------
+Please document your code. Each package, module, class, and function should have a comment.
+For major changes it might also be good to update the documentation you are currently reading.
+It is generated with `Sphinx <http://www.sphinx-doc.org>`_ and you can find the source files in the ``./docs`` directory.
+
+Code Tests
+----------
+You do write tests, don't you? They are located in the ``./test`` directory.
+
 Commit Messages
 ---------------
 The commit messages follow the
@@ -17,8 +31,8 @@ with the following format::
     <BLANK LINE>
     <footer>
 
-Usually the subject line (``<type>: <subject>``) is enough.
-It contains a succinct description of the change. Allowed ``<type>`` are:
+Usually the first line is enough, i.e. ``<type>: <subject>`` .
+It contains a succinct description of the change. Allowed ``<type>`` s are:
 
  * feat (feature)
  * fix (bug fix)
@@ -29,16 +43,3 @@ It contains a succinct description of the change. Allowed ``<type>`` are:
  * chore (maintain)
 
 An example would be: ``feat: Dice coefficient``
-
-Code Documentation
-------------------
-Please document your code. Each package, module, class, and function should have a comment.
-Don't forget to add a documentation to Sphinx (reStructuredText).
-
-Code Style
-----------
-We follow the `PEP 8 -- Style Guide for Python Code <https://www.python.org/dev/peps/pep-0008/>`_.
-
-Tests
------
-You do write tests, don't you? =) They are located in the ``./test`` directory.
