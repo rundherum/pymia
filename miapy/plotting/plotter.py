@@ -1,3 +1,7 @@
+"""Enables the plotting of images for presentation and documentation purposes using the ``matplotlib`` library.
+
+Refer also to `SimpleITK Notebooks
+<http://insightsoftwareconsortium.github.io/SimpleITK-Notebooks/10_matplotlib's_imshow.html>`_."""
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
