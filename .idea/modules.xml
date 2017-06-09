@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/PythonCommon.iml" filepath="$PROJECT_DIR$/.idea/PythonCommon.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/miapy.iml" filepath="$PROJECT_DIR$/.idea/miapy.iml" />
     </modules>
   </component>
 </project>

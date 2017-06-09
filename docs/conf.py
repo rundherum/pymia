@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# PythonCommon documentation build configuration file, created by
+# miapy documentation build configuration file, created by
 # sphinx-quickstart on Tue May 30 21:31:00 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -108,7 +108,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'PythonCommondoc'
+htmlhelp_basename = 'miapydoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -135,7 +135,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'PythonCommon.tex', 'PythonCommon Documentation',
+    (master_doc, 'miapy.tex', 'miapy Documentation',
      'Fabian Balsiger', 'manual'),
 ]
 
@@ -145,7 +145,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'pythoncommon', 'PythonCommon Documentation',
+    (master_doc, 'miapy', 'miapy Documentation',
      [author], 1)
 ]
 
@@ -156,7 +156,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'PythonCommon', 'PythonCommon Documentation',
-     author, 'PythonCommon', 'One line description of project.',
+    (master_doc, 'miapy', 'miapy Documentation',
+     author, 'miapy', 'One line description of project.',
      'Miscellaneous'),
 ]

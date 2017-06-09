@@ -23,13 +23,13 @@ TEST_PACKAGES = [
 ]
 
 setup(
-    name='PythonCommon',
+    name='miapy',
     version='0.1.0',
-    description='PythonCommon helps MIA',
+    description='miapy facilitates medical image analysis',
     long_description=readme,
     author='Medical Image Analysis Group',
     author_email='fabian.balsiger@istb.unibe.ch',
-    url='https://github.com/istb-mia/PythonCommon',
+    url='https://github.com/istb-mia/miapy',
     license=license_,
     packages=find_packages(exclude=['test', 'docs']),
     install_requires=REQUIRED_PACKAGES,
