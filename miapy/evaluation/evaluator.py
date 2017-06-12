@@ -2,9 +2,9 @@
 import csv
 import os
 from abc import ABCMeta, abstractmethod
-
+from typing import Union
 import SimpleITK as sitk
-
+import numpy as np
 from miapy.evaluation.metric import IMetric, IConfusionMatrixMetric, ConfusionMatrix
 
 
@@ -209,7 +209,8 @@ class Evaluator:
         self.writers.append(writer)
         self.is_header_written = False  # re-write header
 
-    def evaluate(self, image: sitk.Image, ground_truth: sitk.Image, evaluation_id: str):
+    def evaluate(self, image: Union[sitk.Image, np.ndarray], ground_truth: Union[sitk.Image, np.ndarray],
+                 evaluation_id: str):
         """
         Evaluates the metrics on the provided image and ground truth image.
 
@@ -224,8 +225,12 @@ class Evaluator:
         if not self.is_header_written:
             self.write_header()
 
-        image_arr = sitk.GetArrayFromImage(image).flatten()
-        ground_truth_arr = sitk.GetArrayFromImage(ground_truth).flatten()
+        if isinstance(image, sitk.Image):
+            image = sitk.GetArrayFromImage(image)
+        if isinstance(ground_truth, sitk.Image):
+            ground_truth = sitk.GetArrayFromImage(ground_truth)
+        image_arr = image.flatten()
+        ground_truth_arr = ground_truth.flatten()
 
         results = []  # clear results
 
