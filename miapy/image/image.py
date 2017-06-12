@@ -3,6 +3,8 @@ This module holds classes related to images.
 A strong focus is given to ITK images and numpy arrays.
 """
 import SimpleITK as sitk
+import numpy as np
+from typing import Tuple
 
 
 class ImageProperties:
@@ -131,17 +133,18 @@ class NumpySimpleITKImageBridge:
 
 class SimpleITKNumpyImageBridge:
     """
-    Represents a SimpleITK to numpy bridge.
-    It provides static methods to convert between SimpleITK image and numpy array.
+    A SimpleITK to numpy bridge, which provides static methods to convert between SimpleITK image and numpy array.
     """
 
     @staticmethod
-    def convert(image: sitk.Image):
+    def convert(image: sitk.Image) -> Tuple[np.ndarray, ImageProperties]:
         """
-        Converts
+        Converts an image to a numpy array and an ImageProperties class.
 
-        :param image: The image. 
-        :return: (array, info): The image as numpy array and the ImageProperties.
+        :param image: The image.
+        :type image: sitk.Image
+        :return: (array, properties): The image as numpy array and the image properties as ImageProperties.
+        :rtype: Tuple[np.ndarray, ImageProperties]
         """
-        # todo comment
+
         return sitk.GetArrayFromImage(image), ImageProperties(image)
