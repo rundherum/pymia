@@ -72,31 +72,39 @@ class ImageProperties:
 
 class NumpySimpleITKImageBridge:
     """
-    Represents a numpy to SimpleITK bridge.
-    It provides static methods to convert between numpy array and SimpleITK image.
+    A numpy to SimpleITK bridge, which provides static methods to convert between numpy array and SimpleITK image.
     """
 
     @staticmethod
-    def convert(array, properties: ImageProperties) -> sitk.Image:
+    def convert(array: np.ndarray, properties: ImageProperties) -> sitk.Image:
         """
-        Converts a one-dimensional numpy array to a SimpleITK image.
+        Converts a numpy array to a SimpleITK image.
 
-        :param array: The image as numpy one-dimensional array, e.g. shape=(n,), where n = total number of voxels.
+        :param array: The image as numpy array. The shape can be either:
+            - shape=(n,), where n = total number of voxels
+            - shape=(n,v), where n = total number of voxels and v = number of components per pixel (vector image)
+            - shape=(<reversed image size>), what you get from itk.GetArrayFromImage
+        :type array: np.ndarray
         :param properties: The image information.
-        :return: The SimpleITK image. 
+        :type properties: ImageProperties
+        :return: The SimpleITK image.
+        :rtype: sitk.Image
         """
 
-        if not properties.is_vector_image() and array.ndim != 1:
-            raise ValueError("array needs to be one-dimensional")
+        if not array.shape == properties.size[::-1]:
+            # we need to reshape the array
 
-        if properties.is_vector_image() and array.ndim != 2:
-            raise ValueError("array needs to be two-dimensional")
+            if not properties.is_vector_image() and array.ndim != 1:
+                raise ValueError("array needs to be one-dimensional")
 
-        # reshape array
-        if not properties.is_vector_image():
-            array = array.reshape(properties.size[::-1])
-        else:
-            array = array.reshape((properties.size[::-1] + (properties.number_of_components_per_pixel, )))
+            if properties.is_vector_image() and array.ndim != 2:
+                raise ValueError("array needs to be two-dimensional")
+
+            # reshape array
+            if not properties.is_vector_image():
+                array = array.reshape(properties.size[::-1])
+            else:
+                array = array.reshape((properties.size[::-1] + (properties.number_of_components_per_pixel, )))
 
         image = sitk.GetImageFromArray(array)
         image.SetOrigin(properties.origin)
@@ -106,7 +114,7 @@ class NumpySimpleITKImageBridge:
         return image
 
     @staticmethod
-    def convert_to_vector_image(array, properties: ImageProperties) -> sitk.Image:
+    def convert_to_vector_image(array: np.ndarray, properties: ImageProperties) -> sitk.Image:
         """
         Converts a two-dimensional numpy array to a SimpleITK vector image with the properties of a scalar image.
 
