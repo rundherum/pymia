@@ -162,16 +162,16 @@ class Evaluator:
     Patient1;Nerve;0.70692469107;0.842776093884
     """
 
-    def __init__(self, writer: IEvaluatorWriter):
+    def __init__(self, writer: IEvaluatorWriter=None):
         """
         Initializes a new instance of the Evaluator class.
 
-        :param writer: An evaluator writer.
+        :param writer: One evaluator writer.
         :type writer: IEvaluatorWriter
         """
 
         self.metrics = []  # list of IMetrics
-        self.writers = [writer]  # list of IEvaluatorWriters
+        self.writers = [writer] if writer is not None else []  # list of IEvaluatorWriters
         self.labels = {}  # dictionary of label: label_str
         self.is_header_written = False
 
