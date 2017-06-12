@@ -160,6 +160,10 @@ $RECYCLE.BIN/
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff:
+.idea/**/*.iml
+.idea/**/misc.xml
+.idea/**/modules.xml
+.idea/**/vcs.xml
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/dictionaries
@@ -199,8 +203,6 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
-
-# PyCharm
 
 # Sonarlint plugin
 .idea/sonarlint
