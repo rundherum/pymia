@@ -23,6 +23,14 @@ class RigidMultiModalRegistration(IFilter):
     - Mutual information similarity metric
     - Linear interpolation
     - Gradient descent optimization
+
+    Example:
+
+    >>> fixed_image = sitk.ReadImage("/path/to/image/fixed.mha")
+    >>> moving_image = sitk.ReadImage("/path/to/image/moving.mha")
+    >>> registration = RigidMultiModalRegistration()  # specify parameters to your needs
+    >>> parameters = RigidMultiModalRegistrationParams(fixed_image)
+    >>> registered_image = reg.execute(moving, parameters)
     """
 
     def __init__(self,
