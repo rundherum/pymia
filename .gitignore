@@ -201,11 +201,6 @@ crashlytics-build.properties
 fabric.properties
 
 # PyCharm
-*.iml
-modules.xml
-.idea/misc.xml
-.idea/vcs.xml
-.ipr
 
 # Sonarlint plugin
 .idea/sonarlint
