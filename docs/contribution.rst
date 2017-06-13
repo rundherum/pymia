@@ -12,10 +12,9 @@ We follow the `PEP 8 -- Style Guide for Python Code <https://www.python.org/dev/
 Code Documentation
 ------------------
 Please document your code. Each package, module, class, and function should have a comment.
+We use `Google style docstrings <http://google.github.io/styleguide/pyguide.html#Comments>`_.
 For major changes it might also be good to update the documentation you are currently reading.
 It is generated with `Sphinx <http://www.sphinx-doc.org>`_ and you can find the source files in the ``./docs`` directory.
-
-TODO(fabianbalsiger): switch to Google Python Style? http://sphinxcontrib-napoleon.readthedocs.io/en/latest/index.html
 
 Code Tests
 ----------
