@@ -10,7 +10,7 @@ Before you use PyCharm, ensure that you have been added
 1. Open PyCharm
 2. In the main menu select VCS > Checkout from Version Control > GitHub
 3. The Clone Repository dialog appears. Select the https://github.com/istb-mia/miapy.git
-and specify the parent directory and directory name (miapy)
+    and specify the parent directory and directory name (miapy)
 
 Use miapy in another project
 ----------------------------
