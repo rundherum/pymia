@@ -25,6 +25,7 @@ class ImageProperties:
         self.direction = image.GetDirection()
         self.dimensions = image.GetDimension()
         self.number_of_components_per_pixel = image.GetNumberOfComponentsPerPixel()
+        self.pixel_id = image.GetPixelID()
 
     def is_two_dimensional(self) -> bool:
         """
@@ -122,7 +123,7 @@ class NumpySimpleITKImageBridge:
         :type array: np.ndarray
         :param properties: The image properties (scalar image; otherwise use convert()).
         :type properties: ImageProperties
-        :return: The SimpleITK image. 
+        :return: The SimpleITK image.
         :rtype: sitk.Image
         """
 
@@ -140,19 +141,20 @@ class NumpySimpleITKImageBridge:
 
 
 class SimpleITKNumpyImageBridge:
-    """
-    A SimpleITK to numpy bridge, which provides static methods to convert between SimpleITK image and numpy array.
+    """A SimpleITK to numpy bridge.
+
+    Converts SimpleITK images to numpy arrays. Use the ``NumpySimpleITKImageBridge`` to convert back.
     """
 
     @staticmethod
     def convert(image: sitk.Image) -> Tuple[np.ndarray, ImageProperties]:
-        """
-        Converts an image to a numpy array and an ImageProperties class.
+        """Converts an image to a numpy array and an ImageProperties class.
 
-        :param image: The image.
-        :type image: sitk.Image
-        :return: (array, properties): The image as numpy array and the image properties as ImageProperties.
-        :rtype: Tuple[np.ndarray, ImageProperties]
+        Args:
+            image (SimpleITK.Image): The image.
+
+        Returns:
+            A Tuple[np.ndarray, ImageProperties]: The image as numpy array and the image properties.
         """
 
         return sitk.GetArrayFromImage(image), ImageProperties(image)
