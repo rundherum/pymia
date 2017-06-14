@@ -12,6 +12,8 @@ We follow the `PEP 8 -- Style Guide for Python Code <https://www.python.org/dev/
 Code Documentation
 ------------------
 Please document your code. Each package, module, class, and function should have a comment.
+We use `Google style docstrings <http://google.github.io/styleguide/pyguide.html#Comments>`_ and you can find
+a great example `here <http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html>`_.
 For major changes it might also be good to update the documentation you are currently reading.
 It is generated with `Sphinx <http://www.sphinx-doc.org>`_ and you can find the source files in the ``./docs`` directory.
 
@@ -31,7 +33,7 @@ with the following format::
     <BLANK LINE>
     <footer>
 
-Usually the first line is enough, i.e. ``<type>: <subject>`` .
+Usually the first line is enough, i.e. ``<type>(<scope>): <subject>`` .
 It contains a succinct description of the change. Allowed ``<type>`` s are:
 
  * feat (feature)
@@ -42,4 +44,12 @@ It contains a succinct description of the change. Allowed ``<type>`` s are:
  * test (when adding missing tests)
  * chore (maintain)
 
-An example would be: ``feat: Dice coefficient``
+An example would be: ``feat(DiceCoefficient): add Dice coefficient``
+
+TODOs
+-----
+Mark todos like this::
+
+    # TODO(<name>): improve performance by vectorization
+
+Where ``<name>`` should be replaced by your GitHub name.
