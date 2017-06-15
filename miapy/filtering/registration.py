@@ -1,9 +1,9 @@
 """Some doc about registration"""
 import SimpleITK as sitk
-from miapy.filtering.filter import IFilter, IFilterParams
+import miapy.filtering.filter as fltr
 
 
-class RigidMultiModalRegistrationParams(IFilterParams):
+class RigidMultiModalRegistrationParams(fltr.IFilterParams):
 
     def __init__(self, fixed_image: sitk.Image):
         """
@@ -15,7 +15,7 @@ class RigidMultiModalRegistrationParams(IFilterParams):
         self.fixed_image = fixed_image
 
 
-class RigidMultiModalRegistration(IFilter):
+class RigidMultiModalRegistration(fltr.IFilter):
     """
     Represents a multi-modal image registration filter.
 
