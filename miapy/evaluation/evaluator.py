@@ -175,12 +175,12 @@ class Evaluator:
         self.labels = {}  # dictionary of label: label_str
         self.is_header_written = False
 
-    def add_label(self, label: int, description: str):
+    def add_label(self, label: Union[tuple, int], description: str):
         """
         Adds a label with its description to the evaluation.
 
-        :param label: The label.
-        :type label: int
+        :param label: The label or a tuple of labels that should be merged.
+        :type label: Union[tuple, int]
         :param description: The label's description.
         :type description: str
         """
@@ -237,23 +237,12 @@ class Evaluator:
         for label, label_str in self.labels.items():
             label_results = [evaluation_id, label_str]
 
-            # we set all values equal to label = 1 (positive) and all other = 0 (negative)
-            predictions = image_arr.copy()
-            labels = ground_truth_arr.copy()
-
-            if label != 0:
-                predictions[predictions != label] = 0
-                predictions[predictions == label] = 1
-                labels[labels != label] = 0
-                labels[labels == label] = 1
-            else:
-                max_value = max(predictions.max(), labels.max()) + 1
-                predictions[predictions == label] = max_value
-                predictions[predictions != max_value] = 0
-                predictions[predictions == max_value] = 1
-                labels[labels == label] = max_value
-                labels[labels != max_value] = 0
-                labels[labels == max_value] = 1
+            predictions = np.zeros_like(image_arr, dtype=np.bool)
+            mask = np.in1d(image_arr.ravel(), label, True).reshape(image_arr.shape)
+            predictions[mask] = 1
+            labels = np.zeros_like(ground_truth_arr, dtype=np.bool)
+            mask = np.in1d(ground_truth_arr.ravel(), label, True).reshape(ground_truth_arr.shape)
+            labels[mask] = 1
 
             # calculate the confusion matrix (used for most metrics)
             confusion_matrix = ConfusionMatrix(predictions, labels)
