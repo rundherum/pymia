@@ -65,6 +65,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs/_static/
 
 # PyBuilder
 target/
@@ -230,8 +231,3 @@ xcuserdata/
 *.moved-aside
 *.xccheckout
 *.xcscmblueprint
-docs/_static/
-/.idea/vcs.xml
-/.idea/modules.xml
-/.idea/misc.xml
-/.idea/miapy.iml
