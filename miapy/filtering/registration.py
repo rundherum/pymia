@@ -1,30 +1,43 @@
-"""Some doc about registration"""
+"""The registration module contains classes for image registration.
+
+Image registration aims to align two images using a particular transformation.
+miapy currently supports multi-modal rigid registration, i.e. align two images of different modalities
+using a rigid transformation (rotation, translation, reflection, or their combination).
+
+See Also:
+    `ITK Registration <https://itk.org/Doxygen/html/RegistrationPage.html>`_
+"""
 import SimpleITK as sitk
+
 import miapy.filtering.filter as fltr
 
 
 class RigidMultiModalRegistrationParams(fltr.IFilterParams):
+    """Represents parameters for the multi-modal rigid registration."""
 
-    def __init__(self, fixed_image: sitk.Image):
-        """
-        Initializes a new instance of the RigidMultiModalRegistrationParams class.
+    def __init__(self, fixed_image: sitk.Image, verbose: bool=True):
+        """Initializes a new instance of the RigidMultiModalRegistrationParams class.
 
-        :param fixed_image: The fixed image for the registration.
-        :type fixed_image: sitk.Image
+        Args:
+            fixed_image (sitk.Image): The fixed image for the registration.
+            verbose (bool): Verbose command line output if True; otherwise, not.
         """
+
         self.fixed_image = fixed_image
+        self.verbose = verbose
 
 
 class RigidMultiModalRegistration(fltr.IFilter):
-    """
-    Represents a multi-modal image registration filter.
+    """Represents a multi-modal rigid image registration filter.
 
     The filter estimates a 3-dimensional rigid transformation between images of different modalities using
     - Mutual information similarity metric
     - Linear interpolation
     - Gradient descent optimization
 
-    Example:
+    Examples:
+
+    The following example shows the usage of the RigidMultiModalRegistration class.
 
     >>> fixed_image = sitk.ReadImage("/path/to/image/fixed.mha")
     >>> moving_image = sitk.ReadImage("/path/to/image/moving.mha")
@@ -40,13 +53,15 @@ class RigidMultiModalRegistration(fltr.IFilter):
                  number_of_iterations: int=200,
                  shrink_factors: [int]=[4, 2, 1],
                  smoothing_sigmas: [float]=[2, 1, 0]):
-        """
-        Initializes a new instance of the MultiModalRegistration class.
+        """Initializes a new instance of the MultiModalRegistration class.
 
-        :param number_of_histogram_bins: The number of histogram bins.
-        :type number_of_histogram_bins: int
-        :param number_of_iterations: The maximum number of optimization iterations.
-        :type number_of_iterations: int
+        Args:
+            number_of_histogram_bins (int): The number of histogram bins.
+            learning_rate (float): The optimizer's learning rate.
+            step_size (float): the optimizer's step size.
+            number_of_iterations (int): The maximum number of optimization iterations.
+            shrink_factors ([int]): The shrink factors at each shrinking level (from high to low).
+            smoothing_sigmas ([int]):  The Gaussian sigmas for smoothing at each shrinking level.
         """
 
         if len(shrink_factors) != len(smoothing_sigmas):
@@ -63,9 +78,10 @@ class RigidMultiModalRegistration(fltr.IFilter):
 
         # similarity metric
         # will compare how well the two images match each other
+        # registration.SetMetricAsJointHistogramMutualInformation(self.number_of_histogram_bins, 1.5)
         registration.SetMetricAsMattesMutualInformation(self.number_of_histogram_bins)
         registration.SetMetricSamplingStrategy(registration.RANDOM)
-        registration.SetMetricSamplingPercentage(0.1)
+        registration.SetMetricSamplingPercentage(0.01)
 
         # interpolator
         # will evaluate the intensities of the moving image at non-rigid positions
@@ -77,6 +93,10 @@ class RigidMultiModalRegistration(fltr.IFilter):
                                                               self.step_size,
                                                               self.number_of_iterations)
 
+        # registration.SetOptimizerAsGradientDescent(learningRate=1.0, numberOfIterations=200,
+        #                                            convergenceMinimumValue=1e-6, convergenceWindowSize=30)
+
+        registration.SetOptimizerScalesFromPhysicalShift()
         # setup for the multi-resolution framework
         registration.SetShrinkFactorsPerLevel(self.shrink_factors)
         registration.SetSmoothingSigmasPerLevel(self.smoothing_sigmas)
@@ -85,19 +105,18 @@ class RigidMultiModalRegistration(fltr.IFilter):
         self.registration = registration
 
     def execute(self, image: sitk.Image, params: RigidMultiModalRegistrationParams=None) -> sitk.Image:
-        """
-        Executes a rigid multi-modal registration.
+        """Executes a multi-modal rigid registration.
 
-        :param image: The moving image.
-        :type image: sitk.Image
-        :param params: The filter parameters.
-        :type params: RigidMultiModalRegistrationParams.
-        :return: The registered image.
-        :rtype: sitk.Image
+        Args:
+            image (sitk.Image): The moving image.
+            params (RigidMultiModalRegistrationParams): The parameters, which contain the fixed image.
+
+        Returns:
+            sitk.Image: The registered image.
         """
 
         if params is None:
-            raise ValueError("params need to be provided")
+            raise ValueError("params is not defined")
 
         initial_transform = sitk.CenteredTransformInitializer(sitk.Cast(params.fixed_image, image.GetPixelIDValue()),
                                                               image,
@@ -111,19 +130,20 @@ class RigidMultiModalRegistration(fltr.IFilter):
         transform = self.registration.Execute(sitk.Cast(fixed_image, sitk.sitkFloat32),
                                               sitk.Cast(image, sitk.sitkFloat32))
 
-        if self.number_of_iterations == self.registration.GetOptimizerIteration():
-            print("RigidMultiModalRegistration: Optimizer terminated at number of iterations and did not converge!")
-
-        print('Final metric value: {0}'.format(self.registration.GetMetricValue()))
-        print('Optimizer\'s stopping condition, {0}'.format(self.registration.GetOptimizerStopConditionDescription()))
+        if params.verbose:
+            print('RigidMultiModalRegistration:\n Final metric value: {0}'.format(self.registration.GetMetricValue()))
+            print(' Optimizer\'s stopping condition, {0}'.format(
+                self.registration.GetOptimizerStopConditionDescription()))
+        elif self.number_of_iterations == self.registration.GetOptimizerIteration():
+            print('RigidMultiModalRegistration: Optimizer terminated at number of iterations and did not converge!')
 
         return sitk.Resample(image, params.fixed_image, transform, sitk.sitkLinear, 0.0, image.GetPixelIDValue())
 
     def __str__(self):
-        """
-        Gets a nicely printable string representation.
+        """Gets a nicely printable string representation.
 
-        :return: String representation.
+        Returns:
+            str: The string representation.
         """
 
         return 'RigidMultiModalRegistration:\n' \
