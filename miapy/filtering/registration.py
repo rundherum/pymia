@@ -15,16 +15,14 @@ import miapy.filtering.filter as fltr
 class RigidMultiModalRegistrationParams(fltr.IFilterParams):
     """Represents parameters for the multi-modal rigid registration."""
 
-    def __init__(self, fixed_image: sitk.Image, verbose: bool=True):
+    def __init__(self, fixed_image: sitk.Image):
         """Initializes a new instance of the RigidMultiModalRegistrationParams class.
 
         Args:
             fixed_image (sitk.Image): The fixed image for the registration.
-            verbose (bool): Verbose command line output if True; otherwise, not.
         """
 
         self.fixed_image = fixed_image
-        self.verbose = verbose
 
 
 class RigidMultiModalRegistration(fltr.IFilter):
@@ -131,7 +129,7 @@ class RigidMultiModalRegistration(fltr.IFilter):
         transform = self.registration.Execute(sitk.Cast(fixed_image, sitk.sitkFloat32),
                                               sitk.Cast(image, sitk.sitkFloat32))
 
-        if params.verbose:
+        if self.verbose:
             print('RigidMultiModalRegistration:\n Final metric value: {0}'.format(self.registration.GetMetricValue()))
             print(' Optimizer\'s stopping condition, {0}'.format(
                 self.registration.GetOptimizerStopConditionDescription()))
