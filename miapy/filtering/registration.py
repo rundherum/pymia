@@ -63,6 +63,7 @@ class RigidMultiModalRegistration(fltr.IFilter):
             shrink_factors ([int]): The shrink factors at each shrinking level (from high to low).
             smoothing_sigmas ([int]):  The Gaussian sigmas for smoothing at each shrinking level.
         """
+        super().__init__()
 
         if len(shrink_factors) != len(smoothing_sigmas):
             raise ValueError("shrink_factors and smoothing_sigmas need to be same length")

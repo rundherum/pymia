@@ -4,20 +4,22 @@ from abc import ABCMeta, abstractmethod
 
 
 class IFilterParams(metaclass=ABCMeta):
-    """
-    Represents a filter parameters interface.
+    """Represents a filter parameters interface.
     """
 
 
 class IFilter(metaclass=ABCMeta):
+    """Filter base class.
     """
-    Filter interface.
-    """
+
+    def __init__(self):
+        """Initializes a new instance of the IFilter class.
+        """
+        self.verbose = False
 
     @abstractmethod
     def execute(self, image: sitk.Image, params: IFilterParams=None) -> sitk.Image:
-        """
-        Executes a filter on an image.
+        """Executes a filter on an image.
 
         :param image: The image.
         :param params: The filter parameters.
@@ -27,13 +29,11 @@ class IFilter(metaclass=ABCMeta):
 
 
 class FilterPipeline:
-    """
-    Represents a filter pipeline, which can be executed on images.
+    """Represents a filter pipeline, which can be executed on images.
     """
 
     def __init__(self):
-        """
-        Initializes a new instance of the `FilterPipeline` class.
+        """Initializes a new instance of the `FilterPipeline` class.
         """
         self.filters = []  # holds the `IFilter`s
         self.params = []  # holds image-specific parameters
@@ -47,8 +47,7 @@ class FilterPipeline:
         self.params.append(None)  # params must have the same length as filters
 
     def set_param(self, params, filter_index):
-        """
-        Sets an image-specific parameter for a filter.
+        """Sets an image-specific parameter for a filter.
 
         :param params: The parameter(s).
         :param filter_index: The filter's index.
@@ -56,8 +55,7 @@ class FilterPipeline:
         self.params[filter_index] = params
 
     def execute(self, image: sitk.Image) -> sitk.Image:
-        """
-        Executes the filter pipeline on an image.
+        """Executes the filter pipeline on an image.
 
         :param image: The image.
         :return: The filtered image.
@@ -68,8 +66,7 @@ class FilterPipeline:
         return image
 
     def __str__(self):
-        """
-        Gets a nicely printable string representation.
+        """Gets a nicely printable string representation.
 
         :return: String representation.
         """

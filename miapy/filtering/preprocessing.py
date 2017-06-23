@@ -33,6 +33,7 @@ class BiasFieldCorrector(IFilter):
         :param number_of_iterations: 
         :param number_of_fitting_levels: 
         """
+        super().__init__()
         self.shrink_factor = shrink_factor
         self.number_of_iterations = number_of_iterations
         self.number_of_fitting_levels = number_of_fitting_levels
@@ -92,6 +93,7 @@ class GradientAnisotropicDiffusion(IFilter):
         :param conductance_scaling_update_interval: 
         :param no_iterations: 
         """
+        super().__init__()
         self.time_step = time_step
         self.conductance = conductance
         self.conductance_scaling_update_interval = conductance_scaling_update_interval
@@ -136,6 +138,7 @@ class RescaleIntensity(IFilter):
         :param min_intensity: The min intensity value.
         :param max_intensity: The max intensity value.
         """
+        super().__init__()
         self.min_intensity = min_intensity
         self.max_intensity = max_intensity
 
