@@ -155,6 +155,12 @@ class SimpleITKNumpyImageBridge:
 
         Returns:
             A Tuple[np.ndarray, ImageProperties]: The image as numpy array and the image properties.
+
+        Raises:
+            ValueError: If `image` is `None`.
         """
+
+        if image is None:
+            raise ValueError('image can not be None')
 
         return sitk.GetArrayFromImage(image), ImageProperties(image)
