@@ -42,9 +42,10 @@ class TestImageProperties(TestCase):
         x = 10
         y = 10
         z = 3
+        pixel_id = sitk.sitkUInt8
         size = (x, y, z)
         direction = (0, 1, 0, 1, 0, 0, 0, 0, 1)
-        image = sitk.Image([x, y, z], sitk.sitkUInt8)
+        image = sitk.Image([x, y, z], pixel_id)
         image.SetOrigin(size)
         image.SetSpacing(size)
         image.SetDirection(direction)
@@ -56,3 +57,4 @@ class TestImageProperties(TestCase):
         self.assertEqual(dut.direction, direction)
         self.assertEqual(dut.dimensions, z)
         self.assertEqual(dut.number_of_components_per_pixel, 1)
+        self.assertEqual(dut.pixel_id, pixel_id)
