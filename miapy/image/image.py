@@ -7,17 +7,45 @@ import numpy as np
 from typing import Tuple
 
 
-class ImageProperties:
+def get_numpy_data_type(data_type: int) -> np.dtype:
+    """Gets the numpy data type for a SimpleITK data type.
+
+    Args:
+        data_type (int): A SimpleITK data type.
+
+    Returns:
+        np.dtype: The numpy data type.
+
+    See Also:
+        http://insightsoftwareconsortium.github.io/SimpleITK-Notebooks/01_Image_Basics.html
+        https://docs.scipy.org/doc/numpy-1.12.0/user/basics.types.html
+
+    TODO:
+        fabianbalsiger: complete list
     """
-    Represents ITK image properties.
-    Also refer to itk::simple::Image::CopyInformation.
+    return {
+        sitk.sitkUInt8: np.uint8,
+        sitk.sitkInt8: np.int8,
+    }.get(data_type, np.float32)
+
+
+class ImageProperties:
+    """Represents ITK image properties.
+
+    Holds common ITK image meta-data such as the size, origin, spacing, and direction.
+
+    See Also:
+        SimpleITK provides `itk::simple::Image::CopyInformation`_ to copy image information.
+
+    .. _itk::simple::Image::CopyInformation:
+        https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1Image.html#afa8a4757400c414e809d1767ee616bd0
     """
 
     def __init__(self, image: sitk.Image):
-        """
-        Initializes a new instance of the ImageInformation class.
+        """Initializes a new instance of the ImageInformation class.
 
-        :param image: The image.
+        Args:
+            image (sitk.Image): The image whose properties to hold.
         """
         self.size = image.GetSize()
         self.origin = image.GetOrigin()
@@ -28,38 +56,34 @@ class ImageProperties:
         self.pixel_id = image.GetPixelID()
 
     def is_two_dimensional(self) -> bool:
-        """
-        Determines whether the image is two-dimensional.
+        """Determines whether the image is two-dimensional.
 
-        :return: True if the image is two-dimensional; otherwise, False.
-        :rtype: bool
+        Returns:
+            bool: True if the image is two-dimensional; otherwise, False.
         """
         return self.dimensions == 2
 
     def is_three_dimensional(self) -> bool:
-        """
-        Determines whether the image is three-dimensional.
+        """Determines whether the image is three-dimensional.
 
-        :return: True if the image is three-dimensional; otherwise, False.
-        :rtype: bool
+        Returns:
+            bool: True if the image is three-dimensional; otherwise, False.
         """
         return self.dimensions == 3
 
     def is_vector_image(self) -> bool:
-        """
-        Determines whether the image is a vector image.
+        """Determines whether the image is a vector image.
 
-        :return: True for vector images; False for scalar images.
-        :rtype: bool
+        Returns:
+            bool: True for vector images; False for scalar images.
         """
         return self.number_of_components_per_pixel > 1
 
     def __str__(self):
-        """
-        Gets a nicely printable string representation.
+        """Gets a printable string representation.
 
-        :return: String representation.
-        :rtype: str
+        Returns:
+            str: String representation.
         """
         return 'ImageProperties:\n' \
                ' size:                           {self.size}\n' \
@@ -68,7 +92,52 @@ class ImageProperties:
                ' direction:                      {self.direction}\n' \
                ' dimensions:                     {self.dimensions}\n' \
                ' number_of_components_per_pixel: {self.number_of_components_per_pixel}\n' \
+               ' pixel_id:                       {self.pixel_id}\n' \
             .format(self=self)
+
+    def __eq__(self, other):
+        """Determines the equality of two ImageProperties classes.
+
+        Notes
+            The equality does not include the number_of_components_per_pixel and pixel_id.
+
+        Args:
+            other (object): An ImageProperties instance or any other object.
+
+        Returns:
+            bool: True if the ImageProperties are equal; otherwise, False.
+        """
+        if isinstance(other, self.__class__):
+            return self.size == other.size and \
+                   self.origin == other.origin and \
+                   self.spacing == other.spacing and \
+                   self.direction == other.direction and \
+                   self.dimensions == other.dimensions
+        return NotImplemented
+
+    def __ne__(self, other):
+        """Determines the non-equality of two ImageProperties classes.
+
+        Notes
+            The non-equality does not include the number_of_components_per_pixel and pixel_id.
+
+        Args:
+            other (object): An ImageProperties instance or any other object.
+
+        Returns:
+            bool: True if the ImageProperties are non-equal; otherwise, False.
+        """
+        if isinstance(other, self.__class__):
+            return not self.__eq__(other)
+        return NotImplemented
+
+    def __hash__(self):
+        """Gets the hash.
+
+        Returns:
+            int: The hash of the object.
+        """
+        return hash(tuple(sorted(self.__dict__.items())))
 
 
 class NumpySimpleITKImageBridge:
