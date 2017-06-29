@@ -60,6 +60,98 @@ class TestImageProperties(TestCase):
         self.assertEqual(dut.number_of_components_per_pixel, 1)
         self.assertEqual(dut.pixel_id, pixel_id)
 
+    def test_equality(self):
+        x = 10
+        y = 10
+        z = 3
+        pixel_id = sitk.sitkUInt8
+        size = (x, y, z)
+        direction = (0, 1, 0, 1, 0, 0, 0, 0, 1)
+        image = sitk.Image([x, y, z], pixel_id)
+        image.SetOrigin(size)
+        image.SetSpacing(size)
+        image.SetDirection(direction)
+        dut1 = img.ImageProperties(image)
+        dut2 = img.ImageProperties(image)
+
+        self.assertTrue(dut1 == dut2)
+        self.assertFalse(dut1 != dut2)
+
+        image = sitk.Image([x, y, z], sitk.sitkInt8)
+        image.SetOrigin(size)
+        image.SetSpacing(size)
+        image.SetDirection(direction)
+        dut1 = img.ImageProperties(image)
+
+        self.assertTrue(dut1 == dut2)
+        self.assertFalse(dut1 != dut2)
+
+        image = sitk.Image([x, y, z], sitk.sitkVectorUInt8, 2)
+        image.SetOrigin(size)
+        image.SetSpacing(size)
+        image.SetDirection(direction)
+        dut1 = img.ImageProperties(image)
+
+        self.assertTrue(dut1 == dut2)
+        self.assertFalse(dut1 != dut2)
+
+    def test_non_equality(self):
+        x = 10
+        y = 10
+        z = 3
+        pixel_id = sitk.sitkUInt8
+        size = (x, y, z)
+        direction = (0, 1, 0, 1, 0, 0, 0, 0, 1)
+        image = sitk.Image([x, y, z], pixel_id)
+        image.SetOrigin(size)
+        image.SetSpacing(size)
+        image.SetDirection(direction)
+        dut1 = img.ImageProperties(image)
+
+        different_size = (x, y, 2)
+
+        # non-equal size
+        image = sitk.Image(different_size, pixel_id)
+        image.SetOrigin(size)
+        image.SetSpacing(size)
+        image.SetDirection(direction)
+        dut2 = img.ImageProperties(image)
+
+        self.assertFalse(dut1 == dut2)
+        self.assertTrue(dut1 != dut2)
+
+        # non-equal origin
+        image = sitk.Image(size, pixel_id)
+        image.SetOrigin(different_size)
+        image.SetSpacing(size)
+        image.SetDirection(direction)
+        dut2 = img.ImageProperties(image)
+
+        self.assertFalse(dut1 == dut2)
+        self.assertTrue(dut1 != dut2)
+
+        # non-equal spacing
+        different_size = (x, y, 2)
+        image = sitk.Image(size, pixel_id)
+        image.SetOrigin(size)
+        image.SetSpacing(different_size)
+        image.SetDirection(direction)
+        dut2 = img.ImageProperties(image)
+
+        self.assertFalse(dut1 == dut2)
+        self.assertTrue(dut1 != dut2)
+
+        # non-equal direction
+        different_size = (x, y, 2)
+        image = sitk.Image(size, pixel_id)
+        image.SetOrigin(size)
+        image.SetSpacing(size)
+        image.SetDirection((1, 0, 0, 0, 1, 0, 0, 0, 1))
+        dut2 = img.ImageProperties(image)
+
+        self.assertFalse(dut1 == dut2)
+        self.assertTrue(dut1 != dut2)
+
 
 class TestSimpleITKNumpyImageBridge(TestCase):
     def test_convert(self):
