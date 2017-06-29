@@ -25,6 +25,10 @@ class LargestNConnectedComponents(fltr.IFilter):
                 if set to True; otherwise, all components will have value 1.
         """
         super().__init__()
+
+        if not number_of_components >= 1:
+            raise ValueError("number_of_components must be larger or equal to 1")
+
         self.number_of_components = number_of_components
         self.consecutive_component_labels = consecutive_component_labels
 
