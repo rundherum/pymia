@@ -1,4 +1,4 @@
-from unittest import TestCase
+import unittest
 
 import numpy as np
 import SimpleITK as sitk
@@ -6,7 +6,7 @@ import SimpleITK as sitk
 import miapy.image.image as img
 
 
-class TestImageProperties(TestCase):
+class TestImageProperties(unittest.TestCase):
     def test_is_two_dimensional(self):
         x = 10
         y = 10
@@ -153,7 +153,7 @@ class TestImageProperties(TestCase):
         self.assertTrue(dut1 != dut2)
 
 
-class TestSimpleITKNumpyImageBridge(TestCase):
+class TestSimpleITKNumpyImageBridge(unittest.TestCase):
     def test_convert(self):
         x = 10
         y = 10
