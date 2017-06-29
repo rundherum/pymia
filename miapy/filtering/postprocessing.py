@@ -59,7 +59,7 @@ class LargestNConnectedComponents(fltr.IFilter):
             str: String representation.
         """
 
-        return 'LargestNComponents:\n' \
+        return 'LargestNConnectedComponents:\n' \
                ' number_of_components:         {self.number_of_components}\n' \
                ' consecutive_component_labels: {self.consecutive_component_labels}\n' \
             .format(self=self)
