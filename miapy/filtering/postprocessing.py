@@ -7,12 +7,13 @@ import SimpleITK as sitk
 import miapy.filtering.filter as fltr
 
 
-class LargestNComponents(fltr.IFilter):
-    """Represents a largest N components filter.
+class LargestNConnectedComponents(fltr.IFilter):
+    """Represents a largest N connected components filter.
 
-    Extracts the largest N components from a label image. By default the N components will all have the value 1 in
-    the output image. Use the `consecutive_component_labels` option such that the largest has value 1,
-    the second largest has value 2, etc. Background is assumed to be 0.
+    Extracts the largest N connected components from a label image.
+    By default the N components will all have the value 1 in the output image.
+    Use the `consecutive_component_labels` option such that the largest has value 1,
+    the second largest has value 2, etc. Background is always assumed to be 0.
     """
 
     def __init__(self, number_of_components: int = 1, consecutive_component_labels: bool = False):
@@ -28,7 +29,7 @@ class LargestNComponents(fltr.IFilter):
         self.consecutive_component_labels = consecutive_component_labels
 
     def execute(self, image: sitk.Image, params: fltr.IFilterParams = None) -> sitk.Image:
-        """Executes the largest N components filter on an image.
+        """Executes the largest N connected components filter on an image.
 
         Args:
             image (sitk.Image): The image.
