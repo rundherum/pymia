@@ -18,7 +18,7 @@ Pre-processing (:mod:`filtering.preprocessing`)
     :members:
 
 Post-processing (:mod:`filtering.postprocessing`)
------------------------------------------------
+-------------------------------------------------
 
 .. automodule:: filtering.postprocessing
     :members:
