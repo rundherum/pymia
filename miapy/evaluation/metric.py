@@ -1,6 +1,7 @@
 """metric description"""
 import math
 import numpy as np
+import SimpleITK as sitk
 from abc import ABCMeta, abstractmethod
 
 
@@ -53,23 +54,33 @@ class IMetric(metaclass=ABCMeta):
 
 
 class IConfusionMatrixMetric(IMetric):
-    """
-    Represents an evaluation metric based on the confusion matrix.
-    """
+    """Represents an evaluation metric based on the confusion matrix."""
 
     def __init__(self):
-        """
-        Initializes a new instance of the IConfusionMatrixMetric class.
-        """
+        """Initializes a new instance of the IConfusionMatrixMetric class."""
         super().__init__()
-        self.metric = "IConfusionMatrixMetric"
+        self.metric = 'IConfusionMatrixMetric'
         self.confusion_matrix = None  # ConfusionMatrix
 
     @abstractmethod
     def calculate(self):
-        """
-        Calculates the metric.
-        """
+        """Calculates the metric."""
+        raise NotImplementedError
+
+
+class ISimpleITKImageMetric(IMetric):
+    """Represents an evaluation metric based on SimpleITK images."""
+
+    def __init__(self):
+        """Initializes a new instance of the ISimpleITKImageMetric class."""
+        super(ISimpleITKImageMetric, self).__init__()
+        self.metric = 'ISimpleITKImageMetric'
+        self.ground_truth = None  # SimpleITK.Image
+        self.segmentation = None  # SimpleITK.Image
+
+    @abstractmethod
+    def calculate(self):
+        """Calculates the metric."""
         raise NotImplementedError
 
 
@@ -258,20 +269,30 @@ class GlobalConsistencyError(IConfusionMatrixMetric):
         return min(e1, e2)
 
 
-class HausdorffDistance(IMetric):
+class HausdorffDistance(ISimpleITKImageMetric):
+    """Represents a Hausdorff distance metric.
+
+    Calculates the distance between the set of non-zero pixels of two images using the following equation:
+
+    .. math:: H(A,B) = max(h(A,B), h(B,A)),
+
+    where
+
+    .. math:: d(A,B) = \\max_{a \\in A} \\min_{b \\in B} \\lVert a - b \\rVert
+
+    is the directed Hausdorff distance and :math:`A` and :math:`B` are the set of non-zero pixels in the images.
+    """
 
     def __init__(self):
-        """
-        Initializes a new instance of the HausdorffDistance class.
-        """
+        """Initializes a new instance of the HausdorffDistance class."""
         super().__init__()
         self.metric = "HDRFDST"
 
     def calculate(self):
-        """
-        Calculates the metric.
-        """
-        raise NotImplementedError
+        """Calculates the Hausdorff distance."""
+        distance_filter = sitk.HausdorffDistanceImageFilter()
+        distance_filter.Execute(self.ground_truth, self.segmentation)
+        return distance_filter.GetHausdorffDistance()
 
 
 class InterclassCorrelation(IMetric):
