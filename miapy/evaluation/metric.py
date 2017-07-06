@@ -392,20 +392,44 @@ class MahalanobisDistance(IMetric):
         raise NotImplementedError
 
 
-class MutualInformation(IMetric):
+class MutualInformation(IConfusionMatrixMetric):
+    """Represents a mutual information metric."""
 
     def __init__(self):
-        """
-        Initializes a new instance of the MutualInformation class.
-        """
+        """Initializes a new instance of the MutualInformation class."""
         super().__init__()
         self.metric = "MUTINF"
 
     def calculate(self):
-        """
-        Calculates the metric.
-        """
-        raise NotImplementedError
+        """Calculates the mutual information."""
+
+        tp = self.confusion_matrix.tp
+        tn = self.confusion_matrix.tn
+        fp = self.confusion_matrix.fp
+        fn = self.confusion_matrix.fn
+        n = self.confusion_matrix.n
+
+        fn_tp = fn + tp
+        fp_tp = fp + tp
+
+        H1 = -((fn_tp / n) * math.log2(fn_tp / n) +
+               (1 - fn_tp / n) * math.log2(1 - fn_tp / n))
+
+        H2 = -((fp_tp / n) * math.log2(fp_tp / n) +
+               (1 - fp_tp / n) * math.log2(1 - fp_tp / n))
+
+        p00 = 1 if tn == 0 else (tn / n)
+        p01 = 1 if fn == 0 else (fn / n)
+        p10 = 1 if fp == 0 else (fp / n)
+        p11 = 1 if tp == 0 else (tp / n)
+
+        H12 = -((tn / n) * math.log2(p00) +
+                (fn / n) * math.log2(p01) +
+                (fp / n) * math.log2(p10) +
+                (tp / n) * math.log2(p11))
+
+        MI = H1 + H2 - H12
+        return MI
 
 
 class Precision(IConfusionMatrixMetric):
