@@ -94,6 +94,22 @@ class ISimpleITKImageMetric(IMetric):
         raise NotImplementedError
 
 
+class INumpyArrayMetric(IMetric):
+    """Represents an evaluation metric based on numpy arrays."""
+
+    def __init__(self):
+        """Initializes a new instance of the INumpyArrayMetric class."""
+        super(INumpyArrayMetric, self).__init__()
+        self.metric = 'INumpyArrayMetric'
+        self.ground_truth = None  # np.ndarray
+        self.segmentation = None  # np.ndarray
+
+    @abstractmethod
+    def calculate(self):
+        """Calculates the metric."""
+        raise NotImplementedError
+
+
 class Accuracy(IConfusionMatrixMetric):
     """
     Represents an accuracy metric.
@@ -337,20 +353,33 @@ class HausdorffDistance(ISimpleITKImageMetric):
         return distance_filter.GetHausdorffDistance()
 
 
-class InterclassCorrelation(IMetric):
+class InterclassCorrelation(INumpyArrayMetric):
+    """Represents a interclass correlation metric."""
 
     def __init__(self):
-        """
-        Initializes a new instance of the InterclassCorrelation class.
-        """
+        """Initializes a new instance of the InterclassCorrelation class."""
         super().__init__()
         self.metric = "ICCORR"
 
     def calculate(self):
-        """
-        Calculates the metric.
-        """
-        raise NotImplementedError
+        """Calculates the interclass correlation."""
+
+        gt = self.ground_truth.flatten()
+        seg = self.segmentation.flatten()
+
+        n = gt.size
+        mean_gt = gt.mean()
+        mean_seg = seg.mean()
+        mean = (mean_gt + mean_seg) / 2
+
+        m = (gt + seg) / 2
+        ssw = np.power(gt - m, 2).sum() + np.power(seg - m, 2).sum()
+        ssb = np.power(m - mean, 2).sum()
+
+        ssw /= n
+        ssb = ssb / (n - 1) * 2
+
+        return (ssb - ssw) / (ssb + ssw)
 
 
 class JaccardCoefficient(IConfusionMatrixMetric):
@@ -457,20 +486,27 @@ class Precision(IConfusionMatrixMetric):
             return 0
 
 
-class ProbabilisticDistance(IMetric):
+class ProbabilisticDistance(INumpyArrayMetric):
+    """Represents a probabilistic distance metric."""
 
     def __init__(self):
-        """
-        Initializes a new instance of the ProbabilisticDistance class.
-        """
+        """Initializes a new instance of the ProbabilisticDistance class."""
         super().__init__()
         self.metric = "PROBDST"
 
     def calculate(self):
-        """
-        Calculates the metric.
-        """
-        raise NotImplementedError
+        """Calculates the probabilistic distance."""
+
+        gt = self.ground_truth.flatten()
+        seg = self.segmentation.flatten()
+
+        probability_diff = np.absolute(gt - seg).sum()
+        probability_joint = (gt * seg).sum()
+
+        if probability_joint != 0:
+            return probability_diff / (2 * probability_joint)
+        else:
+            return -1
 
 
 class RandIndex(IMetric):

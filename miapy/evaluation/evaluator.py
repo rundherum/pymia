@@ -5,7 +5,7 @@ from abc import ABCMeta, abstractmethod
 from typing import Union
 import SimpleITK as sitk
 import numpy as np
-from miapy.evaluation.metric import IMetric, IConfusionMatrixMetric, ConfusionMatrix
+from miapy.evaluation.metric import IMetric, IConfusionMatrixMetric, ConfusionMatrix, ISimpleITKImageMetric, INumpyArrayMetric
 
 
 class IEvaluatorWriter(metaclass=ABCMeta):
@@ -247,10 +247,28 @@ class Evaluator:
             # calculate the confusion matrix (used for most metrics)
             confusion_matrix = ConfusionMatrix(predictions, labels)
 
+            # flag indicating whether the images have been converted for ISimpleITKImageMetric
+            converted_to_image = False
+            prediction_as_image = None
+            ground_truth_as_image = None
+
             # calculate the metrics
             for param_index, metric in enumerate(self.metrics):
                 if isinstance(metric, IConfusionMatrixMetric):
                     metric.confusion_matrix = confusion_matrix
+                elif isinstance(metric, INumpyArrayMetric):
+                    metric.ground_truth = labels.astype(np.uint8)
+                    metric.segmentation = predictions.astype(np.uint8)
+                elif isinstance(metric, ISimpleITKImageMetric):
+                    if not converted_to_image:
+                        prediction_as_image = sitk.GetImageFromArray(predictions)
+                        prediction_as_image.CopyInformation(image)
+                        ground_truth_as_image = sitk.GetImageFromArray(labels)
+                        ground_truth_as_image.CopyInformation(labels)
+                        converted_to_image = True
+
+                    metric.ground_truth = ground_truth_as_image
+                    metric.segmentation = prediction_as_image
 
                 # todo add other metric instances
 
