@@ -268,8 +268,22 @@ class FMeasure(IConfusionMatrixMetric):
         """
         Calculates the Dice coefficient.
         """
+        beta = 1 # or 0.5 or 2 can also calculate F2 or F0.5 measure
 
-        raise NotImplementedError
+        beta_squared = beta * beta
+        precision = Precision()
+        precision.confusion_matrix = self.confusion_matrix
+        precision = precision.calculate()
+        recall = Recall()
+        recall.confusion_matrix = self.confusion_matrix
+        recall = recall.calculate()
+
+        denominator = beta_squared * precision + recall
+
+        if denominator != 0:
+            return (1 + beta_squared) * ((precision * recall) / denominator)
+        else:
+            return 0
 
 
 class GlobalConsistencyError(IConfusionMatrixMetric):
