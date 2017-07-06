@@ -10,6 +10,7 @@ and implement the function :func:`calculate`.
 
 """
 from abc import ABCMeta, abstractmethod
+import math
 
 import numpy as np
 import SimpleITK as sitk
@@ -34,8 +35,7 @@ class ConfusionMatrix:
         # false negative (fn): we predict a label of 0 (negative), but the true label is 1
         self.fn = np.sum(np.logical_and(prediction == 0, label == 1))
 
-        self.condition_positive = 0
-        self.condition_negative = 0
+        self.n = prediction.size
 
 
 class IMetric(metaclass=ABCMeta):
@@ -253,20 +253,16 @@ class Fallout(IConfusionMatrixMetric):
 
 
 class FMeasure(IConfusionMatrixMetric):
-    """
-    Represents a F-measure metric.
-    """
+    """Represents a F-measure metric."""
 
     def __init__(self):
-        """
-        Initializes a new instance of the FMeasure class.
-        """
+        """Initializes a new instance of the FMeasure class."""
         super().__init__()
         self.metric = "FMEASR"
 
     def calculate(self):
         """
-        Calculates the Dice coefficient.
+        Calculates the F1 measure.
         """
         beta = 1 # or 0.5 or 2 can also calculate F2 or F0.5 measure
 
@@ -514,38 +510,59 @@ class Sensitivity(IConfusionMatrixMetric):
 
 
 class Specificity(IConfusionMatrixMetric):
-    """
-    Represents a specificity metric.
-    """
+    """Represents a specificity metric."""
 
     def __init__(self):
-        """
-        Initializes a new instance of the Specificity class.
-        """
+        """Initializes a new instance of the Specificity class."""
         super().__init__()
         self.metric = "SPCFTY"
 
     def calculate(self):
-        """
-        Calculates the specificity.
-        """
+        """Calculates the specificity."""
+
         return self.confusion_matrix.tn / (self.confusion_matrix.tn + self.confusion_matrix.fp)
 
 
-class VariationOfInformation(IMetric):
+class VariationOfInformation(IConfusionMatrixMetric):
+    """Represents a variation of information metric."""
 
     def __init__(self):
-        """
-        Initializes a new instance of the VariationOfInformation class.
-        """
+        """Initializes a new instance of the VariationOfInformation class."""
         super().__init__()
         self.metric = "VARINFO"
 
     def calculate(self):
-        """
-        Calculates the metric.
-        """
-        raise NotImplementedError
+        """Calculates the variation of information."""
+
+        tp = self.confusion_matrix.tp
+        tn = self.confusion_matrix.tn
+        fp = self.confusion_matrix.fp
+        fn = self.confusion_matrix.fn
+        n = self.confusion_matrix.n
+
+        fn_tp = fn + tp
+        fp_tp = fp + tp
+
+        H1 = -((fn_tp / n) * math.log2(fn_tp / n) +
+               (1 - fn_tp / n) * math.log2(1 - fn_tp / n))
+
+        H2 = -((fp_tp / n) * math.log2(fp_tp / n) +
+               (1 - fp_tp / n) * math.log2(1 - fp_tp / n))
+
+        p00 = 1 if tn == 0 else (tn / n)
+        p01 = 1 if fn == 0 else (fn / n)
+        p10 = 1 if fp == 0 else (fp / n)
+        p11 = 1 if tp == 0 else (tp / n)
+
+        H12 = -((tn / n) * math.log2(p00) +
+                (fn / n) * math.log2(p01) +
+                (fp / n) * math.log2(p10) +
+                (tp / n) * math.log2(p11))
+
+        MI = H1 + H2 - H12
+
+        VI = H1 + H2 - 2 * MI
+        return VI
 
 
 class VolumeSimilarity(IConfusionMatrixMetric):
