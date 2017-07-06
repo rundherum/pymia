@@ -119,6 +119,25 @@ class Accuracy(IConfusionMatrixMetric):
             return 0
 
 
+class AdjustedRandIndex(IConfusionMatrixMetric):
+    """Represents an adjusted rand index metric."""
+
+    def __init__(self):
+        """Initializes a new instance of the AdjustedRandIndex class."""
+        super().__init__()
+        self.metric = "ADJRIND"
+
+    def calculate(self):
+        """Calculates the adjusted rand index."""
+
+        tp = self.confusion_matrix.tp
+        tn = self.confusion_matrix.tn
+        fp = self.confusion_matrix.fp
+        fn = self.confusion_matrix.fn
+
+        raise NotImplementedError
+
+
 class AreaUnderCurve(IConfusionMatrixMetric):
     """
     Represents an area under the curve metric.
