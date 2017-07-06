@@ -195,16 +195,19 @@ class CohenKappaMetric(IConfusionMatrixMetric):
         """
         Calculates the Cohen's kappa coefficient.
         """
-        agreement = self.confusion_matrix.tp + self.confusion_matrix.tn
-        chance0 = (self.confusion_matrix.tn + self.confusion_matrix.fn) * \
-                  (self.confusion_matrix.tn + self.confusion_matrix.fp)
-        chance1 = (self.confusion_matrix.fp + self.confusion_matrix.tp) * \
-                  (self.confusion_matrix.fn + self.confusion_matrix.tp)
-        sum = self.confusion_matrix.tp + self.confusion_matrix.tn + \
-              self.confusion_matrix.fp + self.confusion_matrix.fn
+
+        tp = self.confusion_matrix.tp
+        tn = self.confusion_matrix.tn
+        fp = self.confusion_matrix.fp
+        fn = self.confusion_matrix.fn
+
+        agreement = tp + tn
+        chance0 = (tn + fn) * (tn + fp)
+        chance1 = (fp + tp) * (fn + tp)
+        sum = tn + fn + fp + tp
         chance = (chance0 + chance1) / sum
 
-        return (agreement - chance1) / (sum - chance)
+        return (agreement - chance) / (sum - chance)
 
 
 class DiceCoefficient(IConfusionMatrixMetric):
