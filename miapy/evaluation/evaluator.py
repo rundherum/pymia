@@ -211,66 +211,56 @@ class Evaluator:
 
     def evaluate(self, image: Union[sitk.Image, np.ndarray], ground_truth: Union[sitk.Image, np.ndarray],
                  evaluation_id: str):
-        """
-        Evaluates the metrics on the provided image and ground truth image.
+        """Evaluates the metrics on the provided image and ground truth image.
 
-        :param image: The image.
-        :type image: sitk.Image
-        :param ground_truth: The ground truth image.
-        :type ground_truth: sitk.Image
-        :param evaluation_id: The identification.
-        :type evaluation_id: str
+        Args:
+            image (sitk.Image): The segmented image.
+            ground_truth (sitk.Image): The ground truth image.
+            evaluation_id (str): The identification of the evaluation.
         """
 
         if not self.is_header_written:
             self.write_header()
 
         if isinstance(image, sitk.Image):
-            image = sitk.GetArrayFromImage(image)
+            image_array = sitk.GetArrayFromImage(image)
         if isinstance(ground_truth, sitk.Image):
-            ground_truth = sitk.GetArrayFromImage(ground_truth)
-        image_arr = image.flatten()
-        ground_truth_arr = ground_truth.flatten()
+            ground_truth_array = sitk.GetArrayFromImage(ground_truth)
 
         results = []  # clear results
 
         for label, label_str in self.labels.items():
             label_results = [evaluation_id, label_str]
 
-            predictions = np.zeros_like(image_arr, dtype=np.bool)
-            mask = np.in1d(image_arr.ravel(), label, True).reshape(image_arr.shape)
-            predictions[mask] = 1
-            labels = np.zeros_like(ground_truth_arr, dtype=np.bool)
-            mask = np.in1d(ground_truth_arr.ravel(), label, True).reshape(ground_truth_arr.shape)
-            labels[mask] = 1
+            # get only current label
+            predictions = np.in1d(image_array.ravel(), label, True).reshape(image_array.shape).astype(np.uint8)
+            labels = np.in1d(ground_truth_array.ravel(), label, True).reshape(ground_truth_array.shape).astype(np.uint8)
 
-            # calculate the confusion matrix (used for most metrics)
+            # calculate the confusion matrix for IConfusionMatrixMetric
             confusion_matrix = ConfusionMatrix(predictions, labels)
 
             # flag indicating whether the images have been converted for ISimpleITKImageMetric
             converted_to_image = False
-            prediction_as_image = None
-            ground_truth_as_image = None
+            predictions_as_image = None
+            labels_as_image = None
 
             # calculate the metrics
             for param_index, metric in enumerate(self.metrics):
                 if isinstance(metric, IConfusionMatrixMetric):
                     metric.confusion_matrix = confusion_matrix
                 elif isinstance(metric, INumpyArrayMetric):
-                    metric.ground_truth = labels.astype(np.uint8)
-                    metric.segmentation = predictions.astype(np.uint8)
+                    metric.ground_truth = labels
+                    metric.segmentation = predictions
                 elif isinstance(metric, ISimpleITKImageMetric):
                     if not converted_to_image:
-                        prediction_as_image = sitk.GetImageFromArray(predictions)
-                        prediction_as_image.CopyInformation(image)
-                        ground_truth_as_image = sitk.GetImageFromArray(labels)
-                        ground_truth_as_image.CopyInformation(labels)
+                        predictions_as_image = sitk.GetImageFromArray(predictions)
+                        predictions_as_image.CopyInformation(image)
+                        labels_as_image = sitk.GetImageFromArray(labels)
+                        labels_as_image.CopyInformation(ground_truth)
                         converted_to_image = True
 
-                    metric.ground_truth = ground_truth_as_image
-                    metric.segmentation = prediction_as_image
-
-                # todo add other metric instances
+                    metric.ground_truth = labels_as_image
+                    metric.segmentation = predictions_as_image
 
                 label_results.append(metric.calculate())
 
