@@ -266,6 +266,34 @@ class DiceCoefficient(IConfusionMatrixMetric):
                 self.confusion_matrix.fp + self.confusion_matrix.fn)
 
 
+class FalseNegative(IConfusionMatrixMetric):
+    """Represents a false negative metric."""
+
+    def __init__(self):
+        """Initializes a new instance of the FalseNegative class."""
+        super().__init__()
+        self.metric = "FN"
+
+    def calculate(self):
+        """Calculates the false negatives."""
+
+        return self.confusion_matrix.fn
+
+
+class FalsePositive(IConfusionMatrixMetric):
+    """Represents a false positive metric."""
+
+    def __init__(self):
+        """Initializes a new instance of the FalsePositive class."""
+        super().__init__()
+        self.metric = "FP"
+
+    def calculate(self):
+        """Calculates the false positives."""
+
+        return self.confusion_matrix.fp
+
+
 class Fallout(IConfusionMatrixMetric):
     """
     Represents a fallout (false positive rate) metric.
@@ -623,6 +651,34 @@ class Specificity(IConfusionMatrixMetric):
         """Calculates the specificity."""
 
         return self.confusion_matrix.tn / (self.confusion_matrix.tn + self.confusion_matrix.fp)
+
+
+class TrueNegative(IConfusionMatrixMetric):
+    """Represents a true negative metric."""
+
+    def __init__(self):
+        """Initializes a new instance of the TrueNegative class."""
+        super().__init__()
+        self.metric = "TN"
+
+    def calculate(self):
+        """Calculates the true negatives."""
+
+        return self.confusion_matrix.tn
+
+
+class TruePositive(IConfusionMatrixMetric):
+    """Represents a true positive metric."""
+
+    def __init__(self):
+        """Initializes a new instance of the TruePositive class."""
+        super().__init__()
+        self.metric = "TP"
+
+    def calculate(self):
+        """Calculates the true positives."""
+
+        return self.confusion_matrix.tp
 
 
 class VariationOfInformation(IConfusionMatrixMetric):
