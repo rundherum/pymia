@@ -187,20 +187,31 @@ class AreaUnderCurve(IConfusionMatrixMetric):
         return (true_positive_rate - false_positive_rate + 1) / 2
 
 
-class AverageDistance(IMetric):
+class AverageDistance(ISimpleITKImageMetric):
+    """Represents an average (Hausdorff) distance metric.
+
+        Calculates the distance between the set of non-zero pixels of two images using the following equation:
+
+        .. math:: AVD(A,B) = max(d(A,B), d(B,A)),
+
+        where
+
+        .. math:: d(A,B) = \\frac{1}{N} \\sum_{a \\in A} \\min_{b \\in B} \\lVert a - b \\rVert
+
+        is the directed Hausdorff distance and :math:`A` and :math:`B` are the set of non-zero pixels in the images.
+        """
 
     def __init__(self):
-        """
-        Initializes a new instance of the AverageDistance class.
-        """
+        """Initializes a new instance of the AverageDistance class."""
         super().__init__()
         self.metric = "AVGDIST"
 
     def calculate(self):
-        """
-        Calculates the metric.
-        """
-        raise NotImplementedError
+        """Calculates the average (Hausdorff) distance."""
+
+        distance_filter = sitk.HausdorffDistanceImageFilter()
+        distance_filter.Execute(self.ground_truth, self.segmentation)
+        return distance_filter.GetAverageHausdorffDistance()
 
 
 class CohenKappaMetric(IConfusionMatrixMetric):
@@ -344,7 +355,7 @@ class HausdorffDistance(ISimpleITKImageMetric):
 
     where
 
-    .. math:: d(A,B) = \\max_{a \\in A} \\min_{b \\in B} \\lVert a - b \\rVert
+    .. math:: h(A,B) = \\max_{a \\in A} \\min_{b \\in B} \\lVert a - b \\rVert
 
     is the directed Hausdorff distance and :math:`A` and :math:`B` are the set of non-zero pixels in the images.
     """
@@ -536,11 +547,11 @@ class ProbabilisticDistance(INumpyArrayMetric):
         gt = self.ground_truth.flatten()
         seg = self.segmentation.flatten()
 
-        probability_diff = np.absolute(gt - seg).sum()
+        probability_difference = np.absolute(gt - seg).sum()
         probability_joint = (gt * seg).sum()
 
         if probability_joint != 0:
-            return probability_diff / (2 * probability_joint)
+            return probability_difference / (2. * probability_joint)
         else:
             return -1
 
