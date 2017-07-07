@@ -16,6 +16,14 @@ import numpy as np
 import SimpleITK as sitk
 
 
+def _calculate_volume(image: sitk.Image):
+    """Calculates the volume of a label image."""
+    voxel_volume = np.prod(image.GetSpacing())
+    number_of_voxels = sitk.GetArrayFromImage(image).sum()
+
+    return number_of_voxels * voxel_volume
+
+
 class ConfusionMatrix:
     """
     Represents a confusion matrix (or error matrix).
@@ -405,6 +413,20 @@ class JaccardCoefficient(IConfusionMatrixMetric):
         return tp / (tp + fp + fn)
 
 
+class LabelVolume(ISimpleITKImageMetric):
+    """Represents a label (ground truth) volume metric."""
+
+    def __init__(self):
+        """Initializes a new instance of the LabelVolume class."""
+        super().__init__()
+        self.metric = "LBLVOL"
+
+    def calculate(self):
+        """Calculates the labeled (ground truth) volume in mm3."""
+
+        return _calculate_volume(self.ground_truth)
+
+
 class MahalanobisDistance(IMetric):
 
     def __init__(self):
@@ -486,6 +508,20 @@ class Precision(IConfusionMatrixMetric):
             return 0
 
 
+class PredictionVolume(ISimpleITKImageMetric):
+    """Represents a prediction (segmentation) volume metric."""
+
+    def __init__(self):
+        """Initializes a new instance of the PredictionVolume class."""
+        super().__init__()
+        self.metric = "PRDVOL"
+
+    def calculate(self):
+        """Calculates the predicted (segmented) volume in mm3."""
+
+        return _calculate_volume(self.segmentation)
+
+
 class ProbabilisticDistance(INumpyArrayMetric):
     """Represents a probabilistic distance metric."""
 
@@ -551,21 +587,16 @@ class Recall(IConfusionMatrixMetric):
 
 
 class Sensitivity(IConfusionMatrixMetric):
-    """
-    Represents a sensitivity (true positive rate) metric.
-    """
+    """Represents a sensitivity (true positive rate) metric."""
 
     def __init__(self):
-        """
-        Initializes a new instance of the Sensitivity class.
-        """
+        """Initializes a new instance of the Sensitivity class."""
         super().__init__()
         self.metric = "SNSVTY"
 
     def calculate(self):
-        """
-        Calculates the sensitivity (true positive rate).
-        """
+        """Calculates the sensitivity (true positive rate)."""
+
         return self.confusion_matrix.tp / (self.confusion_matrix.tp + self.confusion_matrix.fn)
 
 
