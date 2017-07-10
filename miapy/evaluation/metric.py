@@ -211,8 +211,30 @@ class AdjustedRandIndex(IConfusionMatrixMetric):
         tn = self.confusion_matrix.tn
         fp = self.confusion_matrix.fp
         fn = self.confusion_matrix.fn
+        n = self.confusion_matrix.n
 
-        raise NotImplementedError
+        fp_tn = tn + fp
+        tp_fn = fn + tp
+        tn_fn = tn + fn
+        tp_fp = fp + tp
+        nis = tn_fn * tn_fn + tp_fp * tp_fp
+        njs = fp_tn * fp_tn + tp_fn * tp_fn
+        sum_of_squares = tp * tp + tn * tn + fp * fp + fn * fn
+
+        a = (tp * (tp - 1) + fp * (fp - 1) + tn * (tn - 1) + fn * (fn - 1)) / 2.
+        b = (njs - sum_of_squares) / 2.
+        c = (nis - sum_of_squares) / 2.
+        d = (n * n + sum_of_squares - nis - njs) / 2.
+
+        x1 = a - ((a + c) * (a + b) / (a + b + c + d))
+        x2 = ((a + c) + (a + b)) / 2.
+        x3 = ((a + c) * (a + b)) / (a + b + c + d)
+        denominator = x2 - x3
+
+        if denominator != 0:
+            return x1 / denominator
+        else:
+            return 0
 
 
 class AreaUnderCurve(IConfusionMatrixMetric):
@@ -615,7 +637,7 @@ class ProbabilisticDistance(INumpyArrayMetric):
             return -1
 
 
-class RandIndex(IMetric):
+class RandIndex(IConfusionMatrixMetric):
     """Represents a rand index metric."""
 
     def __init__(self):
@@ -626,7 +648,26 @@ class RandIndex(IMetric):
     def calculate(self):
         """Calculates the rand index."""
 
-        raise NotImplementedError
+        tp = self.confusion_matrix.tp
+        tn = self.confusion_matrix.tn
+        fp = self.confusion_matrix.fp
+        fn = self.confusion_matrix.fn
+        n = self.confusion_matrix.n
+
+        fp_tn = tn + fp
+        tp_fn = fn + tp
+        tn_fn = tn + fn
+        tp_fp = fp + tp
+        nis = tn_fn * tn_fn + tp_fp * tp_fp
+        njs = fp_tn * fp_tn + tp_fn * tp_fn
+        sum_of_squares = tp * tp + tn * tn + fp * fp + fn * fn
+
+        a = (tp * (tp - 1) + fp * (fp - 1) + tn * (tn - 1) + fn * (fn - 1)) / 2.
+        b = (njs - sum_of_squares) / 2.
+        c = (nis - sum_of_squares) / 2.
+        d = (n * n + sum_of_squares - nis - njs) / 2.
+
+        return (a + d) / (a + b + c + d)
 
 
 class Recall(IConfusionMatrixMetric):
