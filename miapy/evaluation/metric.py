@@ -634,8 +634,8 @@ class ProbabilisticDistance(INumpyArrayMetric):
     def calculate(self):
         """Calculates the probabilistic distance."""
 
-        gt = self.ground_truth.flatten()
-        seg = self.segmentation.flatten()
+        gt = self.ground_truth.flatten().astype(np.int8)
+        seg = self.segmentation.flatten().astype(np.int8)
 
         probability_difference = np.absolute(gt - seg).sum()
         probability_joint = (gt * seg).sum()
