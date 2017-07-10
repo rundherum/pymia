@@ -80,6 +80,7 @@ def get_classical_metrics():
 
 def _calculate_volume(image: sitk.Image):
     """Calculates the volume of a label image."""
+
     voxel_volume = np.prod(image.GetSpacing())
     number_of_voxels = sitk.GetArrayFromImage(image).sum()
 
@@ -87,14 +88,10 @@ def _calculate_volume(image: sitk.Image):
 
 
 class ConfusionMatrix:
-    """
-    Represents a confusion matrix (or error matrix).
-    """
+    """Represents a confusion matrix (or error matrix)."""
 
     def __init__(self, prediction, label):
-        """
-        Initializes a new instance of the ConfusionMatrix class.
-        """
+        """Initializes a new instance of the ConfusionMatrix class."""
 
         # true positive (tp): we predict a label of 1 (positive), and the true label is 1
         self.tp = np.sum(np.logical_and(prediction == 1, label == 1))
@@ -109,25 +106,22 @@ class ConfusionMatrix:
 
 
 class IMetric(metaclass=ABCMeta):
-    """
-    Represents an evaluation metric.
-    """
+    """Represents an evaluation metric."""
 
     def __init__(self):
         self.metric = "IMetric"
 
     @abstractmethod
     def calculate(self):
-        """
-        Calculates the metric.
-        """
+        """Calculates the metric."""
+
         raise NotImplementedError
 
     def __str__(self):
-        """
-        Gets a nicely printable string representation.
+        """Gets a printable string representation.
 
-        :return: String representation.
+        Returns
+            str: String representation.
         """
         return '{self.metric}' \
             .format(self=self)
@@ -145,6 +139,7 @@ class IConfusionMatrixMetric(IMetric):
     @abstractmethod
     def calculate(self):
         """Calculates the metric."""
+
         raise NotImplementedError
 
 
@@ -161,6 +156,7 @@ class ISimpleITKImageMetric(IMetric):
     @abstractmethod
     def calculate(self):
         """Calculates the metric."""
+
         raise NotImplementedError
 
 
@@ -177,25 +173,20 @@ class INumpyArrayMetric(IMetric):
     @abstractmethod
     def calculate(self):
         """Calculates the metric."""
+
         raise NotImplementedError
 
 
 class Accuracy(IConfusionMatrixMetric):
-    """
-    Represents an accuracy metric.
-    """
+    """Represents an accuracy metric."""
 
     def __init__(self):
-        """
-        Initializes a new instance of the Accuracy class.
-        """
+        """Initializes a new instance of the Accuracy class."""
         super().__init__()
         self.metric = "ACURCY"
 
     def calculate(self):
-        """
-        Calculates the accuracy.
-        """
+        """Calculates the accuracy."""
 
         sum = self.confusion_matrix.tp + self.confusion_matrix.tn + self.confusion_matrix.fp + self.confusion_matrix.fn
 
@@ -225,21 +216,16 @@ class AdjustedRandIndex(IConfusionMatrixMetric):
 
 
 class AreaUnderCurve(IConfusionMatrixMetric):
-    """
-    Represents an area under the curve metric.
-    """
+    """Represents an area under the curve metric."""
 
     def __init__(self):
-        """
-        Initializes a new instance of the AreaUnderCurve class.
-        """
+        """Initializes a new instance of the AreaUnderCurve class."""
         super().__init__()
         self.metric = "AUC"
 
     def calculate(self):
-        """
-        Calculates the area under the curve.
-        """
+        """Calculates the area under the curve."""
+
         specificity = self.confusion_matrix.tn / (self.confusion_matrix.tn + self.confusion_matrix.fp)
 
         false_positive_rate = 1 - specificity
@@ -277,21 +263,15 @@ class AverageDistance(ISimpleITKImageMetric):
 
 
 class CohenKappaMetric(IConfusionMatrixMetric):
-    """
-    Represents a Cohen's kappa coefficient metric.
-    """
+    """Represents a Cohen's kappa coefficient metric."""
 
     def __init__(self):
-        """
-        Initializes a new instance of the CohenKappaMetric class.
-        """
+        """Initializes a new instance of the CohenKappaMetric class."""
         super().__init__()
         self.metric = "KAPPA"
 
     def calculate(self):
-        """
-        Calculates the Cohen's kappa coefficient.
-        """
+        """Calculates the Cohen's kappa coefficient."""
 
         tp = self.confusion_matrix.tp
         tn = self.confusion_matrix.tn
@@ -308,21 +288,16 @@ class CohenKappaMetric(IConfusionMatrixMetric):
 
 
 class DiceCoefficient(IConfusionMatrixMetric):
-    """
-    Represents a Dice coefficient metric.
-    """
+    """Represents a Dice coefficient metric."""
 
     def __init__(self):
-        """
-        Initializes a new instance of the DiceCoefficient class.
-        """
+        """Initializes a new instance of the DiceCoefficient class."""
         super().__init__()
         self.metric = "DICE"
 
     def calculate(self):
-        """
-        Calculates the Dice coefficient.
-        """
+        """Calculates the Dice coefficient."""
+
         return 2 * self.confusion_matrix.tp / \
                (2 * self.confusion_matrix.tp +
                 self.confusion_matrix.fp + self.confusion_matrix.fn)
@@ -357,21 +332,15 @@ class FalsePositive(IConfusionMatrixMetric):
 
 
 class Fallout(IConfusionMatrixMetric):
-    """
-    Represents a fallout (false positive rate) metric.
-    """
+    """Represents a fallout (false positive rate) metric."""
 
     def __init__(self):
-        """
-        Initializes a new instance of the Fallout class.
-        """
+        """Initializes a new instance of the Fallout class."""
         super().__init__()
         self.metric = "FALLOUT"
 
     def calculate(self):
-        """
-        Calculates the fallout (false positive rate).
-        """
+        """Calculates the fallout (false positive rate)."""
 
         specificity = self.confusion_matrix.tn / (self.confusion_matrix.tn + self.confusion_matrix.fp)
         return 1 - specificity
@@ -386,9 +355,8 @@ class FMeasure(IConfusionMatrixMetric):
         self.metric = "FMEASR"
 
     def calculate(self):
-        """
-        Calculates the F1 measure.
-        """
+        """Calculates the F1 measure."""
+
         beta = 1 # or 0.5 or 2 can also calculate F2 or F0.5 measure
 
         beta_squared = beta * beta
@@ -408,22 +376,19 @@ class FMeasure(IConfusionMatrixMetric):
 
 
 class GlobalConsistencyError(IConfusionMatrixMetric):
-    """
-    Represents a global consistency error metric.
+    """Represents a global consistency error metric.
+
     Implementation based on Martin 2001.
     """
 
     def __init__(self):
-        """
-        Initializes a new instance of the GlobalConsistencyError class.
-        """
+        """Initializes a new instance of the GlobalConsistencyError class."""
         super().__init__()
         self.metric = "GCOERR"
 
     def calculate(self):
-        """
-        Calculates the global consistency error.
-        """
+        """Calculates the global consistency error."""
+
         tp = self.confusion_matrix.tp
         tn = self.confusion_matrix.tn
         fp = self.confusion_matrix.fp
@@ -457,6 +422,7 @@ class HausdorffDistance(ISimpleITKImageMetric):
 
     def calculate(self):
         """Calculates the Hausdorff distance."""
+
         distance_filter = sitk.HausdorffDistanceImageFilter()
         distance_filter.Execute(self.ground_truth, self.segmentation)
         return distance_filter.GetHausdorffDistance()
@@ -492,21 +458,16 @@ class InterclassCorrelation(INumpyArrayMetric):
 
 
 class JaccardCoefficient(IConfusionMatrixMetric):
-    """
-    Represents a Jaccard coefficient metric.
-    """
+    """Represents a Jaccard coefficient metric."""
 
     def __init__(self):
-        """
-        Initializes a new instance of the JaccardCoefficient class.
-        """
+        """Initializes a new instance of the JaccardCoefficient class."""
         super().__init__()
         self.metric = "JACRD"
 
     def calculate(self):
-        """
-        Calculates the Jaccard coefficient.
-        """
+        """Calculates the Jaccard coefficient."""
+
         tp = self.confusion_matrix.tp
         fp = self.confusion_matrix.fp
         fn = self.confusion_matrix.fn
@@ -530,6 +491,7 @@ class LabelVolume(ISimpleITKImageMetric):
 
 class MahalanobisDistance(INumpyArrayMetric):
     """Represents a Mahalanobis distance metric."""
+
     def __init__(self):
         """Initializes a new instance of the MahalanobisDistance class."""
         super().__init__()
@@ -598,21 +560,15 @@ class MutualInformation(IConfusionMatrixMetric):
 
 
 class Precision(IConfusionMatrixMetric):
-    """
-    Represents a precision metric.
-    """
+    """Represents a precision metric."""
 
     def __init__(self):
-        """
-        Initializes a new instance of the Precision class.
-        """
+        """Initializes a new instance of the Precision class."""
         super().__init__()
         self.metric = "PRCISON"
 
     def calculate(self):
-        """
-        Calculates the precision.
-        """
+        """Calculates the precision."""
 
         sum = self.confusion_matrix.tp + self.confusion_matrix.fp
 
@@ -660,37 +616,29 @@ class ProbabilisticDistance(INumpyArrayMetric):
 
 
 class RandIndex(IMetric):
+    """Represents a rand index metric."""
 
     def __init__(self):
-        """
-        Initializes a new instance of the RandIndex class.
-        """
+        """Initializes a new instance of the RandIndex class."""
         super().__init__()
         self.metric = "RNDIND"
 
     def calculate(self):
-        """
-        Calculates the metric.
-        """
+        """Calculates the rand index."""
+
         raise NotImplementedError
 
 
 class Recall(IConfusionMatrixMetric):
-    """
-    Represents a recall metric.
-    """
+    """Represents a recall metric."""
 
     def __init__(self):
-        """
-        Initializes a new instance of the Recall class.
-        """
+        """Initializes a new instance of the Recall class."""
         super().__init__()
         self.metric = "RECALL"
 
     def calculate(self):
-        """
-        Calculates the recall.
-        """
+        """Calculates the recall."""
 
         sum = self.confusion_matrix.tp + self.confusion_matrix.fn
 
@@ -799,21 +747,16 @@ class VariationOfInformation(IConfusionMatrixMetric):
 
 
 class VolumeSimilarity(IConfusionMatrixMetric):
-    """
-    Represents a volume similarity metric.
-    """
+    """Represents a volume similarity metric."""
 
     def __init__(self):
-        """
-        Initializes a new instance of the VolumeSimilarity class.
-        """
+        """Initializes a new instance of the VolumeSimilarity class."""
         super().__init__()
         self.metric = "VOLSMTY"
 
     def calculate(self):
-        """
-        Calculates the volume similarity.
-        """
+        """Calculates the volume similarity."""
+
         tp = self.confusion_matrix.tp
         fp = self.confusion_matrix.fp
         fn = self.confusion_matrix.fn
