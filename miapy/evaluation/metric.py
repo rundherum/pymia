@@ -16,6 +16,68 @@ import numpy as np
 import SimpleITK as sitk
 
 
+def get_all_metrics():
+    """Gets a list with all metrics.
+
+    Returns:
+        list[IMetric]: A list of metrics.
+    """
+    return get_overlap_metrics() + get_distance_metrics() + get_distance_metrics()
+
+
+def get_overlap_metrics():
+    """Gets a list of overlap-based metrics.
+
+    Returns:
+        list[IMetric]: A list of metrics.
+    """
+    return [DiceCoefficient(),
+            JaccardCoefficient(),
+            AreaUnderCurve(),
+            CohenKappaMetric(),
+            # RandIndex(),
+            # AdjustedRandIndex(),
+            InterclassCorrelation(),
+            VolumeSimilarity(),
+            MutualInformation()]
+
+
+def get_distance_metrics():
+    """Gets a list of distance-based metrics.
+
+    Returns:
+        list[IMetric]: A list of metrics.
+    """
+
+    return [HausdorffDistance(),
+            AverageDistance(),
+            # MahalanobisDistance(),
+            VariationOfInformation(),
+            GlobalConsistencyError(),
+            ProbabilisticDistance()]
+
+
+def get_classical_metrics():
+    """Gets a list of classical metrics.
+
+    Returns:
+        list[IMetric]: A list of metrics.
+    """
+
+    return[Sensitivity(),
+           Specificity(),
+           Precision(),
+           FMeasure(),
+           Accuracy(),
+           Fallout(),
+           TruePositive(),
+           FalsePositive(),
+           TrueNegative(),
+           FalseNegative(),
+           LabelVolume(),
+           PredictionVolume()]
+
+
 def _calculate_volume(image: sitk.Image):
     """Calculates the volume of a label image."""
     voxel_volume = np.prod(image.GetSpacing())
