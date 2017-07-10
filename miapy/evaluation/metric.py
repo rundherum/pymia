@@ -51,7 +51,7 @@ def get_distance_metrics():
 
     return [HausdorffDistance(),
             AverageDistance(),
-            # MahalanobisDistance(),
+            MahalanobisDistance(),
             VariationOfInformation(),
             GlobalConsistencyError(),
             ProbabilisticDistance()]
@@ -528,20 +528,33 @@ class LabelVolume(ISimpleITKImageMetric):
         return _calculate_volume(self.ground_truth)
 
 
-class MahalanobisDistance(IMetric):
-
+class MahalanobisDistance(INumpyArrayMetric):
+    """Represents a Mahalanobis distance metric."""
     def __init__(self):
-        """
-        Initializes a new instance of the MahalanobisDistance class.
-        """
+        """Initializes a new instance of the MahalanobisDistance class."""
         super().__init__()
         self.metric = "MAHLNBS"
 
     def calculate(self):
-        """
-        Calculates the metric.
-        """
-        raise NotImplementedError
+        """Calculates the Mahalanobis distance."""
+
+        gt_n = np.count_nonzero(self.ground_truth)
+        gt_indices = np.flip(np.where(self.ground_truth == 1), axis=0)
+        gt_mean = gt_indices.mean(axis=1)
+        gt_cov = np.cov(gt_indices)
+
+        seg_n = np.count_nonzero(self.segmentation)
+        seg_indices = np.flip(np.where(self.segmentation == 1), axis=0)
+        seg_mean = seg_indices.mean(axis=1)
+        seg_cov = np.cov(seg_indices)
+
+        # calculate common covariance matrix
+        common_cov = (gt_n * gt_cov + seg_n * seg_cov) / (gt_n + seg_n)
+        common_cov_inv = np.linalg.inv(common_cov)
+
+        mean = np.matrix(np.array(gt_mean) - np.array(seg_mean))
+
+        return math.sqrt(mean * np.matrix(common_cov_inv) * mean.T)
 
 
 class MutualInformation(IConfusionMatrixMetric):
