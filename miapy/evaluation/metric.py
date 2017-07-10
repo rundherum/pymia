@@ -35,8 +35,8 @@ def get_overlap_metrics():
             JaccardCoefficient(),
             AreaUnderCurve(),
             CohenKappaMetric(),
-            # RandIndex(),
-            # AdjustedRandIndex(),
+            RandIndex(),
+            AdjustedRandIndex(),
             InterclassCorrelation(),
             VolumeSimilarity(),
             MutualInformation()]
