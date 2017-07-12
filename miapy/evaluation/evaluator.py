@@ -222,10 +222,8 @@ class Evaluator:
         if not self.is_header_written:
             self.write_header()
 
-        if isinstance(image, sitk.Image):
-            image_array = sitk.GetArrayFromImage(image)
-        if isinstance(ground_truth, sitk.Image):
-            ground_truth_array = sitk.GetArrayFromImage(ground_truth)
+        image_array = sitk.GetArrayFromImage(image) if isinstance(image, sitk.Image) else image
+        ground_truth_array = sitk.GetArrayFromImage(ground_truth) if isinstance(ground_truth, sitk.Image) else ground_truth
 
         results = []  # clear results
 
