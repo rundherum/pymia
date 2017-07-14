@@ -1,4 +1,6 @@
 """We provide an easy way to set up a filtering pipeline. All modules in this package implement..."""
+from typing import List
+
 import SimpleITK as sitk
 from abc import ABCMeta, abstractmethod
 
@@ -32,11 +34,16 @@ class FilterPipeline:
     """Represents a filter pipeline, which can be executed on images.
     """
 
-    def __init__(self):
+    def __init__(self, filters: List[IFilter]=None):
         """Initializes a new instance of the `FilterPipeline` class.
+
+        :param filters: The filters.
         """
-        self.filters = []  # holds the `IFilter`s
         self.params = []  # holds image-specific parameters
+        self.filters = []  # holds the `IFilter`s
+        if filters is not None:
+            for filter_ in filters:
+                self.add_filter(filter_)
 
     def add_filter(self, filter_: IFilter):
 

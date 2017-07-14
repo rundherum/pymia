@@ -1,6 +1,11 @@
 """Enables the enhancement of images before their use with other algorithms."""
+from typing import Dict, Union
 import SimpleITK as sitk
+import numpy as np
 from miapy.filtering.filter import IFilter, IFilterParams
+import subprocess
+import tempfile
+from os import path
 
 
 class BiasFieldCorrectorParams(IFilterParams):
@@ -8,7 +13,7 @@ class BiasFieldCorrectorParams(IFilterParams):
     Bias field correction filter parameters.
     """
 
-    def __init__(self, mask):
+    def __init__(self, mask: sitk.Image):
         """
         Initializes a new instance of the BiasFieldCorrectorParams class.
 
@@ -25,18 +30,30 @@ class BiasFieldCorrector(IFilter):
     """
     Represents a bias field correction filter.
     """
-    def __init__(self, shrink_factor=4, number_of_iterations=4, number_of_fitting_levels=3):
+    def __init__(self, shrink_factor=1, convergence_threshold=0.001, max_iterations=(50, 50, 50, 50),
+                 fullwidth_at_halfmax = 0.15, fiter_noise=0.01, histogram_bins=200, control_points=(4,4,4),
+                 spline_order=3):
         """
         Initializes a new instance of the BiasFieldCorrector class.
 
-        :param shrink_factor: 
-        :param number_of_iterations: 
-        :param number_of_fitting_levels: 
+        :param shrink_factor:
+        :param convergence_threshold:
+        :param max_iterations:
+        :param fullwidth_at_halfmax:
+        :param fiter_noise:
+        :param histogram_bins:
+        :param control_points:
+        :param spline_order:
         """
         super().__init__()
         self.shrink_factor = shrink_factor
-        self.number_of_iterations = number_of_iterations
-        self.number_of_fitting_levels = number_of_fitting_levels
+        self.convergence_threshold = convergence_threshold
+        self.max_iterations = max_iterations
+        self.fullwidth_at_halfmax = fullwidth_at_halfmax
+        self.filter_noise = fiter_noise
+        self.histogram_bins = histogram_bins
+        self.control_points = control_points
+        self.spline_order = spline_order
 
     def execute(self, image: sitk.Image, params: BiasFieldCorrectorParams=None) -> sitk.Image:
         """
@@ -47,21 +64,12 @@ class BiasFieldCorrector(IFilter):
         :return: The bias field corrected image.
         """
 
-        if params is None:
-            raise ValueError("params need to be provided")
-
-        return sitk.N4BiasFieldCorrection(image,
-                                          params.mask, self.shrink_factor,
-                                          self.number_of_iterations,
-                                          self.number_of_fitting_levels)
-
-        # convergenceThreshold = 0.001, VectorUInt32
-        # maximumNumberOfIterations, double
-        # biasFieldFullWidthAtHalfMaximum = 0.15, double
-        # wienerFilterNoise = 0.01, uint32_t
-        # numberOfHistogramBins = 200, VectorUInt32
-        # numberOfControlPoints, uint32_t
-        # splineOrder = 3) -> Image
+        mask = params.mask if params is not None else sitk.OtsuThreshold(image, 0, 1, 200)
+        if self.shrink_factor > 1:
+            raise ValueError('shrinking is not supported yet')
+        return sitk.N4BiasFieldCorrection(image, mask, self.convergence_threshold, self.max_iterations,
+                                          self.fullwidth_at_halfmax, self.filter_noise, self.histogram_bins,
+                                          self.control_points, self.spline_order)
 
     def __str__(self):
         """
@@ -71,8 +79,13 @@ class BiasFieldCorrector(IFilter):
         """
         return 'BiasFieldCorrector:\n' \
                ' shrink_factor:            {self.shrink_factor}\n' \
-               ' number_of_iterations:     {self.number_of_iterations}\n' \
-               ' number_of_fitting_levels: {self.number_of_fitting_levels}\n' \
+               ' convergence_threshold:    {self.convergence_threshold}\n' \
+               ' max_iterations:           {self.max_iterations}\n' \
+               ' fullwidth_at_halfmax:     {self.fullwidth_at_halfmax}\n' \
+               ' filter_noise:             {self.filter_noise}\n' \
+               ' histogram_bins:           {self.histogram_bins}\n' \
+               ' control_points:           {self.control_points}\n' \
+               ' spline_order:             {self.spline_order}\n' \
             .format(self=self)
 
 
@@ -162,6 +175,92 @@ class RescaleIntensity(IFilter):
         return 'RescaleIntensity:\n' \
                ' min_intensity: {self.min_intensity}\n' \
                ' max_intensity: {self.max_intensity}\n' \
+            .format(self=self)
+
+
+class Relabel(IFilter):
+    """Relabels the labels in the file by the provided rule"""
+
+    def __init__(self, label_changes: Dict[int, Union[int, tuple]]) -> None:
+        """Initializes a new instance of the LargestNComponents class.
+
+        Args:
+            label_changes(Dict[int, Union[int, tuple]]): Label change rule where the key is the new label and
+                the value the existing (can be multiple)
+        """
+        super().__init__()
+        self.label_changes = label_changes
+
+    def execute(self, image: sitk.Image, params: IFilterParams = None) -> sitk.Image:
+        """Executes the largest N connected components filter on an image.
+
+        Args:
+            image (sitk.Image): The image.
+            params (IFilterParams): The parameters (unused).
+
+        Returns:
+            sitk.Image: The filtered image.
+        """
+        np_img = sitk.GetArrayFromImage(image)
+        new_np_img = np_img.copy()
+        for new_label, old_labels in self.label_changes.items():
+            mask = np.in1d(np_img.ravel(), old_labels).reshape(np_img.shape)
+            new_np_img[mask] = new_label
+        new_img = sitk.GetImageFromArray(new_np_img)
+        new_img.CopyInformation(image)
+        return new_img
+
+    def __str__(self):
+        """Gets a printable string representation.
+
+        Returns:
+            str: String representation.
+        """
+        str_list = []
+        for k, v in self.label_changes.items():
+            str_list.append('{}->{}'.format(k, v))
+        return 'Relabel:\n' \
+               ' label_changes:  {label_changes}\n' \
+            .format(self=self, label_changes='; '.join(str_list))
+
+
+class CmdlineExecutor(IFilter):
+    """
+        Represents a command line executable.
+    """
+
+    def __init__(self, executable_path: str):
+        super().__init__()
+        self.executable_path = executable_path
+
+    def execute(self, image: sitk.Image, params: IFilterParams = None) -> sitk.Image:
+        """Executes the largest N connected components filter on an image.
+
+        Args:
+            image (sitk.Image): The image.
+            params (IFilterParams): The parameters (unused).
+
+        Returns:
+            sitk.Image: The filtered image.
+        """
+        temp_dir = tempfile.gettempdir()
+        temp_in = path.join(temp_dir, 'in.nii')
+        sitk.WriteImage(image, temp_in)
+        temp_out = path.join(temp_dir, 'out.nii')
+        subprocess.run([self.executable_path, temp_in, temp_out], check=True)
+        return sitk.ReadImage(temp_out)
+
+    def __str__(self):
+        """Gets a printable string representation.
+
+        Returns:
+            str: String representation.
+        """
+        str_list = []
+        for k, v in self.label_changes.items():
+            str_list.append('{}->{}'.format(k, v))
+        return 'CmdlineExecutor:\n' \
+               ' executable_path:   {self.executable_path}\n' \
             .format(self=self)
 
 
