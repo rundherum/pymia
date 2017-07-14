@@ -256,9 +256,6 @@ class CmdlineExecutor(IFilter):
         Returns:
             str: String representation.
         """
-        str_list = []
-        for k, v in self.label_changes.items():
-            str_list.append('{}->{}'.format(k, v))
         return 'CmdlineExecutor:\n' \
                ' executable_path:   {self.executable_path}\n' \
             .format(self=self)
