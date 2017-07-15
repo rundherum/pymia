@@ -6,6 +6,7 @@ from miapy.filtering.filter import IFilter, IFilterParams
 import subprocess
 import tempfile
 from os import path
+import os
 
 
 class BiasFieldCorrectorParams(IFilterParams):
@@ -192,7 +193,7 @@ class Relabel(IFilter):
         self.label_changes = label_changes
 
     def execute(self, image: sitk.Image, params: IFilterParams = None) -> sitk.Image:
-        """Executes the largest N connected components filter on an image.
+        """Executes the relabeling of the label image.
 
         Args:
             image (sitk.Image): The image.
@@ -234,7 +235,7 @@ class CmdlineExecutor(IFilter):
         self.executable_path = executable_path
 
     def execute(self, image: sitk.Image, params: IFilterParams = None) -> sitk.Image:
-        """Executes the largest N connected components filter on an image.
+        """Executes a command line program.
 
         Args:
             image (sitk.Image): The image.
@@ -248,7 +249,11 @@ class CmdlineExecutor(IFilter):
         sitk.WriteImage(image, temp_in)
         temp_out = path.join(temp_dir, 'out.nii')
         subprocess.run([self.executable_path, temp_in, temp_out], check=True)
-        return sitk.ReadImage(temp_out)
+        out_image = sitk.ReadImage(temp_out, image.GetPixelID())
+        # clean up
+        os.remove(temp_in)
+        os.remove(temp_out)
+        return out_image
 
     def __str__(self):
         """Gets a printable string representation.
@@ -261,5 +266,61 @@ class CmdlineExecutor(IFilter):
             .format(self=self)
 
 
-class HistogramMatcher:
-    """A learning method to align the intensity ranges of images."""
+class HistogramMatcherParams(IFilterParams):
+    """
+    Histogram matching filter parameters.
+    """
+
+    def __init__(self, reference_image: sitk.Image):
+        """Initializes a new instance of the HistogramMatcherParams class.
+
+        Args:
+            reference_image (sitk.Image): Reference image for the matching.
+        """
+        self.reference_image = reference_image
+
+
+class HistogramMatcher(IFilter):
+    """A method to align the intensity ranges of images."""
+
+    def __init__(self, histogram_levels=256, match_points=1, threshold_mean_intensity=True):
+        """Initializes a new instance of the HistogramMatcher class.
+
+        Args:
+            histogram_levels (int): Number of histogram levels.
+            match_points (int): Number of match points.
+            threshold_mean_intensity (bool): Threshold at mean intensity.
+        """
+        super().__init__()
+        self.histogram_levels = histogram_levels
+        self.match_points = match_points
+        self.threshold_mean_intensity = threshold_mean_intensity
+
+    def execute(self, image: sitk.Image, params: HistogramMatcherParams = None) -> sitk.Image:
+        """Matches the image intensity histogram to a reference.
+
+        Args:
+            image (sitk.Image): The image.
+            params (IFilterParams): The parameters (unused).
+
+        Returns:
+            sitk.Image: The filtered image.
+        """
+        if params is None:
+            raise ValueError('Parameter with reference image is required')
+
+        return sitk.HistogramMatching(image, params.reference_image, self.histogram_levels, self.match_points,
+                                      self.threshold_mean_intensity)
+
+    def __str__(self):
+        """Gets a printable string representation.
+
+        Returns:
+            str: String representation.
+        """
+        return 'HistogramMatcher:\n' \
+               ' histogram_levels:           {self.histogram_levels}\n' \
+               ' match_points:               {self.match_points}\n' \
+               ' threshold_mean_intensity:   {self.threshold_mean_intensity}\n' \
+            .format(self=self)
+
