@@ -6,11 +6,11 @@ using a rigid transformation (rotation, translation, reflection, or their combin
 
 See Also:
     `ITK Registration <https://itk.org/Doxygen/html/RegistrationPage.html>`_
+    `ITK Software Guide Registration <https://itk.org/ITKSoftwareGuide/html/Book2/ITKSoftwareGuide-Book2ch3.html>`_
 """
 import matplotlib
 matplotlib.use('Agg')  # use matplotlib without having a window appear
 import matplotlib.pyplot as plt
-import matplotlib.ticker
 import numpy as np
 import SimpleITK as sitk
 
@@ -20,16 +20,18 @@ import miapy.filtering.filter as fltr
 class RigidMultiModalRegistrationParams(fltr.IFilterParams):
     """Represents parameters for the multi-modal rigid registration."""
 
-    def __init__(self, fixed_image: sitk.Image, plot_directory_path: str=''):
+    def __init__(self, fixed_image: sitk.Image, fixed_image_mask: sitk.Image=None, plot_directory_path: str=''):
         """Initializes a new instance of the RigidMultiModalRegistrationParams class.
 
         Args:
             fixed_image (sitk.Image): The fixed image for the registration.
+            fixed_image_mask (sitk.Image): A mask for the fixed image to limit the registration.
             plot_directory_path (str): Path to the directory where to plot the registration progress if any.
                 Note that this increases the computational time.
         """
 
         self.fixed_image = fixed_image
+        self.fixed_image_mask = fixed_image_mask
         self.plot_directory_path = plot_directory_path
 
 
@@ -57,17 +59,21 @@ class RigidMultiModalRegistration(fltr.IFilter):
                  learning_rate: float=1.0,
                  step_size: float=0.001,
                  number_of_iterations: int=200,
-                 shrink_factors: [int]=[4, 2, 1],
-                 smoothing_sigmas: [float]=[2, 1, 0]):
+                 shrink_factors: [int]=[4, 2, 1, 1],
+                 smoothing_sigmas: [float]=[2, 1, 1, 0],
+                 sampling_percentage: float=0.2):
         """Initializes a new instance of the MultiModalRegistration class.
 
         Args:
             number_of_histogram_bins (int): The number of histogram bins.
             learning_rate (float): The optimizer's learning rate.
-            step_size (float): the optimizer's step size.
+            step_size (float): the optimizer's step size. Each step in the optimizer is at least this large.
             number_of_iterations (int): The maximum number of optimization iterations.
             shrink_factors ([int]): The shrink factors at each shrinking level (from high to low).
             smoothing_sigmas ([int]):  The Gaussian sigmas for smoothing at each shrinking level (in physical units).
+            sampling_percentage (float): Fraction of voxel of the fixed image that will be used for registration (0, 1].
+                Typical values range from 0.01 (1 %) for low detail images to 0.2 (20 %) for high detail images.
+                The higher the fraction, the higher the computational time.
         """
         super().__init__()
 
@@ -80,6 +86,7 @@ class RigidMultiModalRegistration(fltr.IFilter):
         self.number_of_iterations = number_of_iterations
         self.shrink_factors = shrink_factors
         self.smoothing_sigmas = smoothing_sigmas
+        self.sampling_percentage = sampling_percentage
 
         registration = sitk.ImageRegistrationMethod()
 
@@ -88,7 +95,7 @@ class RigidMultiModalRegistration(fltr.IFilter):
         # registration.SetMetricAsJointHistogramMutualInformation(self.number_of_histogram_bins, 1.5)
         registration.SetMetricAsMattesMutualInformation(self.number_of_histogram_bins)
         registration.SetMetricSamplingStrategy(registration.RANDOM)
-        registration.SetMetricSamplingPercentage(0.1)
+        registration.SetMetricSamplingPercentage(self.sampling_percentage)
 
         # interpolator
         # will evaluate the intensities of the moving image at non-rigid positions
@@ -123,6 +130,7 @@ class RigidMultiModalRegistration(fltr.IFilter):
         if params is None:
             raise ValueError("params is not defined")
 
+        # set a transform that is applied to the moving image to initialize the registration
         initial_transform = sitk.CenteredTransformInitializer(sitk.Cast(params.fixed_image, image.GetPixelIDValue()),
                                                               image,
                                                               sitk.Euler3DTransform(),
@@ -131,6 +139,9 @@ class RigidMultiModalRegistration(fltr.IFilter):
 
         fixed_image = sitk.Normalize(params.fixed_image)
         image = sitk.Normalize(image)
+
+        if params.fixed_image_mask:
+            self.registration.SetMetricFixedMask(params.fixed_image_mask)
 
         if params.plot_directory_path:
             RegistrationPlotter(self.registration, fixed_image, image, initial_transform, params.plot_directory_path)
