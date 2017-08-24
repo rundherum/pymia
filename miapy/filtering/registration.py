@@ -8,6 +8,7 @@ See Also:
     `ITK Registration <https://itk.org/Doxygen/html/RegistrationPage.html>`_
     `ITK Software Guide Registration <https://itk.org/ITKSoftwareGuide/html/Book2/ITKSoftwareGuide-Book2ch3.html>`_
 """
+from enum import Enum
 import matplotlib
 matplotlib.use('Agg')  # use matplotlib without having a window appear
 import matplotlib.pyplot as plt
@@ -15,6 +16,12 @@ import numpy as np
 import SimpleITK as sitk
 
 import miapy.filtering.filter as fltr
+
+
+class RegistrationType(Enum):
+    """Represents the registration transformation type."""
+    AFFINE = 1
+    RIGID = 2
 
 
 class MultiModalRegistrationParams(fltr.IFilterParams):
@@ -55,7 +62,7 @@ class MultiModalRegistration(fltr.IFilter):
     """
 
     def __init__(self,
-                 registration_type: str='rigid',
+                 registration_type: RegistrationType=RegistrationType.RIGID,
                  number_of_histogram_bins: int=200,
                  learning_rate: float=1.0,
                  step_size: float=0.001,
@@ -67,7 +74,7 @@ class MultiModalRegistration(fltr.IFilter):
         """Initializes a new instance of the MultiModalRegistration class.
 
         Args:
-            registration_type (str): The type of the registration ('rigid' or 'affine').
+            registration_type (RegistrationType): The type of the registration ('rigid' or 'affine').
             number_of_histogram_bins (int): The number of histogram bins.
             learning_rate (float): The optimizer's learning rate.
             step_size (float): The optimizer's step size. Each step in the optimizer is at least this large.
@@ -83,9 +90,6 @@ class MultiModalRegistration(fltr.IFilter):
 
         if len(shrink_factors) != len(smoothing_sigmas):
             raise ValueError("shrink_factors and smoothing_sigmas need to be same length")
-
-        if registration_type != 'rigid' and registration_type != 'affine':
-            raise ValueError('registration_type needs to be ''rigid'' or ''affine''')
 
         self.registration_type = registration_type
         self.number_of_histogram_bins = number_of_histogram_bins
@@ -150,9 +154,9 @@ class MultiModalRegistration(fltr.IFilter):
             raise ValueError("params is not defined")
 
         # set a transform that is applied to the moving image to initialize the registration
-        if self.registration_type == 'rigid':
+        if self.registration_type == RegistrationType.RIGID:
             transform_type = sitk.VersorRigid3DTransform()
-        elif self.registration_type == 'affine':
+        elif self.registration_type == RegistrationType.AFFINE:
             transform_type = sitk.AffineTransform(3)
         else:
             raise ValueError('not supported registration_type')
