@@ -7,6 +7,7 @@ import subprocess
 import tempfile
 from os import path
 import os
+from scipy.interpolate.interpolate import interp1d
 
 
 class BiasFieldCorrectorParams(IFilterParams):
@@ -121,7 +122,7 @@ class GradientAnisotropicDiffusion(IFilter):
         :param params: The gradient anisotropic diffusion filter parameters.
         :return: The smoothed image.
         """
-        return sitk.GradientAnisotropicDiffusion(image,
+        return sitk.GradientAnisotropicDiffusion(sitk.Cast(image, sitk.sitkFloat32),
                                                  self.time_step,
                                                  self.conductance,
                                                  self.conductance_scaling_update_interval,
@@ -179,93 +180,6 @@ class RescaleIntensity(IFilter):
             .format(self=self)
 
 
-class Relabel(IFilter):
-    """Relabels the labels in the file by the provided rule"""
-
-    def __init__(self, label_changes: Dict[int, Union[int, tuple]]) -> None:
-        """Initializes a new instance of the LargestNComponents class.
-
-        Args:
-            label_changes(Dict[int, Union[int, tuple]]): Label change rule where the key is the new label and
-                the value the existing (can be multiple)
-        """
-        super().__init__()
-        self.label_changes = label_changes
-
-    def execute(self, image: sitk.Image, params: IFilterParams = None) -> sitk.Image:
-        """Executes the relabeling of the label image.
-
-        Args:
-            image (sitk.Image): The image.
-            params (IFilterParams): The parameters (unused).
-
-        Returns:
-            sitk.Image: The filtered image.
-        """
-        np_img = sitk.GetArrayFromImage(image)
-        new_np_img = np_img.copy()
-        for new_label, old_labels in self.label_changes.items():
-            mask = np.in1d(np_img.ravel(), old_labels).reshape(np_img.shape)
-            new_np_img[mask] = new_label
-        new_img = sitk.GetImageFromArray(new_np_img)
-        new_img.CopyInformation(image)
-        return new_img
-
-    def __str__(self):
-        """Gets a printable string representation.
-
-        Returns:
-            str: String representation.
-        """
-        str_list = []
-        for k, v in self.label_changes.items():
-            str_list.append('{}->{}'.format(k, v))
-        return 'Relabel:\n' \
-               ' label_changes:  {label_changes}\n' \
-            .format(self=self, label_changes='; '.join(str_list))
-
-
-class CmdlineExecutor(IFilter):
-    """
-        Represents a command line executable.
-    """
-
-    def __init__(self, executable_path: str):
-        super().__init__()
-        self.executable_path = executable_path
-
-    def execute(self, image: sitk.Image, params: IFilterParams = None) -> sitk.Image:
-        """Executes a command line program.
-
-        Args:
-            image (sitk.Image): The image.
-            params (IFilterParams): The parameters (unused).
-
-        Returns:
-            sitk.Image: The filtered image.
-        """
-        temp_dir = tempfile.gettempdir()
-        temp_in = path.join(temp_dir, 'in.nii')
-        sitk.WriteImage(image, temp_in)
-        temp_out = path.join(temp_dir, 'out.nii')
-        subprocess.run([self.executable_path, temp_in, temp_out], check=True)
-        out_image = sitk.ReadImage(temp_out, image.GetPixelID())
-        # clean up
-        os.remove(temp_in)
-        os.remove(temp_out)
-        return out_image
-
-    def __str__(self):
-        """Gets a printable string representation.
-
-        Returns:
-            str: String representation.
-        """
-        return 'CmdlineExecutor:\n' \
-               ' executable_path:   {self.executable_path}\n' \
-            .format(self=self)
-
-
 class HistogramMatcherParams(IFilterParams):
     """
     Histogram matching filter parameters.
@@ -301,7 +215,7 @@ class HistogramMatcher(IFilter):
 
         Args:
             image (sitk.Image): The image.
-            params (IFilterParams): The parameters (unused).
+            params (IFilterParams): The parameters.
 
         Returns:
             sitk.Image: The filtered image.
@@ -323,4 +237,3 @@ class HistogramMatcher(IFilter):
                ' match_points:               {self.match_points}\n' \
                ' threshold_mean_intensity:   {self.threshold_mean_intensity}\n' \
             .format(self=self)
-
