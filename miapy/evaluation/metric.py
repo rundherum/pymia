@@ -368,6 +368,20 @@ class Fallout(IConfusionMatrixMetric):
         return 1 - specificity
 
 
+class FalseNegativeRate(IConfusionMatrixMetric):
+    """Represents a false negative rate metric."""
+
+    def __init__(self):
+        super().__init__()
+        self.metric = 'FNR'
+
+    def calculate(self):
+        """Calculates the false negative rate."""
+
+        sensitivity = self.confusion_matrix.tp / (self.confusion_matrix.tp + self.confusion_matrix.fn)
+        return 1 - sensitivity
+
+
 class FMeasure(IConfusionMatrixMetric):
     """Represents a F-measure metric."""
 
@@ -690,7 +704,7 @@ class Recall(IConfusionMatrixMetric):
 
 
 class Sensitivity(IConfusionMatrixMetric):
-    """Represents a sensitivity (true positive rate) metric."""
+    """Represents a sensitivity (true positive rate or recall) metric."""
 
     def __init__(self):
         """Initializes a new instance of the Sensitivity class."""
