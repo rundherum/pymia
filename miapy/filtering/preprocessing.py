@@ -1,13 +1,7 @@
 """Enables the enhancement of images before their use with other algorithms."""
-from typing import Dict, Union
 import SimpleITK as sitk
-import numpy as np
+
 from miapy.filtering.filter import IFilter, IFilterParams
-import subprocess
-import tempfile
-from os import path
-import os
-from scipy.interpolate.interpolate import interp1d
 
 
 class BiasFieldCorrectorParams(IFilterParams):
