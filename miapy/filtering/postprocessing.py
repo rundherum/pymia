@@ -4,10 +4,10 @@ Image post-processing aims to alter images such that they depict a desired repre
 """
 import SimpleITK as sitk
 
-import miapy.filtering.filter as fltr
+import miapy.filtering.filter as miapy_fltr
 
 
-class LargestNConnectedComponents(fltr.IFilter):
+class LargestNConnectedComponents(miapy_fltr.IFilter):
     """Represents a largest N connected components filter.
 
     Extracts the largest N connected components from a label image.
@@ -32,7 +32,7 @@ class LargestNConnectedComponents(fltr.IFilter):
         self.number_of_components = number_of_components
         self.consecutive_component_labels = consecutive_component_labels
 
-    def execute(self, image: sitk.Image, params: fltr.IFilterParams = None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: miapy_fltr.IFilterParams = None) -> sitk.Image:
         """Executes the largest N connected components filter on an image.
 
         Args:

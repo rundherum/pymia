@@ -9,13 +9,14 @@ See Also:
     `ITK Software Guide Registration <https://itk.org/ITKSoftwareGuide/html/Book2/ITKSoftwareGuide-Book2ch3.html>`_
 """
 from enum import Enum
+
 import matplotlib
 matplotlib.use('Agg')  # use matplotlib without having a window appear
 import matplotlib.pyplot as plt
 import numpy as np
 import SimpleITK as sitk
 
-import miapy.filtering.filter as fltr
+import miapy.filtering.filter as miapy_fltr
 
 
 class RegistrationType(Enum):
@@ -24,7 +25,7 @@ class RegistrationType(Enum):
     RIGID = 2
 
 
-class MultiModalRegistrationParams(fltr.IFilterParams):
+class MultiModalRegistrationParams(miapy_fltr.IFilterParams):
     """Represents parameters for the multi-modal rigid registration."""
 
     def __init__(self, fixed_image: sitk.Image, fixed_image_mask: sitk.Image=None, plot_directory_path: str=''):
@@ -42,7 +43,7 @@ class MultiModalRegistrationParams(fltr.IFilterParams):
         self.plot_directory_path = plot_directory_path
 
 
-class MultiModalRegistration(fltr.IFilter):
+class MultiModalRegistration(miapy_fltr.IFilter):
     """Represents a multi-modal image registration filter.
 
     The filter estimates a 3-dimensional rigid or affine transformation between images of different modalities using
