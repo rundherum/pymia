@@ -17,6 +17,12 @@ Pre-processing (:mod:`filtering.preprocessing`)
 .. automodule:: filtering.preprocessing
     :members:
 
+Post-processing (:mod:`filtering.postprocessing`)
+-------------------------------------------------
+
+.. automodule:: filtering.postprocessing
+    :members:
+
 Registration (:mod:`filtering.registration`)
 --------------------------------------------
 

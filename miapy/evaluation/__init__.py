@@ -15,7 +15,7 @@ and/or evaluation purposes on two binary masks (i.e. measuring their similarity)
 distance between histograms.
 
 The evaluator module (:mod:`evaluation.evaluator`)
-==================================================
+--------------------------------------------------
 
 .. autoclass:: evaluation.evaluator.Evaluator
 
@@ -26,40 +26,12 @@ The evaluator module (:mod:`evaluation.evaluator`)
 
 The metric module (:mod:`evaluation.metric`)
 ********************************************
-The :mod:`metrics` module contains a set of metrics based on the paper of Taha 2016.
-Refer to the paper for metrics selection, description, and math.
 
-.. module:: evaluation.metric
-.. autosummary::
-
-    Accuracy
-    AreaUnderCurve
-    AverageDistance
-    CohenKappaMetric
-    DiceCoefficient
-    Fallout
-    FMeasure
-    GlobalConsistencyError
-    HausdorffDistance
-    InterclassCorrelation
-    JaccardCoefficient
-    MahalanobisDistance
-    MutualInformation
-    Precision
-    ProbabilisticDistance
-    RandIndex
-    Recall
-    Sensitivity
-    Specificity
-    VariationOfInformation
-    VolumeSimilarity
-
-It is possible to implement your own metrics and use them with the :class:`evaluator.Evaluator`.
-Just inherit from :class:`metric.IMetric` or :class:`metric.IConfusionMatrixMetric`
-and implement :func:`metric.IMetric.calculate`.
+.. automodule:: evaluation.metric
+    :members:
 
 The validation module (:mod:`evaluation.validation`)
-====================================================
+----------------------------------------------------
 
 .. automodule:: evaluation.validation
     :members:

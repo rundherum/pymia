@@ -1,21 +1,51 @@
-"""This module holds classes related to ITK images and numpy arrays."""
+"""
+This module holds classes related to images.
+A strong focus is given to ITK images and numpy arrays.
+"""
+import SimpleITK as sitk
+import numpy as np
 from typing import Tuple
 
-import numpy as np
-import SimpleITK as sitk
+
+def get_numpy_data_type(data_type: int) -> np.dtype:
+    """Gets the numpy data type for a SimpleITK data type.
+
+    Args:
+        data_type (int): A SimpleITK data type.
+
+    Returns:
+        np.dtype: The numpy data type.
+
+    See Also:
+        http://insightsoftwareconsortium.github.io/SimpleITK-Notebooks/01_Image_Basics.html
+        https://docs.scipy.org/doc/numpy-1.12.0/user/basics.types.html
+
+    TODO:
+        fabianbalsiger: complete list
+    """
+    return {
+        sitk.sitkUInt8: np.uint8,
+        sitk.sitkInt8: np.int8,
+    }.get(data_type, np.float32)
 
 
 class ImageProperties:
     """Represents ITK image properties.
 
-    Also refer to itk::simple::Image::CopyInformation.
+    Holds common ITK image meta-data such as the size, origin, spacing, and direction.
+
+    See Also:
+        SimpleITK provides `itk::simple::Image::CopyInformation`_ to copy image information.
+
+    .. _itk::simple::Image::CopyInformation:
+        https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1Image.html#afa8a4757400c414e809d1767ee616bd0
     """
 
     def __init__(self, image: sitk.Image):
         """Initializes a new instance of the ImageInformation class.
 
         Args:
-            image (sitk.Image): The image to get the properties.
+            image (sitk.Image): The image whose properties to hold.
         """
         self.size = image.GetSize()
         self.origin = image.GetOrigin()
@@ -62,38 +92,83 @@ class ImageProperties:
                ' direction:                      {self.direction}\n' \
                ' dimensions:                     {self.dimensions}\n' \
                ' number_of_components_per_pixel: {self.number_of_components_per_pixel}\n' \
+               ' pixel_id:                       {self.pixel_id}\n' \
             .format(self=self)
+
+    def __eq__(self, other):
+        """Determines the equality of two ImageProperties classes.
+
+        Notes
+            The equality does not include the number_of_components_per_pixel and pixel_id.
+
+        Args:
+            other (object): An ImageProperties instance or any other object.
+
+        Returns:
+            bool: True if the ImageProperties are equal; otherwise, False.
+        """
+        if isinstance(other, self.__class__):
+            return self.size == other.size and \
+                   self.origin == other.origin and \
+                   self.spacing == other.spacing and \
+                   self.direction == other.direction and \
+                   self.dimensions == other.dimensions
+        return NotImplemented
+
+    def __ne__(self, other):
+        """Determines the non-equality of two ImageProperties classes.
+
+        Notes
+            The non-equality does not include the number_of_components_per_pixel and pixel_id.
+
+        Args:
+            other (object): An ImageProperties instance or any other object.
+
+        Returns:
+            bool: True if the ImageProperties are non-equal; otherwise, False.
+        """
+        if isinstance(other, self.__class__):
+            return not self.__eq__(other)
+        return NotImplemented
+
+    def __hash__(self):
+        """Gets the hash.
+
+        Returns:
+            int: The hash of the object.
+        """
+        return hash(tuple(sorted(self.__dict__.items())))
 
 
 class NumpySimpleITKImageBridge:
-    """A numpy to SimpleITK bridge.
-
-    Converts numpy array to SimpleITK images.
+    """
+    A numpy to SimpleITK bridge, which provides static methods to convert between numpy array and SimpleITK image.
     """
 
     @staticmethod
     def convert(array: np.ndarray, properties: ImageProperties) -> sitk.Image:
-        """Converts a numpy array to a SimpleITK image.
+        """
+        Converts a numpy array to a SimpleITK image.
 
-        Args:
-            array (np.ndarray): The image as numpy array. The shape can be either:
-                - shape=(n,), where n = total number of voxels
-                - shape=(n,v), where n = total number of voxels and v = number of components per pixel (vector image)
-                - shape=(<reversed image size>), what you get from itk.GetArrayFromImage
-            properties (ImageProperties): The image properties.
-
-        Returns:
-            sitk.Image: The SimpleITK image.
+        :param array: The image as numpy array. The shape can be either:
+            - shape=(n,), where n = total number of voxels
+            - shape=(n,v), where n = total number of voxels and v = number of components per pixel (vector image)
+            - shape=(<reversed image size>), what you get from itk.GetArrayFromImage
+        :type array: np.ndarray
+        :param properties: The image information.
+        :type properties: ImageProperties
+        :return: The SimpleITK image.
+        :rtype: sitk.Image
         """
 
         if not array.shape == properties.size[::-1]:
             # we need to reshape the array
 
             if not properties.is_vector_image() and array.ndim != 1:
-                raise ValueError('array needs to be one-dimensional')
+                raise ValueError("array needs to be one-dimensional")
 
             if properties.is_vector_image() and array.ndim != 2:
-                raise ValueError('array needs to be two-dimensional')
+                raise ValueError("array needs to be two-dimensional")
 
             # reshape array
             if not properties.is_vector_image():
@@ -110,18 +185,19 @@ class NumpySimpleITKImageBridge:
 
     @staticmethod
     def convert_to_vector_image(array: np.ndarray, properties: ImageProperties) -> sitk.Image:
-        """Converts a two-dimensional numpy array to a SimpleITK vector image with the properties of a scalar image.
+        """
+        Converts a two-dimensional numpy array to a SimpleITK vector image with the properties of a scalar image.
 
-        Args:
-            array (np.ndarray): The image as numpy two-dimensional array, e.g. shape=(4181760,2).
-            properties (ImageProperties): The image properties (scalar image; otherwise use convert()).
-
-        Returns:
-            sitk.Image: The SimpleITK image.
+        :param array: The image as numpy two-dimensional array, e.g. shape=(4181760,2).
+        :type array: np.ndarray
+        :param properties: The image properties (scalar image; otherwise use convert()).
+        :type properties: ImageProperties
+        :return: The SimpleITK image.
+        :rtype: sitk.Image
         """
 
         if array.ndim != 2:
-            raise ValueError('array needs to be two-dimensional')
+            raise ValueError("array needs to be two-dimensional")
 
         array = array.reshape((properties.size[::-1] + (array.shape[1], )))
 
@@ -144,7 +220,7 @@ class SimpleITKNumpyImageBridge:
         """Converts an image to a numpy array and an ImageProperties class.
 
         Args:
-            image (sitk.Image): The image.
+            image (SimpleITK.Image): The image.
 
         Returns:
             A Tuple[np.ndarray, ImageProperties]: The image as numpy array and the image properties.
