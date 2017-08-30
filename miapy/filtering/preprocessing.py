@@ -136,6 +136,45 @@ class GradientAnisotropicDiffusion(miapy_fltr.IFilter):
             .format(self=self)
 
 
+class NormalizeZScore(miapy_fltr.IFilter):
+    """Represents a z-score normalization filter."""
+
+    def __init__(self):
+        """Initializes a new instance of the NormalizeZScore class."""
+        super().__init__()
+
+    def execute(self, image: sitk.Image, params: miapy_fltr.IFilterParams=None) -> sitk.Image:
+        """Executes a z-score normalization on an image.
+
+        Args:
+            image (sitk.Image): The image.
+            params (miapy_fltr.IFilterParams): The parameters (unused).
+
+        Returns:
+            sitk.Image: The normalized image.
+        """
+
+        img_arr = sitk.GetArrayFromImage(image)
+
+        mean = img_arr.mean()
+        std = img_arr.std()
+        img_arr = (img_arr - mean) / std
+
+        img_out = sitk.GetImageFromArray(img_arr)
+        img_out.CopyInformation(image)
+
+        return img_out
+
+    def __str__(self):
+        """Gets a printable string representation.
+
+        Returns:
+            str: String representation.
+        """
+        return 'NormalizeZScore:\n' \
+            .format(self=self)
+
+
 class RescaleIntensity(miapy_fltr.IFilter):
     """Represents a rescale intensity filter."""
 
