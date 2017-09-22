@@ -11,6 +11,12 @@ Filter pipeline (:mod:`filtering.filter`)
 .. automodule:: filtering.filter
     :members:
 
+Miscellaneous (:mod:`filtering.misc`)
+-----------------------------------------------
+
+.. automodule:: filtering.misc
+    :members:
+
 Pre-processing (:mod:`filtering.preprocessing`)
 -----------------------------------------------
 

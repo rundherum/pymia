@@ -22,7 +22,8 @@ import sys
 import os
 
 sys.path.insert(0, os.path.abspath('.'))  # docs directory
-sys.path.insert(0, os.path.abspath('../miapy'))  # root directory of project
+sys.path.insert(0, os.path.abspath('..'))  # root directory of project
+sys.path.insert(0, os.path.abspath('../miapy'))  # root directory of miapy package
 
 # -- General configuration ------------------------------------------------
 
@@ -40,7 +41,7 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.imgmath',
               'sphinx.ext.todo',
               'sphinx.ext.viewcode',
-              'sphinxcontrib.napoleon']
+              'sphinx.ext.napoleon']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -88,6 +89,9 @@ todo_include_todos = True
 
 # The output image format for rendered math images.
 imgmath_image_format = 'svg'
+
+# Enable to output the class and the __init__ method docstring
+autoclass_content = 'both'
 
 # -- Options for HTML output ----------------------------------------------
 

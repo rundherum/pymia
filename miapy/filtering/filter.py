@@ -1,43 +1,46 @@
-"""We provide an easy way to set up a filtering pipeline. All modules in this package implement..."""
+"""This module contains classes to set up a filtering pipeline.
+
+All modules in the filter package implement the basic IFilter interface and can be used to set up a pipeline.
+"""
+from abc import ABCMeta, abstractmethod
 from typing import List
 
 import SimpleITK as sitk
-from abc import ABCMeta, abstractmethod
 
 
 class IFilterParams(metaclass=ABCMeta):
-    """Represents a filter parameters interface.
-    """
+    """Represents a filter parameters interface."""
 
 
 class IFilter(metaclass=ABCMeta):
-    """Filter base class.
-    """
+    """Filter base class."""
 
     def __init__(self):
-        """Initializes a new instance of the IFilter class.
-        """
+        """Initializes a new instance of the IFilter class."""
         self.verbose = False
 
     @abstractmethod
     def execute(self, image: sitk.Image, params: IFilterParams=None) -> sitk.Image:
         """Executes a filter on an image.
 
-        :param image: The image.
-        :param params: The filter parameters.
-        :return: The filtered image.
+        Args:
+            image (sitk.Image): The image.
+            params (IFilterParams): The filter parameters.
+
+        Returns:
+            sitk.Image: The filtered image.
         """
         raise NotImplementedError()
 
 
 class FilterPipeline:
-    """Represents a filter pipeline, which can be executed on images.
-    """
+    """Represents a filter pipeline, which can be executed on images."""
 
     def __init__(self, filters: List[IFilter]=None):
         """Initializes a new instance of the `FilterPipeline` class.
 
-        :param filters: The filters.
+        Args:
+            filters (list of IFilter): The filters.
         """
         self.params = []  # holds image-specific parameters
         self.filters = []  # holds the `IFilter`s
@@ -46,26 +49,34 @@ class FilterPipeline:
                 self.add_filter(filter_)
 
     def add_filter(self, filter_: IFilter):
+        """Add a filter to the pipeline.
 
+        Args:
+            filter_ (IFilter): A filter.
+        """
         if filter_ is None:
             raise ValueError("The parameter filter needs to be specified.")
 
         self.filters.append(filter_)
         self.params.append(None)  # params must have the same length as filters
 
-    def set_param(self, params, filter_index):
+    def set_param(self, params, filter_index: int):
         """Sets an image-specific parameter for a filter.
 
-        :param params: The parameter(s).
-        :param filter_index: The filter's index.
+        Args:
+            params (IFilterParams): The parameter(s).
+            filter_index (int): The filter's index the parameters belong to.
         """
         self.params[filter_index] = params
 
     def execute(self, image: sitk.Image) -> sitk.Image:
         """Executes the filter pipeline on an image.
 
-        :param image: The image.
-        :return: The filtered image.
+        Args:
+            image (sitk.Image): The image.
+
+        Returns:
+            sitk.Image: The filtered image.
         """
         for param_index, filter_ in enumerate(self.filters):
             image = filter_.execute(image, self.params[param_index])
@@ -73,14 +84,15 @@ class FilterPipeline:
         return image
 
     def __str__(self):
-        """Gets a nicely printable string representation.
+        """Gets a printable string representation.
 
-        :return: String representation.
+        Returns:
+            str: String representation.
         """
 
         string = 'FilterPipeline:\n'
 
         for filter_no, filter_ in enumerate(self.filters):
-            string += " " + str(filter_no + 1) + ". " + "    ".join(str(filter_).splitlines(True))
+            string += ' ' + str(filter_no + 1) + '. ' + '    '.join(str(filter_).splitlines(True))
 
         return string.format(self=self)

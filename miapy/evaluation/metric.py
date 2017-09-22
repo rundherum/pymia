@@ -7,7 +7,6 @@ and the math.
 It is possible to implement your own metrics and use them with the :class:`evaluator.Evaluator`.
 Just inherit from :class:`metric.IMetric`, :class:`metric.IConfusionMatrixMetric` or :class:`ISimpleITKImageMetric`
 and implement the function :func:`calculate`.
-
 """
 from abc import ABCMeta, abstractmethod
 import math
@@ -120,7 +119,7 @@ class IMetric(metaclass=ABCMeta):
     def __str__(self):
         """Gets a printable string representation.
 
-        Returns
+        Returns:
             str: String representation.
         """
         return '{self.metric}' \

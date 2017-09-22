@@ -1,14 +1,17 @@
-from typing import Dict, Union
-from miapy.filtering.filter import IFilter, IFilterParams
+"""The misc (miscellaneous) module contains filters, which don't have a classical purpose."""
+
 import subprocess
-import tempfile
-from os import path
 import os
-import SimpleITK as sitk
+import tempfile
+from typing import Dict, Union
+
 import numpy as np
+import SimpleITK as sitk
+
+import miapy.filtering.filter as miapy_fltr
 
 
-class Relabel(IFilter):
+class Relabel(miapy_fltr.IFilter):
     """Relabels the labels in the file by the provided rule"""
 
     def __init__(self, label_changes: Dict[int, Union[int, tuple]]) -> None:
@@ -21,12 +24,12 @@ class Relabel(IFilter):
         super().__init__()
         self.label_changes = label_changes
 
-    def execute(self, image: sitk.Image, params: IFilterParams = None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: miapy_fltr.IFilterParams = None) -> sitk.Image:
         """Executes the relabeling of the label image.
 
         Args:
             image (sitk.Image): The image.
-            params (IFilterParams): The parameters (unused).
+            params (miapy_fltr.IFilterParams): The parameters (unused).
 
         Returns:
             sitk.Image: The filtered image.
@@ -50,18 +53,15 @@ class Relabel(IFilter):
         for k, v in self.label_changes.items():
             str_list.append('{}->{}'.format(k, v))
         return 'Relabel:\n' \
-               ' label_changes:  {label_changes}\n' \
+               ' label_changes: {label_changes}\n' \
             .format(self=self, label_changes='; '.join(str_list))
 
 
-class SizeCorrectionParams(IFilterParams):
-    """
-     Size (shape) correction filter parameters.
-    """
+class SizeCorrectionParams(miapy_fltr.IFilterParams):
+    """Size (shape) correction filter parameters."""
 
     def __init__(self, reference_shape: tuple) -> None:
-        """
-        Initializes a new instance of the SizeCorrectionParams class.
+        """Initializes a new instance of the SizeCorrectionParams class.
 
         Args:
             reference_shape (tuple): The reference or target shape.
@@ -70,12 +70,11 @@ class SizeCorrectionParams(IFilterParams):
         self.reference_shape = reference_shape
 
 
-class SizeCorrectionFilter(IFilter):
+class SizeCorrectionFilter(miapy_fltr.IFilter):
     """A method to correct shape/size difference."""
 
     def __init__(self, two_sided=True, pad_constant=0.0) -> None:
         """ Initializes a new instance of the SizeCorrectionFilter class.
-
 
         Args:
             two_sided (bool): whether the cropping and padding should be applied on one or both side of the dimension.
@@ -86,8 +85,7 @@ class SizeCorrectionFilter(IFilter):
         self.pad_constant = pad_constant
 
     def execute(self, image: sitk.Image, params: SizeCorrectionParams = None) -> sitk.Image:
-        """
-        Executes the shape/size correction by help of padding and cropping.
+        """Executes the shape/size correction by help of padding and cropping.
 
         Args:
             image (sitk.Image): The image.
@@ -138,18 +136,15 @@ class SizeCorrectionFilter(IFilter):
             str: String representation.
         """
         return 'SizeCorrectionFilter:\n' \
-               ' two_sided:   {self.two_sided}\n' \
+               ' two_sided: {self.two_sided}\n' \
             .format(self=self)
 
 
-class CmdlineExecutor(IFilter):
-    """
-        Represents a command line executable.
-    """
+class CmdlineExecutor(miapy_fltr.IFilter):
+    """Represents a command line executable."""
 
     def __init__(self, executable_path: str):
-        """
-        Initializes a new instance of the CmdlineExecutor class.
+        """Initializes a new instance of the CmdlineExecutor class.
 
         Args:
             executable_path (str): path to the executable to run.
@@ -157,20 +152,20 @@ class CmdlineExecutor(IFilter):
         super().__init__()
         self.executable_path = executable_path
 
-    def execute(self, image: sitk.Image, params: IFilterParams = None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: miapy_fltr.IFilterParams=None) -> sitk.Image:
         """Executes a command line program.
 
         Args:
             image (sitk.Image): The image.
-            params (IFilterParams): The parameters (unused).
+            params (miapy_fltr.IFilterParams): The parameters (unused).
 
         Returns:
             sitk.Image: The filtered image.
         """
         temp_dir = tempfile.gettempdir()
-        temp_in = path.join(temp_dir, 'in.nii')
+        temp_in = os.path.join(temp_dir, 'in.nii')
         sitk.WriteImage(image, temp_in)
-        temp_out = path.join(temp_dir, 'out.nii')
+        temp_out = os.path.join(temp_dir, 'out.nii')
         subprocess.run([self.executable_path, temp_in, temp_out], check=True)
         out_image = sitk.ReadImage(temp_out, image.GetPixelID())
         # clean up
@@ -185,5 +180,5 @@ class CmdlineExecutor(IFilter):
             str: String representation.
         """
         return 'CmdlineExecutor:\n' \
-               ' executable_path:   {self.executable_path}\n' \
+               ' executable_path: {self.executable_path}\n' \
             .format(self=self)
