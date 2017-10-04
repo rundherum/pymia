@@ -1,9 +1,8 @@
 import sys
 from setuptools import find_packages, setup
 
-
-if not sys.hexversion < 0x03060000:
-    sys.exit("Requires Python 3.6 or higher")
+if sys.version_info < (3, 5):
+    sys.exit("Requires Python 3.5 or higher")
 
 with open('README.rst') as f:
     readme = f.read()
