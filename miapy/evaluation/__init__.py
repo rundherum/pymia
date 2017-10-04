@@ -18,6 +18,7 @@ The evaluator module (:mod:`evaluation.evaluator`)
 --------------------------------------------------
 
 .. autoclass:: evaluation.evaluator.Evaluator
+    :members:
 
 .. autoclass:: evaluation.evaluator.CSVEvaluatorWriter
 
