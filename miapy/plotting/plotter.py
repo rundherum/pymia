@@ -170,6 +170,56 @@ def plot_2d_segmentation(path: str,
     plt.close()
 
 
+def plot_2d_segmentation_contour(path: str,
+                                 image: np.ndarray,
+                                 ground_truth : np.ndarray,
+                                 segmentation : np.ndarray,
+                                 alpha: float=1,
+                                 label: int=1) -> None:
+    """Plots a 2-dimensional image with overlaid ground truth and segmentation contour.
+
+    Use sitk.BinaryContour(...) to extract a contour.
+
+    Args:
+        path (str): The output file path.
+        image (np.ndarray): The 2-D image.
+        ground_truth (np.ndarray): The 2-D ground truth contour.
+        segmentation (np.ndarray): The 2-D segmentation contour.
+        alpha (float): The alpha blending value, between 0 (transparent) and 1 (opaque).
+        label (int): The ground truth and segmentation label.
+    """
+
+    if not image.shape == ground_truth.shape == segmentation.shape:
+        raise ValueError('image, ground_truth, and segmentation must have equal shape')
+    if not image.ndim == 2:
+        raise ValueError('only 2-dimensional images supported')
+
+    mask = np.zeros(ground_truth.shape)
+    mask[ground_truth == label] = 1  # set ground truth contour to 1
+    mask[segmentation == label] = 2  # set
+    masked = np.ma.masked_where(mask == 0, mask)
+
+    fig = plt.figure(figsize=image.shape[::-1], dpi=2)  # figure is twice as large as array (in pixels)
+    # configure axes such that no boarder is plotted
+    # refer to https://github.com/matplotlib/matplotlib/issues/7940/ about how to remove axis from plot
+    ax = plt.Axes(fig, [0., 0., 1., 1.])
+    ax.set_axis_off()
+    ax.margins(0)
+    ax.tick_params(which='both', direction='in')
+
+    # plot image and mask
+    ax.imshow(image, 'gray', interpolation='none')
+    cm = plt_colors.LinearSegmentedColormap.from_list('rgb',
+                                                      [(0, 0, 1), (0, 1, 0)], N=2)  # simple RGB color map
+    ax.imshow(masked, interpolation='none', alpha=alpha, cmap=cm)
+
+    fig.add_axes(ax)
+
+    extent = ax.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
+    plt.savefig(path, bbox_inches=extent)
+    plt.close()
+
+
 def plot_2d_segmentation_series(path: str,
                                 file_name_suffix: str,
                                 image: sitk.Image,
