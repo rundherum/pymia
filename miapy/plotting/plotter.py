@@ -172,13 +172,15 @@ def plot_2d_segmentation(path: str,
 
 def plot_2d_segmentation_contour(path: str,
                                  image: np.ndarray,
-                                 ground_truth : np.ndarray,
-                                 segmentation : np.ndarray,
+                                 ground_truth: np.ndarray,
+                                 segmentation: np.ndarray,
                                  alpha: float=1,
                                  label: int=1) -> None:
     """Plots a 2-dimensional image with overlaid ground truth and segmentation contour.
 
-    Use sitk.BinaryContour(...) to extract a contour.
+    The ground truth is plotted in blue and the segmentation in green.
+    One can use the SimpleITK `BinaryContourImageFilter
+    <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1BinaryContourImageFilter.html>`_ to extract a contour.
 
     Args:
         path (str): The output file path.
@@ -196,7 +198,7 @@ def plot_2d_segmentation_contour(path: str,
 
     mask = np.zeros(ground_truth.shape)
     mask[ground_truth == label] = 1  # set ground truth contour to 1
-    mask[segmentation == label] = 2  # set
+    mask[segmentation == label] = 2  # set segmentation contour to 2
     masked = np.ma.masked_where(mask == 0, mask)
 
     fig = plt.figure(figsize=image.shape[::-1], dpi=2)  # figure is twice as large as array (in pixels)
@@ -210,7 +212,7 @@ def plot_2d_segmentation_contour(path: str,
     # plot image and mask
     ax.imshow(image, 'gray', interpolation='none')
     cm = plt_colors.LinearSegmentedColormap.from_list('rgb',
-                                                      [(0, 0, 1), (0, 1, 0)], N=2)  # simple RGB color map
+                                                      [(0.25, 0.5, 1), (0, 1, 0)], N=2)  # simple RGB color map
     ax.imshow(masked, interpolation='none', alpha=alpha, cmap=cm)
 
     fig.add_axes(ax)
