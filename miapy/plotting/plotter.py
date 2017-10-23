@@ -95,7 +95,7 @@ def plot_slice(path: str, image: sitk.Image, slice_no: int) -> None:
 
     slice_ = sitk.GetArrayFromImage(image[:, :, slice_no])
 
-    fig = plt.figure()
+    fig = plt.figure(figsize=slice_.shape[::-1], dpi=2)  # figure is twice as large as array (in pixels)
     # configure axes such that no boarder is plotted
     # refer to https://github.com/matplotlib/matplotlib/issues/7940/ about how to remove axis from plot
     ax = plt.Axes(fig, [0., 0., 1., 1.])
