@@ -89,10 +89,10 @@ class TestRelabel(unittest.TestCase):
         re_image = relabel.execute(image)
         np_re_image = sitk.GetArrayFromImage(re_image)
         self.assertFalse((np_re_image == 5).any())
-        self.assertEqual(image.GetPixel(1, 1), 3)
-        self.assertEqual(image.GetPixel(1, 2), 3)
+        self.assertEqual(re_image.GetPixel(1, 1), 3)
+        self.assertEqual(re_image.GetPixel(1, 2), 3)
         self.assertFalse((np_re_image == 1).any())
-        self.assertEqual(image.GetPixel(3, 3), 2)
+        self.assertEqual(re_image.GetPixel(3, 3), 2)
 
     def test_relabel_multiples(self):
         image = sitk.Image(4, 4, sitk.sitkUInt8)
@@ -101,15 +101,15 @@ class TestRelabel(unittest.TestCase):
         image.SetPixel(0, 3, 1)
         image.SetPixel(3, 1, 1)
 
-        relabel = m.Relabel({3: (1, 5)})  # 5 replaced by 3
+        relabel = m.Relabel({3: (1, 5)})  # 5 and 1 replaced by 3
         re_image = relabel.execute(image)
         np_re_image = sitk.GetArrayFromImage(re_image)
         self.assertFalse((np_re_image == 5).any())
         self.assertFalse((np_re_image == 1).any())
-        self.assertEqual(image.GetPixel(1, 1), 3)
-        self.assertEqual(image.GetPixel(1, 2), 3)
-        self.assertEqual(image.GetPixel(0, 3), 3)
-        self.assertEqual(image.GetPixel(3, 1), 3)
+        self.assertEqual(re_image.GetPixel(1, 1), 3)
+        self.assertEqual(re_image.GetPixel(1, 2), 3)
+        self.assertEqual(re_image.GetPixel(0, 3), 3)
+        self.assertEqual(re_image.GetPixel(3, 1), 3)
 
 
 
