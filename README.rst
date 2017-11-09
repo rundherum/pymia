@@ -2,8 +2,8 @@
 miapy
 ======
 
-.. image:: https://readthedocs.org/projects/pythoncommon/badge/?version=latest
-	:target: http://pythoncommon.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/miapy/badge/?version=latest
+	:target: http://miapy.readthedocs.io/en/latest/?badge=latest
 	:alt: Documentation Status
 	
 miapy contains generic and often used code for medical image analysis. 
