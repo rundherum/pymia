@@ -17,13 +17,26 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-import sphinx_rtd_theme
-import sys
 import os
+import sys
+import unittest.mock
+
+import sphinx_rtd_theme
 
 sys.path.insert(0, os.path.abspath('.'))  # docs directory
 sys.path.insert(0, os.path.abspath('..'))  # root directory of project
 sys.path.insert(0, os.path.abspath('../miapy'))  # root directory of miapy package
+
+# mock modules for read the docs
+
+
+class Mock(unittest.mock.MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+            return unittest.mock.MagicMock()
+
+MOCK_MODULES = ['numpy', 'SimpleITK', 'matplotlib', 'matplotlib.colors', 'matplotlib.pyplot']
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 # -- General configuration ------------------------------------------------
 
