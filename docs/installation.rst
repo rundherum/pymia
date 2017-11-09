@@ -2,12 +2,18 @@
 Installation
 ============
 
-
-
 Dependencies
 ------------
-dsf
+miapy depends on the following packages:
 
+ - `Matplotlib <https://matplotlib.org/>`_
+ - `NumPy <http://www.numpy.org/>`_
+ - `SimpleITK <http://www.simpleitk.org/>`_
+
+Building the documentation requires:
+
+ - `Sphinx <http://www.sphinx-doc.org>`_
+ - `Read the Docs Sphinx Theme <https://github.com/rtfd/sphinx_rtd_theme>`_
 
 ITK
 ---
@@ -22,7 +28,7 @@ You can install ITK using pip:
 Or... the longer and more painful way...
 Some modules depend on ITK. This describes how to install ITK with wrappers for Python (tested with ITK 4.12).
 
-You will need ccmake (install by sudo apt-get install cmake-curses-gui)
+You will need ccmake (install by :bash:`sudo apt-get install cmake-curses-gui`)
 
 1. Download ITK https://itk.org/ITK/resources/software.html
 2. Create ITK install folder
