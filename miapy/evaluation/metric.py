@@ -73,8 +73,8 @@ def get_classical_metrics():
            FalsePositive(),
            TrueNegative(),
            FalseNegative(),
-           LabelVolume(),
-           PredictionVolume()]
+           GroundTruthVolume(),
+           SegmentationVolume()]
 
 
 def _calculate_volume(image: sitk.Image):
@@ -510,16 +510,16 @@ class JaccardCoefficient(IConfusionMatrixMetric):
         return tp / (tp + fp + fn)
 
 
-class LabelVolume(ISimpleITKImageMetric):
-    """Represents a label (ground truth) volume metric."""
+class GroundTruthVolume(ISimpleITKImageMetric):
+    """Represents a ground truth volume metric."""
 
     def __init__(self):
-        """Initializes a new instance of the LabelVolume class."""
+        """Initializes a new instance of the GroundTruthVolume class."""
         super().__init__()
-        self.metric = "LBLVOL"
+        self.metric = "GTVOL"
 
     def calculate(self):
-        """Calculates the labeled (ground truth) volume in mm3."""
+        """Calculates the ground truth volume in mm3."""
 
         return _calculate_volume(self.ground_truth)
 
@@ -613,16 +613,16 @@ class Precision(IConfusionMatrixMetric):
             return 0
 
 
-class PredictionVolume(ISimpleITKImageMetric):
-    """Represents a prediction (segmentation) volume metric."""
+class SegmentationVolume(ISimpleITKImageMetric):
+    """Represents a segmentation volume metric."""
 
     def __init__(self):
-        """Initializes a new instance of the PredictionVolume class."""
+        """Initializes a new instance of the SegmentationVolume class."""
         super().__init__()
-        self.metric = "PRDVOL"
+        self.metric = "SEGVOL"
 
     def calculate(self):
-        """Calculates the predicted (segmented) volume in mm3."""
+        """Calculates the segmented volume in mm3."""
 
         return _calculate_volume(self.segmentation)
 
