@@ -210,6 +210,12 @@ class Evaluator:
         if not self.labels:
             raise ValueError('No labels to evaluate defined')
 
+        if isinstance(image, sitk.Image) and image.GetNumberOfComponentsPerPixel() > 1:
+            raise ValueError('Image has more than one component per pixel')
+
+        if isinstance(ground_truth, sitk.Image) and ground_truth.GetNumberOfComponentsPerPixel() > 1:
+            raise ValueError('Image has more than one component per pixel')
+
         if not self.is_header_written:
             self.write_header()
 
