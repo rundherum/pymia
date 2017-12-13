@@ -202,7 +202,13 @@ class Evaluator:
             image (sitk.Image): The segmented image.
             ground_truth (sitk.Image): The ground truth image.
             evaluation_id (str): The identification of the evaluation.
+
+        Raises:
+            ValueError: If no labels are defined (see add_label).
         """
+
+        if not self.labels:
+            raise ValueError('No labels to evaluate defined')
 
         if not self.is_header_written:
             self.write_header()
