@@ -8,7 +8,9 @@ See Also:
     `ITK Registration <https://itk.org/Doxygen/html/RegistrationPage.html>`_
     `ITK Software Guide Registration <https://itk.org/ITKSoftwareGuide/html/Book2/ITKSoftwareGuide-Book2ch3.html>`_
 """
-from enum import Enum
+import enum
+import abc
+import typing as t
 
 import matplotlib
 matplotlib.use('Agg')  # use matplotlib without having a window appear
@@ -19,28 +21,80 @@ import SimpleITK as sitk
 import miapy.filtering.filter as miapy_fltr
 
 
-class RegistrationType(Enum):
+class RegistrationType(enum.Enum):
     """Represents the registration transformation type."""
     AFFINE = 1
-    RIGID = 2
+    SIMILARITY = 2
+    RIGID = 3
+
+
+class RegistrationCallback(metaclass=abc.ABCMeta):
+    """Represents the abstract handler for the registration callbacks."""
+
+    def __init__(self) -> None:
+        """Initializes a new instance of the abstract RegistrationCallback class."""
+        self.registration_method = None
+        self.fixed_image = None
+        self.moving_image = None
+        self.transform = None
+
+    def set_params(self, registration_method: sitk.ImageRegistrationMethod,
+                   fixed_image: sitk.Image,
+                   moving_image: sitk.Image,
+                   transform: sitk.Transform):
+        """Sets the parameters that might be used during the callbacks
+
+        Args:
+            registration_method (sitk.ImageRegistrationMethod): The registration method.
+            fixed_image (sitk.Image): The fixed image.
+            moving_image (sitk.Image): The moving image.
+            transform (sitk.Transform): The transformation.
+        """
+        self.registration_method = registration_method
+        self.fixed_image = fixed_image
+        self.moving_image = moving_image
+        self.transform = transform
+        # link the callback functions to the events
+        self.registration_method.AddCommand(sitk.sitkStartEvent, self.registration_started)
+        self.registration_method.AddCommand(sitk.sitkEndEvent, self.registration_ended)
+        self.registration_method.AddCommand(sitk.sitkMultiResolutionIterationEvent,
+                                            self.registration_resolution_changed)
+        self.registration_method.AddCommand(sitk.sitkIterationEvent, self.registration_iteration_ended)
+
+    def registration_ended(self):
+        """Callback for the EndEvent."""
+        pass
+
+    def registration_started(self):
+        """Callback for the StartEvent."""
+        pass
+
+    def registration_resolution_changed(self):
+        """Callback for the MultiResolutionIterationEvent."""
+        pass
+
+    def registration_iteration_ended(self):
+        """Callback for the IterationEvent."""
+        pass
 
 
 class MultiModalRegistrationParams(miapy_fltr.IFilterParams):
     """Represents parameters for the multi-modal rigid registration."""
 
-    def __init__(self, fixed_image: sitk.Image, fixed_image_mask: sitk.Image=None, plot_directory_path: str=''):
+    def __init__(self, fixed_image: sitk.Image, fixed_image_mask: sitk.Image=None,
+                 callbacks: t.List[RegistrationCallback]=None):
         """Initializes a new instance of the MultiModalRegistrationParams class.
 
         Args:
             fixed_image (sitk.Image): The fixed image for the registration.
             fixed_image_mask (sitk.Image): A mask for the fixed image to limit the registration.
-            plot_directory_path (str): Path to the directory where to plot the registration progress if any.
-                Note that this increases the computational time.
+            callbacks (t.List[RegistrationCallback]): Path to the directory where to plot the registration
+                progress if any. Note that this increases the computational time.
         """
 
         self.fixed_image = fixed_image
         self.fixed_image_mask = fixed_image_mask
-        self.plot_directory_path = plot_directory_path
+        self.callbacks = callbacks
 
 
 class MultiModalRegistration(miapy_fltr.IFilter):
@@ -71,7 +125,8 @@ class MultiModalRegistration(miapy_fltr.IFilter):
                  relaxation_factor: float=0.5,
                  shrink_factors: [int]=(2, 1, 1),
                  smoothing_sigmas: [float]=(2, 1, 0),
-                 sampling_percentage: float=0.2):
+                 sampling_percentage: float=0.2,
+                 resampling_interpolator=sitk.sitkBSpline):
         """Initializes a new instance of the MultiModalRegistration class.
 
         Args:
@@ -86,6 +141,8 @@ class MultiModalRegistration(miapy_fltr.IFilter):
             sampling_percentage (float): Fraction of voxel of the fixed image that will be used for registration (0, 1].
                 Typical values range from 0.01 (1 %) for low detail images to 0.2 (20 %) for high detail images.
                 The higher the fraction, the higher the computational time.
+            resampling_interpolator: Interpolation to be applied while resampling the image by the determined
+                transformation.
         """
         super().__init__()
 
@@ -101,6 +158,7 @@ class MultiModalRegistration(miapy_fltr.IFilter):
         self.shrink_factors = shrink_factors
         self.smoothing_sigmas = smoothing_sigmas
         self.sampling_percentage = sampling_percentage
+        self.resampling_interpolator = resampling_interpolator
 
         registration = sitk.ImageRegistrationMethod()
 
@@ -139,6 +197,7 @@ class MultiModalRegistration(miapy_fltr.IFilter):
         registration.SmoothingSigmasAreSpecifiedInPhysicalUnitsOn()
 
         self.registration = registration
+        self.transform = None
 
     def execute(self, image: sitk.Image, params: MultiModalRegistrationParams=None) -> sitk.Image:
         """Executes a multi-modal rigid registration.
@@ -153,12 +212,17 @@ class MultiModalRegistration(miapy_fltr.IFilter):
 
         if params is None:
             raise ValueError("params is not defined")
+        dimensions = image.GetDimension()
+        if dimensions not in (2, 3):
+            raise ValueError('Image dimension {} is not among the accepted (2, 3)'.format(dimensions))
 
         # set a transform that is applied to the moving image to initialize the registration
         if self.registration_type == RegistrationType.RIGID:
-            transform_type = sitk.VersorRigid3DTransform()
+            transform_type = sitk.VersorRigid3DTransform() if dimensions == 3 else sitk.Euler2DTransform()
         elif self.registration_type == RegistrationType.AFFINE:
-            transform_type = sitk.AffineTransform(3)
+            transform_type = sitk.AffineTransform(dimensions)
+        elif self.registration_type == RegistrationType.SIMILARITY:
+            transform_type = sitk.Similarity3DTransform() if dimensions == 3 else sitk.Similarity2DTransform()
         else:
             raise ValueError('not supported registration_type')
 
@@ -171,11 +235,12 @@ class MultiModalRegistration(miapy_fltr.IFilter):
         if params.fixed_image_mask:
             self.registration.SetMetricFixedMask(params.fixed_image_mask)
 
-        if params.plot_directory_path:
-            RegistrationPlotter(self.registration, params.fixed_image, image, initial_transform, params.plot_directory_path)
+        if params.callbacks is not None:
+            for callback in params.callbacks:
+                callback.set_params(self.registration, params.fixed_image, image, initial_transform)
 
-        transform = self.registration.Execute(sitk.Cast(params.fixed_image, sitk.sitkFloat32),
-                                              sitk.Cast(image, sitk.sitkFloat32))
+        self.transform = self.registration.Execute(sitk.Cast(params.fixed_image, sitk.sitkFloat32),
+                                                   sitk.Cast(image, sitk.sitkFloat32))
 
         if self.verbose:
             print('MultiModalRegistration:\n Final metric value: {0}'.format(self.registration.GetMetricValue()))
@@ -184,7 +249,8 @@ class MultiModalRegistration(miapy_fltr.IFilter):
         elif self.number_of_iterations == self.registration.GetOptimizerIteration():
             print('MultiModalRegistration: Optimizer terminated at number of iterations and did not converge!')
 
-        return sitk.Resample(image, params.fixed_image, transform, sitk.sitkLinear, 0.0, image.GetPixelIDValue())
+        return sitk.Resample(image, params.fixed_image, self.transform, self.resampling_interpolator, 0.0,
+                             image.GetPixelIDValue())
 
     def __str__(self):
         """Gets a nicely printable string representation.
@@ -203,58 +269,43 @@ class MultiModalRegistration(miapy_fltr.IFilter):
                ' shrink_factors:           {self.shrink_factors}\n' \
                ' smoothing_sigmas:         {self.smoothing_sigmas}\n' \
                ' sampling_percentage:      {self.sampling_percentage}\n' \
+               ' resampling_interpolator:  {self.resampling_interpolator}\n' \
             .format(self=self)
 
 
-class RegistrationPlotter:
+class PlotCallback(RegistrationCallback):
     """Represents a plotter for SimpleITK registrations."""
 
-    def __init__(self, registration: sitk.ImageRegistrationMethod,
-                 fixed_image: sitk.Image,
-                 image: sitk.Image,
-                 transform: sitk.Transform,
-                 path: str):
+    def __init__(self, plot_dir) -> None:
         """
-
         Args:
-            registration (sitk.ImageRegistrationMethod): The registration method.
-            fixed_image (sitk.Image): The fixed image.
-            image (sitk.Image): The moving image.
-            transform (sitk.Transform): The transformation.
-            path (str): Path to the directory where to save the plots.
+            plot_dir (str): Path to the directory where to save the plots.
         """
+        super().__init__()
+        self.plot_dir = plot_dir
         self.metric_values = []
         self.multires_iterations = []
 
-        registration.AddCommand(sitk.sitkStartEvent, self._start_plot)
-        registration.AddCommand(sitk.sitkEndEvent, self._end_plot)
-        registration.AddCommand(sitk.sitkMultiResolutionIterationEvent, self._update_multiresolution_iterations)
-        registration.AddCommand(sitk.sitkIterationEvent, lambda: self._save_plot(registration,
-                                                                                 fixed_image,
-                                                                                 image,
-                                                                                 transform,
-                                                                                 path))
-
-    def _end_plot(self):
+    def registration_ended(self):
         """Callback for the EndEvent."""
         plt.close()
 
-    def _start_plot(self):
+    def registration_started(self):
         """Callback for the StartEvent."""
         self.metric_values = []
         self.multires_iterations = []
 
-    def _update_multiresolution_iterations(self):
+    def registration_resolution_changed(self):
         """Callback for the MultiResolutionIterationEvent."""
         self.multires_iterations.append(len(self.metric_values))
 
-    def _save_plot(self, registration_method, fixed, moving, transform, file_name_prefix):
+    def registration_iteration_ended(self):
         """Callback for the IterationEvent.
 
-        Saves an image including the visualization of the registered images and the metric value plot.
-        """
+                Saves an image including the visualization of the registered images and the metric value plot.
+                """
 
-        self.metric_values.append(registration_method.GetMetricValue())
+        self.metric_values.append(self.registration_method.GetMetricValue())
         # Plot the similarity metric values; resolution changes are marked with a blue star
         plt.plot(self.metric_values, 'r')
         plt.plot(self.multires_iterations, [self.metric_values[index] for index in self.multires_iterations], 'b*')
@@ -279,14 +330,17 @@ class RegistrationPlotter:
         # Extract the central axial slice from the two volumes, compose it using the transformation and alpha blend it
         alpha = 0.7
 
-        central_index = round((fixed.GetSize())[2] / 2)
-
-        moving_transformed = sitk.Resample(moving, fixed, transform,
+        moving_transformed = sitk.Resample(self.moving_image, self.fixed_image, self.transform,
                                            sitk.sitkLinear, 0.0,
-                                           moving.GetPixelIDValue())
+                                           self.moving_image.GetPixelIDValue())
         # Extract the central slice in xy and alpha blend them
-        combined = (1.0 - alpha) * sitk.Normalize(fixed[:, :, central_index]) + \
-                   alpha * sitk.Normalize(moving_transformed[:, :, central_index])
+        if self.fixed_image.GetDimension() == 3:
+            central_index = round((self.fixed_image.GetSize())[2] / 2)
+            combined = (1.0 - alpha) * sitk.Normalize(self.fixed_image[:, :, central_index]) + \
+                       alpha * sitk.Normalize(moving_transformed[:, :, central_index])
+        else:
+            combined = (1.0 - alpha) * sitk.Normalize(self.fixed_image) + \
+                       alpha * sitk.Normalize(moving_transformed[:, :])
 
         # Assume the alpha blended images are isotropic and rescale intensity
         # values so that they are in [0,255], convert the grayscale image to
@@ -297,12 +351,14 @@ class RegistrationPlotter:
                                              combined_slices_image)
 
         self._write_combined_image(combined_slices_image, plot_image,
-                                   file_name_prefix + format(len(self.metric_values), '03d') + '.png')
+                                   self.plot_dir + format(len(self.metric_values), '03d') + '.png')
 
-    def _write_combined_image(self, image1, image2, file_name):
+    @staticmethod
+    def _write_combined_image(image1, image2, file_name):
         """Writes an image including the visualization of the registered images and the metric value plot."""
-        combined_image = sitk.Image((image1.GetWidth() + image2.GetWidth(), max(image1.GetHeight(), image2.GetHeight())),
-                                    image1.GetPixelID(), image1.GetNumberOfComponentsPerPixel())
+        combined_image = sitk.Image(
+            (image1.GetWidth() + image2.GetWidth(), max(image1.GetHeight(), image2.GetHeight())),
+            image1.GetPixelID(), image1.GetNumberOfComponentsPerPixel())
 
         image1_destination = [0, 0]
         image2_destination = [image1.GetWidth(), 0]
