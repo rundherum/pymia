@@ -10,6 +10,7 @@ See Also:
 """
 import abc
 import enum
+import os
 import typing as t
 
 import matplotlib
@@ -285,13 +286,15 @@ class MultiModalRegistration(miapy_fltr.IFilter):
 class PlotCallback(RegistrationCallback):
     """Represents a plotter for SimpleITK registrations."""
 
-    def __init__(self, plot_dir) -> None:
+    def __init__(self, plot_dir: str, file_name_prefix: str='') -> None:
         """
         Args:
             plot_dir (str): Path to the directory where to save the plots.
+            file_name_prefix (str): The file name prefix for the plots.
         """
         super().__init__()
         self.plot_dir = plot_dir
+        self.file_name_prefix = file_name_prefix
         self.metric_values = []
         self.multires_iterations = []
 
@@ -360,7 +363,9 @@ class PlotCallback(RegistrationCallback):
                                              combined_slices_image)
 
         self._write_combined_image(combined_slices_image, plot_image,
-                                   self.plot_dir + format(len(self.metric_values), '03d') + '.png')
+                                   os.path.join(self.plot_dir,
+                                                self.file_name_prefix + format(len(self.metric_values), '03d') + '.png')
+                                   )
 
     @staticmethod
     def _write_combined_image(image1, image2, file_name):
