@@ -286,15 +286,18 @@ class MultiModalRegistration(miapy_fltr.IFilter):
 class PlotCallback(RegistrationCallback):
     """Represents a plotter for SimpleITK registrations."""
 
-    def __init__(self, plot_dir: str, file_name_prefix: str='') -> None:
+    def __init__(self, plot_dir: str, file_name_prefix: str='', slice_no: int=-1) -> None:
         """
         Args:
             plot_dir (str): Path to the directory where to save the plots.
             file_name_prefix (str): The file name prefix for the plots.
+            slice_no (int): The slice number to plot (affects only 3-D images). -1 means to use the middle slice.
         """
         super().__init__()
         self.plot_dir = plot_dir
         self.file_name_prefix = file_name_prefix
+        self.slice_no = slice_no
+
         self.metric_values = []
         self.multires_iterations = []
 
@@ -347,9 +350,9 @@ class PlotCallback(RegistrationCallback):
                                            self.moving_image.GetPixelIDValue())
         # Extract the central slice in xy and alpha blend them
         if self.fixed_image.GetDimension() == 3:
-            central_index = round((self.fixed_image.GetSize())[2] / 2)
-            combined = (1.0 - alpha) * sitk.Normalize(self.fixed_image[:, :, central_index]) + \
-                       alpha * sitk.Normalize(moving_transformed[:, :, central_index])
+            slice_index = self.slice_no if self.slice_no != -1 else round((self.fixed_image.GetSize())[2] / 2)
+            combined = (1.0 - alpha) * sitk.Normalize(self.fixed_image[:, :, slice_index]) + \
+                       alpha * sitk.Normalize(moving_transformed[:, :, slice_index])
         else:
             combined = (1.0 - alpha) * sitk.Normalize(self.fixed_image) + \
                        alpha * sitk.Normalize(moving_transformed[:, :])
