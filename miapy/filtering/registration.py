@@ -8,8 +8,8 @@ See Also:
     `ITK Registration <https://itk.org/Doxygen/html/RegistrationPage.html>`_
     `ITK Software Guide Registration <https://itk.org/ITKSoftwareGuide/html/Book2/ITKSoftwareGuide-Book2ch3.html>`_
 """
-import enum
 import abc
+import enum
 import typing as t
 
 import matplotlib
@@ -26,6 +26,7 @@ class RegistrationType(enum.Enum):
     AFFINE = 1
     SIMILARITY = 2
     RIGID = 3
+    BSPLINE = 4
 
 
 class RegistrationCallback(metaclass=abc.ABCMeta):
@@ -182,13 +183,16 @@ class MultiModalRegistration(miapy_fltr.IFilter):
 
         # optimizer
         # is required to explore the parameter space of the transform in search of optimal values of the metric
-        registration.SetOptimizerAsRegularStepGradientDescent(learningRate=self.learning_rate,
-                                                              minStep=self.step_size,
-                                                              numberOfIterations=self.number_of_iterations,
-                                                              relaxationFactor=self.relaxation_factor,
-                                                              gradientMagnitudeTolerance=1e-4,
-                                                              estimateLearningRate=registration.EachIteration,
-                                                              maximumStepSizeInPhysicalUnits=0.0)
+        if self.registration_type == RegistrationType.BSPLINE:
+            registration.SetOptimizerAsLBFGSB()
+        else:
+            registration.SetOptimizerAsRegularStepGradientDescent(learningRate=self.learning_rate,
+                                                                  minStep=self.step_size,
+                                                                  numberOfIterations=self.number_of_iterations,
+                                                                  relaxationFactor=self.relaxation_factor,
+                                                                  gradientMagnitudeTolerance=1e-4,
+                                                                  estimateLearningRate=registration.EachIteration,
+                                                                  maximumStepSizeInPhysicalUnits=0.0)
         registration.SetOptimizerScalesFromPhysicalShift()
 
         # setup for the multi-resolution framework
@@ -212,24 +216,29 @@ class MultiModalRegistration(miapy_fltr.IFilter):
 
         if params is None:
             raise ValueError("params is not defined")
-        dimensions = image.GetDimension()
-        if dimensions not in (2, 3):
-            raise ValueError('Image dimension {} is not among the accepted (2, 3)'.format(dimensions))
+        dimension = image.GetDimension()
+        if dimension not in (2, 3):
+            raise ValueError('Image dimension {} is not among the accepted (2, 3)'.format(dimension))
 
         # set a transform that is applied to the moving image to initialize the registration
-        if self.registration_type == RegistrationType.RIGID:
-            transform_type = sitk.VersorRigid3DTransform() if dimensions == 3 else sitk.Euler2DTransform()
-        elif self.registration_type == RegistrationType.AFFINE:
-            transform_type = sitk.AffineTransform(dimensions)
-        elif self.registration_type == RegistrationType.SIMILARITY:
-            transform_type = sitk.Similarity3DTransform() if dimensions == 3 else sitk.Similarity2DTransform()
+        if self.registration_type == RegistrationType.BSPLINE:
+            transform_domain_mesh_size = [10] * image.GetDimension()
+            initial_transform = sitk.BSplineTransformInitializer(params.fixed_image, transform_domain_mesh_size)
         else:
-            raise ValueError('not supported registration_type')
+            if self.registration_type == RegistrationType.RIGID:
+                transform_type = sitk.VersorRigid3DTransform() if dimension == 3 else sitk.Euler2DTransform()
+            elif self.registration_type == RegistrationType.AFFINE:
+                transform_type = sitk.AffineTransform(dimension)
+            elif self.registration_type == RegistrationType.SIMILARITY:
+                transform_type = sitk.Similarity3DTransform() if dimension == 3 else sitk.Similarity2DTransform()
+            else:
+                raise ValueError('not supported registration_type')
 
-        initial_transform = sitk.CenteredTransformInitializer(sitk.Cast(params.fixed_image, image.GetPixelIDValue()),
-                                                              image,
-                                                              transform_type,
-                                                              sitk.CenteredTransformInitializerFilter.GEOMETRY)
+            initial_transform = sitk.CenteredTransformInitializer(sitk.Cast(params.fixed_image, image.GetPixelIDValue()),
+                                                                  image,
+                                                                  transform_type,
+                                                                  sitk.CenteredTransformInitializerFilter.GEOMETRY)
+
         self.registration.SetInitialTransform(initial_transform, inPlace=True)
 
         if params.fixed_image_mask:
