@@ -348,22 +348,16 @@ class PlotCallback(RegistrationCallback):
         moving_transformed = sitk.Resample(self.moving_image, self.fixed_image, self.transform,
                                            sitk.sitkLinear, 0.0,
                                            self.moving_image.GetPixelIDValue())
-        # Extract the central slice in xy and alpha blend them
+        # Extract the plotting slice in xy and alpha blend them
         if self.fixed_image.GetDimension() == 3:
             slice_index = self.slice_no if self.slice_no != -1 else round((self.fixed_image.GetSize())[2] / 2)
-            combined = (1.0 - alpha) * sitk.Normalize(self.fixed_image[:, :, slice_index]) + \
+            image_registration_overlay = (1.0 - alpha) * sitk.Normalize(self.fixed_image[:, :, slice_index]) + \
                        alpha * sitk.Normalize(moving_transformed[:, :, slice_index])
         else:
-            combined = (1.0 - alpha) * sitk.Normalize(self.fixed_image) + \
+            image_registration_overlay = (1.0 - alpha) * sitk.Normalize(self.fixed_image) + \
                        alpha * sitk.Normalize(moving_transformed[:, :])
 
-        # Assume the alpha blended images are isotropic and rescale intensity
-        # values so that they are in [0,255], convert the grayscale image to
-        # color (r,g,b).
-        combined_slices_image = sitk.Cast(sitk.RescaleIntensity(combined), sitk.sitkUInt8)
-        combined_slices_image = sitk.Compose(combined_slices_image,
-                                             combined_slices_image,
-                                             combined_slices_image)
+        combined_slices_image = sitk.ScalarToRGBColormap(image_registration_overlay)
 
         self._write_combined_image(combined_slices_image, plot_image,
                                    os.path.join(self.plot_dir,
