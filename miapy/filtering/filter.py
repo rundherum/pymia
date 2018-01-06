@@ -2,24 +2,24 @@
 
 All modules in the filter package implement the basic IFilter interface and can be used to set up a pipeline.
 """
-from abc import ABCMeta, abstractmethod
-from typing import List
+import abc
+import typing as t
 
 import SimpleITK as sitk
 
 
-class IFilterParams(metaclass=ABCMeta):
+class IFilterParams(metaclass=abc.ABCMeta):
     """Represents a filter parameters interface."""
 
 
-class IFilter(metaclass=ABCMeta):
+class IFilter(metaclass=abc.ABCMeta):
     """Filter base class."""
 
     def __init__(self):
         """Initializes a new instance of the IFilter class."""
         self.verbose = False
 
-    @abstractmethod
+    @abc.abstractmethod
     def execute(self, image: sitk.Image, params: IFilterParams=None) -> sitk.Image:
         """Executes a filter on an image.
 
@@ -34,16 +34,17 @@ class IFilter(metaclass=ABCMeta):
 
 
 class FilterPipeline:
-    """Represents a filter pipeline, which can be executed on images."""
+    """Represents a filter pipeline, which sequentially executes filters on images."""
 
-    def __init__(self, filters: List[IFilter]=None):
+    def __init__(self, filters: t.List[IFilter]=None):
         """Initializes a new instance of the `FilterPipeline` class.
 
         Args:
             filters (list of IFilter): The filters.
         """
-        self.params = []  # holds image-specific parameters
         self.filters = []  # holds the `IFilter`s
+        self.params = []  # holds image-specific parameters
+
         if filters is not None:
             for filter_ in filters:
                 self.add_filter(filter_)
