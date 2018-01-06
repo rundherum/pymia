@@ -48,17 +48,18 @@ class FilterPipeline:
             for filter_ in filters:
                 self.add_filter(filter_)
 
-    def add_filter(self, filter_: IFilter):
+    def add_filter(self, filter_: IFilter, params=None):
         """Add a filter to the pipeline.
 
         Args:
             filter_ (IFilter): A filter.
+            params (IFilterParams): The parameters.
         """
         if filter_ is None:
             raise ValueError("The parameter filter needs to be specified.")
 
         self.filters.append(filter_)
-        self.params.append(None)  # params must have the same length as filters
+        self.params.append(params)  # params must have the same length as filters
 
     def set_param(self, params, filter_index: int):
         """Sets an image-specific parameter for a filter.
