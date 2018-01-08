@@ -27,6 +27,24 @@ class WithForegroundSelection(SelectionStrategy):
         return np.any(sample['labels'])
 
 
+class SubjectSelection(SelectionStrategy):
+
+    def __init__(self, subjects) -> None:
+        self.subjects = subjects
+
+    def __call__(self, sample):
+        return sample['subject'] in self.subjects
+
+
+class ComposeSelection(SelectionStrategy):
+
+    def __init__(self, strategies) -> None:
+        self.strategies = strategies
+
+    def __call__(self, sample):
+        return all(strategy(sample) for strategy in self.strategies)
+
+
 def select_indices(data_source: data.Dataset, selection_strategy: SelectionStrategy):
     selected_indices = []
     for i, sample in enumerate(data_source):
