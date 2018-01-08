@@ -1,11 +1,11 @@
 """The loading module holds classes to load data."""
-from abc import ABCMeta, abstractmethod
-from enum import Enum
-from typing import List
+import abc
+import enum
+import typing
 import os
 
 
-class FilePathGenerator(metaclass=ABCMeta):
+class FilePathGenerator(metaclass=abc.ABCMeta):
     """Represents an abstract file path generator.
 
     This class is used in :py:class:`FileSystemDataCrawler` to convert a human readable data identifier to an data file path,
@@ -13,7 +13,7 @@ class FilePathGenerator(metaclass=ABCMeta):
     """
 
     @staticmethod
-    @abstractmethod
+    @abc.abstractmethod
     def get_full_file_path(id_: str, root_dir: str, file_key, file_extension: str) -> str:
         """Gets the full file path for a data file.
 
@@ -29,15 +29,15 @@ class FilePathGenerator(metaclass=ABCMeta):
         raise NotImplementedError()
 
 
-class DirectoryFilter(metaclass=ABCMeta):
+class DirectoryFilter(metaclass=abc.ABCMeta):
     """Represents an abstract directory filter.
 
     This class is used in  :py:class:`FileSystemDataCrawler` to filter a list of directories.
     """
 
     @staticmethod
-    @abstractmethod
-    def filter_directories(dirs: List[str]) -> List[str]:
+    @abc.abstractmethod
+    def filter_directories(dirs: typing.List[str]) -> typing.List[str]:
         """Filters a list of directories.
 
         Args:
@@ -70,7 +70,7 @@ class FileSystemDataCrawler:
         We can use the following code to load the images `Image.mha` and `GroundTruth.mha`
         in the directories `Patient1` and `Patient2`:
 
-        >>> class MyImgType(Enum):
+        >>> class MyImgType(enum.Enum):
         >>>     T1 = 1
         >>>     GroundTruth = 2
         >>>
@@ -88,7 +88,7 @@ class FileSystemDataCrawler:
         >>>
         >>> class MyDirFilter(DirectoryFilter):
         >>>     @staticmethod
-        >>>     def filter_directories(dirs: List[str]) -> List[str]:
+        >>>     def filter_directories(dirs: typing.List[str]) -> typing.List[str]:
         >>>         return sorted([dir_ for dir_ in dirs if dir_.lower().__contains__('patient')])
         >>>
         >>> crawler = FileSystemDataCrawler('/path/to/root_dir',
