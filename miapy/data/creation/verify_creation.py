@@ -1,11 +1,11 @@
 import glob
 import os
 
-import data.creation.subjectfile as subj
-import data.creation.writer as wr
-import data.creation.traverser as tv
-import data.creation.callback as cb
-import libs.util.filehelper as fh
+import miapy.data.creation.subjectfile as subj
+import miapy.data.creation.writer as wr
+import miapy.data.creation.traverser as tv
+import miapy.data.creation.callback as cb
+import miapy.data.utils as util
 
 
 def main():
@@ -15,8 +15,8 @@ def main():
     # sort the subject files according to the subject name (identifier)
     subject_files.sort(key=lambda sf: sf.subject)
 
-    fh.create_dir_if_not_exists(out_file, is_file=True)
-    fh.remove_if_exists(out_file)
+    util.create_dir_if_not_exists(out_file, is_file=True)
+    util.remove_if_exists(out_file)
 
     with wr.Hdf5Writer(out_file) as writer:
         callbacks = [cb.WriteNamesCallback(writer), cb.WriteFilesCallback(writer), cb.WriteDataCallback(writer)]

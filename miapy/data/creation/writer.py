@@ -3,8 +3,7 @@ import abc
 import numpy as np
 import h5py
 
-import data.utils as util
-import libs.util.filehelper as fh
+import miapy.data.utils as util
 
 
 class Writer(metaclass=abc.ABCMeta):
@@ -46,6 +45,7 @@ class Hdf5Writer(Writer):
     def __init__(self, file_name: str) -> None:
         self.h5 = None  # type: h5py.File
         self.file_name = file_name
+        util.create_dir_if_not_exists(self.file_name, is_file=True)
 
     def __del__(self):
         self.close()
@@ -54,7 +54,6 @@ class Hdf5Writer(Writer):
         self.h5.close()
 
     def open(self):
-        fh.create_dir_if_not_exists(self.file_name, is_file=True)
         self.h5 = h5py.File(self.file_name)
 
     def reserve(self, entry: str, shape: tuple, dtype=None):

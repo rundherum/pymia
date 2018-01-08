@@ -4,13 +4,13 @@ import numpy as np
 import SimpleITK as sitk
 import torch.utils.data as data
 
-import data.extraction.sample as smpl
-import data.extraction.dataset as d
-import data.extraction.reader as r
-import data.creation.writer as wr
-import data.extraction.indexing as idx
-import data.extraction.extractor as extr
-import libs.util.filehelper as fh
+import miapy.data.extraction.sample as smpl
+import miapy.data.extraction.dataset as d
+import miapy.data.extraction.reader as r
+import miapy.data.creation.writer as wr
+import miapy.data.extraction.indexing as idx
+import miapy.data.extraction.extractor as extr
+import miapy.data.utils as util
 
 
 def main():
@@ -48,7 +48,7 @@ def main():
                 prev_t1 = curr_t1
             if prev_t1 != curr_t1:
                 t1_file = os.path.join(out_dir, prev_t1)
-                fh.create_dir_if_not_exists(t1_file, is_file=True)
+                util.create_dir_if_not_exists(t1_file, is_file=True)
                 np_content = np.asarray(content)
                 sitk.WriteImage(sitk.GetImageFromArray(np_content), t1_file)
                 content = []

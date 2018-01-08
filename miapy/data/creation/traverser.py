@@ -3,10 +3,10 @@ import typing as t
 
 import numpy as np
 
-import data.creation.subjectfile as subj
-import data.creation.callback as cb
-import data.creation.fileloader as load
-import data.transformation as tfm
+import miapy.data.creation.subjectfile as subj
+import miapy.data.creation.callback as cb
+import miapy.data.creation.fileloader as load
+import miapy.data.transformation as tfm
 
 
 class Traverser(metaclass=abc.ABCMeta):
