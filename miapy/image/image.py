@@ -2,32 +2,10 @@
 
 The main purpose of this module is the conversion between SimpleITK images and numpy arrays.
 """
-from typing import Tuple
+import typing
 
 import SimpleITK as sitk
 import numpy as np
-
-
-def get_numpy_data_type(data_type: int) -> np.dtype:
-    """Gets the numpy data type for a SimpleITK data type.
-
-    Args:
-        data_type (int): A SimpleITK data type.
-
-    Returns:
-        np.dtype: The numpy data type.
-
-    See Also:
-        http://insightsoftwareconsortium.github.io/SimpleITK-Notebooks/01_Image_Basics.html
-        https://docs.scipy.org/doc/numpy-1.12.0/user/basics.types.html
-
-    TODO:
-        fabianbalsiger: complete list
-    """
-    return {
-        sitk.sitkUInt8: np.uint8,
-        sitk.sitkInt8: np.int8,
-    }.get(data_type, np.float32)
 
 
 class ImageProperties:
@@ -193,7 +171,7 @@ class SimpleITKNumpyImageBridge:
     """
 
     @staticmethod
-    def convert(image: sitk.Image) -> Tuple[np.ndarray, ImageProperties]:
+    def convert(image: sitk.Image) -> typing.Tuple[np.ndarray, ImageProperties]:
         """Converts an image to a numpy array and an ImageProperties class.
 
         Args:
@@ -207,6 +185,6 @@ class SimpleITKNumpyImageBridge:
         """
 
         if image is None:
-            raise ValueError('image can not be None')
+            raise ValueError('Parameter image can not be None')
 
         return sitk.GetArrayFromImage(image), ImageProperties(image)
