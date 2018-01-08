@@ -52,22 +52,23 @@ class DirectoryFilter(metaclass=ABCMeta):
 class FileSystemDataCrawler:
     """Represents a file system data crawler.
 
-    todo(fabianbalsiger): finish doc
-
     Examples:
         Suppose we have the following directory structure::
 
-            path/to/root_dir
+            /path/to/root_dir
                 ./Patient1
                     ./Image.mha
                     ./GroundTruth.mha
+                    ./some_text_file.txt
                 ./Patient2
                     ./Image.mha
                     ./GroundTruth.mha
+                    ./GroundTruthRater2.mha
                 ./Atlas
                     ./Atlas.mha
 
-        We can use the following code to load the images in the directories `Patient1` and `Patient2`:
+        We can use the following code to load the images `Image.mha` and `GroundTruth.mha`
+        in the directories `Patient1` and `Patient2`:
 
         >>> class MyImgType(Enum):
         >>>     T1 = 1
@@ -88,16 +89,17 @@ class FileSystemDataCrawler:
         >>> class MyDirFilter(DirectoryFilter):
         >>>     @staticmethod
         >>>     def filter_directories(dirs: List[str]) -> List[str]:
-        >>>         return [dir for dir in dirs if dir.lower().__contains__('patient')]
+        >>>         return sorted([dir_ for dir_ in dirs if dir_.lower().__contains__('patient')])
         >>>
-        >>> crawler = FileSystemDataCrawler('path/to/root_dir',
+        >>> crawler = FileSystemDataCrawler('/path/to/root_dir',
         >>>                                 [MyImgType.T1, MyImgType.GroundTruth],
-        >>>                                 dir_filter=MyDirFilter(),
-        >>>                                 file_extension='.mha')
+        >>>                                 MyFilePathGenerator(),
+        >>>                                 MyDirFilter(),
+        >>>                                 '.mha')
         >>> for id_, path in crawler.data.items():
         >>>     print(id_, path)
-        Patient1 path/to/root_dir/Patient1
-        Patient2 path/to/root_dir/Patient2
+        Patient1 {'Patient1': '/path/to/root_dir/Patient1', <MyImgType.T1: 1>: '/path/to/root_dir/Patient1/Image.mha', <MyImgType.GroundTruth: 2>: '/path/to/root_dir/Patient1/GroundTruth.mha'}
+        Patient2 {'Patient2': '/path/to/root_dir/Patient2', <MyImgType.T1: 1>: '/path/to/root_dir/Patient2/Image.mha', <MyImgType.GroundTruth: 2>: '/path/to/root_dir/Patient2/GroundTruth.mha'}
     """
     
     def __init__(self,
