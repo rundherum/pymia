@@ -48,7 +48,7 @@ def main():
                 prev_t1 = curr_t1
             if prev_t1 != curr_t1:
                 t1_file = os.path.join(out_dir, prev_t1)
-                util.create_dir_if_not_exists(t1_file, is_file=True)
+                fh.create_dir_if_not_exists(t1_file, is_file=True)
                 np_content = np.asarray(content)
                 sitk.WriteImage(sitk.GetImageFromArray(np_content), t1_file)
                 content = []

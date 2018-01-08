@@ -15,8 +15,8 @@ def main():
     # sort the subject files according to the subject name (identifier)
     subject_files.sort(key=lambda sf: sf.subject)
 
-    util.create_dir_if_not_exists(out_file, is_file=True)
-    util.remove_if_exists(out_file)
+    fh.create_dir_if_not_exists(out_file, is_file=True)
+    fh.remove_if_exists(out_file)
 
     with wr.Hdf5Writer(out_file) as writer:
         callbacks = [cb.WriteNamesCallback(writer), cb.WriteFilesCallback(writer), cb.WriteDataCallback(writer)]
