@@ -1,7 +1,7 @@
 import os
 
-import data.utils as util
-import data.creation.writer as wr
+import miapy.data.utils as util
+import miapy.data.creation.writer as wr
 
 
 class Callback:

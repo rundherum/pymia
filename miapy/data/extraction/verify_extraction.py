@@ -4,12 +4,12 @@ import numpy as np
 import SimpleITK as sitk
 import torch.utils.data as data
 
-import data.extraction.sample as smpl
-import data.extraction.dataset as d
-import data.extraction.reader as r
-import data.creation.writer as wr
-import data.extraction.indexing as idx
-import data.extraction.extractor as extr
+import miapy.data.extraction.sample as smpl
+import miapy.data.extraction.dataset as d
+import miapy.data.extraction.reader as r
+import miapy.data.creation.writer as wr
+import miapy.data.extraction.indexing as idx
+import miapy.data.extraction.extractor as extr
 import libs.util.filehelper as fh
 
 

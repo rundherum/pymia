@@ -1,7 +1,7 @@
 import abc
 
-import data.utils as util
-import data.extraction.reader as r
+import miapy.data.utils as util
+import miapy.data.extraction.reader as r
 
 
 class Extractor(metaclass=abc.ABCMeta):

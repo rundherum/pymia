@@ -1,10 +1,10 @@
 import glob
 import os
 
-import data.creation.subjectfile as subj
-import data.creation.writer as wr
-import data.creation.traverser as tv
-import data.creation.callback as cb
+import miapy.data.creation.subjectfile as subj
+import miapy.data.creation.writer as wr
+import miapy.data.creation.traverser as tv
+import miapy.data.creation.callback as cb
 import libs.util.filehelper as fh
 
 

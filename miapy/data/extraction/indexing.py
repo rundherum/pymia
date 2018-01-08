@@ -1,7 +1,7 @@
 import abc
 import typing as t
 
-import data.utils as util
+import miapy.data.utils as util
 
 
 class IndexingStrategy(metaclass=abc.ABCMeta):

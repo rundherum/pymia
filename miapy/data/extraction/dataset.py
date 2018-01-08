@@ -2,10 +2,10 @@ import typing as t
 
 import torch.utils.data.dataset as data
 
-import data.transformation as tfm
-import data.extraction.reader as r
-import data.extraction.indexing as idx
-import data.extraction.extractor as extr
+import miapy.data.transformation as tfm
+import miapy.data.extraction.reader as r
+import miapy.data.extraction.indexing as idx
+import miapy.data.extraction.extractor as extr
 
 
 class ParametrizableDataset(data.Dataset):
