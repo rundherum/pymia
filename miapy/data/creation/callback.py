@@ -47,6 +47,22 @@ class WriteDataCallback(Callback):
             self.writer.write('{}/{}'.format(self.GT_PATH, index_str), np_gts)
 
 
+class WriteSubjectCallback(Callback):
+    SUBJECT = 'meta/subjects'
+
+    def __init__(self, writer: wr.Writer) -> None:
+        self.writer = writer
+
+    def on_start(self, params: dict):
+        subject_count = len(params['subject_files'])
+        self.writer.reserve(self.SUBJECT, (subject_count,), str)
+
+    def on_subject_start(self, params: dict):
+        subject = params['subject']
+        subject_index = params['subject_index']
+        self.writer.fill(self.SUBJECT, subject, util.IndexExpression(subject_index))
+
+
 class WriteNamesCallback(Callback):
     SEQ_NAMES = 'meta/sequence_names'
     GT_NAMES = 'meta/gt_names'

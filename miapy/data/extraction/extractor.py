@@ -42,6 +42,13 @@ class NamesExtractor(Extractor):
         return d
 
 
+class SubjectExtractor(Extractor):
+
+    def extract(self, params: dict, extracted: dict) -> None:
+        subject_index_expr = util.IndexExpression(params['subject_index'])
+        extracted['subject'] = self.reader.read('meta/subjects', subject_index_expr)
+
+
 class FilesExtractor(Extractor):
 
     def __init__(self, cache=True) -> None:
