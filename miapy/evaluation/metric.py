@@ -77,15 +77,6 @@ def get_classical_metrics():
            SegmentationVolume()]
 
 
-def _calculate_volume(image: sitk.Image):
-    """Calculates the volume of a label image."""
-
-    voxel_volume = np.prod(image.GetSpacing())
-    number_of_voxels = sitk.GetArrayFromImage(image).sum()
-
-    return number_of_voxels * voxel_volume
-
-
 class ConfusionMatrix:
     """Represents a confusion matrix (or error matrix)."""
 
@@ -174,6 +165,29 @@ class INumpyArrayMetric(IMetric):
         """Calculates the metric."""
 
         raise NotImplementedError
+
+
+class VolumeMetric(ISimpleITKImageMetric):
+    """Represents a volume metric."""
+
+    def __init__(self):
+        """Initializes a new instance of the VolumeMetric class."""
+        super().__init__()
+        self.metric = 'VOL'
+
+    @abstractmethod
+    def calculate(self):
+        """Calculates the metric."""
+        raise NotImplementedError
+
+    @staticmethod
+    def _calculate_volume(image: sitk.Image):
+        """Calculates the volume of a label image."""
+
+        voxel_volume = np.prod(image.GetSpacing())
+        number_of_voxels = sitk.GetArrayFromImage(image).sum()
+
+        return number_of_voxels * voxel_volume
 
 
 class Accuracy(IConfusionMatrixMetric):
@@ -510,7 +524,7 @@ class JaccardCoefficient(IConfusionMatrixMetric):
         return tp / (tp + fp + fn)
 
 
-class GroundTruthVolume(ISimpleITKImageMetric):
+class GroundTruthVolume(VolumeMetric):
     """Represents a ground truth volume metric."""
 
     def __init__(self):
@@ -521,7 +535,7 @@ class GroundTruthVolume(ISimpleITKImageMetric):
     def calculate(self):
         """Calculates the ground truth volume in mm3."""
 
-        return _calculate_volume(self.ground_truth)
+        return self._calculate_volume(self.ground_truth)
 
 
 class MahalanobisDistance(INumpyArrayMetric):
@@ -613,18 +627,18 @@ class Precision(IConfusionMatrixMetric):
             return 0
 
 
-class SegmentationVolume(ISimpleITKImageMetric):
+class SegmentationVolume(VolumeMetric):
     """Represents a segmentation volume metric."""
 
     def __init__(self):
         """Initializes a new instance of the SegmentationVolume class."""
         super().__init__()
-        self.metric = "SEGVOL"
+        self.metric = 'SEGVOL'
 
     def calculate(self):
         """Calculates the segmented volume in mm3."""
 
-        return _calculate_volume(self.segmentation)
+        return self._calculate_volume(self.segmentation)
 
 
 class ProbabilisticDistance(INumpyArrayMetric):
