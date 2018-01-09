@@ -299,7 +299,7 @@ class PlotCallback(RegistrationCallback):
         self.slice_no = slice_no
 
         self.metric_values = []
-        self.multires_iterations = []
+        self.resolution_iterations = []
 
     def registration_ended(self):
         """Callback for the EndEvent."""
@@ -308,22 +308,22 @@ class PlotCallback(RegistrationCallback):
     def registration_started(self):
         """Callback for the StartEvent."""
         self.metric_values = []
-        self.multires_iterations = []
+        self.resolution_iterations = []
 
     def registration_resolution_changed(self):
         """Callback for the MultiResolutionIterationEvent."""
-        self.multires_iterations.append(len(self.metric_values))
+        self.resolution_iterations.append(len(self.metric_values))
 
     def registration_iteration_ended(self):
         """Callback for the IterationEvent.
 
-                Saves an image including the visualization of the registered images and the metric value plot.
-                """
+        Saves an image including the visualization of the registered images and the metric value plot.
+        """
 
         self.metric_values.append(self.registration_method.GetMetricValue())
         # Plot the similarity metric values; resolution changes are marked with a blue star
         plt.plot(self.metric_values, 'r')
-        plt.plot(self.multires_iterations, [self.metric_values[index] for index in self.multires_iterations], 'b*')
+        plt.plot(self.resolution_iterations, [self.metric_values[index] for index in self.resolution_iterations], 'b*')
         plt.xlabel('Iteration', fontsize=12)
         plt.ylabel('Metric Value', fontsize=12)
 
@@ -382,3 +382,46 @@ class PlotCallback(RegistrationCallback):
         combined_image = sitk.Paste(combined_image, image1, image1.GetSize(), (0, 0), image1_destination)
         combined_image = sitk.Paste(combined_image, image2, image2.GetSize(), (0, 0), image2_destination)
         sitk.WriteImage(combined_image, file_name)
+
+
+class PlotOnResolutionChangeCallback(RegistrationCallback):
+    """Represents a plotter for SimpleITK registrations.
+
+    Saves the moving image on each resolution change and the registration end.
+    """
+
+    def __init__(self, plot_dir: str, file_name_prefix: str='') -> None:
+        """
+        Args:
+            plot_dir (str): Path to the directory where to save the plots.
+            file_name_prefix (str): The file name prefix for the plots.
+        """
+        super().__init__()
+        self.plot_dir = plot_dir
+        self.file_name_prefix = file_name_prefix
+
+        self.resolution = 0
+
+    def registration_ended(self):
+        """Callback for the EndEvent."""
+        self._write_image('end')
+
+    def registration_started(self):
+        """Callback for the StartEvent."""
+        self.resolution = 0
+
+    def registration_resolution_changed(self):
+        """Callback for the MultiResolutionIterationEvent."""
+        self._write_image('res' + str(self.resolution))
+        self.resolution = self.resolution + 1
+
+    def registration_iteration_ended(self):
+        """Callback for the IterationEvent."""
+
+    def _write_image(self, file_name_suffix: str):
+        """Writes an image."""
+        file_name = os.path.join(self.plot_dir, self.file_name_prefix + '_' + file_name_suffix + '.mha')
+
+        moving_transformed = sitk.Resample(self.moving_image, self.fixed_image, self.transform,
+                                           sitk.sitkLinear, 0.0, self.moving_image.GetPixelIDValue())
+        sitk.WriteImage(moving_transformed, file_name)
