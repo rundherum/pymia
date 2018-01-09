@@ -10,80 +10,6 @@ import numpy as np
 import SimpleITK as sitk
 
 
-def plot_histogram(path: str, image: sitk.Image, no_bins: int=255, slice_no: int=-1,
-                   title: str='', xlabel: str='', ylabel: str='') -> None:
-    """Plots a histogram of an image.
-
-    Plots either the histogram of a slice of the image or of the whole image.
-    Args:
-        path (str): The file path.
-        image (SimpleITK.Image): The image.
-        no_bins (int): The number of histogram bins.
-        slice_no (int): The slice number or -1 to take the whole image.
-        title (str): The histogram's title.
-        xlabel (str): The histogram's x-axis label.
-        ylabel (str): The histogram's y-axis label.
-    """
-    if slice_no > -1:
-        data = sitk.GetArrayFromImage(image[:, :, slice_no])
-    else:
-        data = sitk.GetArrayFromImage(image)
-
-    data = data.flatten()
-
-    plt.hist(data, bins=no_bins)
-    if title: plt.title(title)
-    if xlabel: plt.xlabel(xlabel)
-    if ylabel: plt.ylabel(ylabel)
-    plt.savefig(path)
-    plt.close()
-
-
-def plot_histogram_overlay(path: str, image1: sitk.Image, image2: sitk.Image,
-                           legend1: str='', legend2: str='',
-                           no_bins: int=255, slice_no: int=-1,
-                           title: str='', xlabel: str='', ylabel: str='',
-                           xaxis_log: bool=False, yaxis_log: bool=False) -> None:
-    """Plots a histogram of an image.
-
-    Plots either the histogram of a slice of the image or of the whole image.
-    
-    Args:
-        path (str): The file path.
-        image1 (sitk.Image): The first image.
-        image2 (sitk.Image): The second image.
-        legend1 (str): The legend for the first image.
-        legend2 (str): The legend for the second image.2
-        no_bins (int): The number of histogram bins.
-        slice_no (int): The slice number or -1 to take the whole image.
-        title (str): The histogram's title.
-        xlabel (str): The histogram's x-axis label.
-        ylabel (str): The histogram's y-axis label.
-        xaxis_log (bool): Logarithmic scale for x-axis.
-        yaxis_log (bool): Logarithmic scale for y-axis.
-    """
-    if slice_no > -1:
-        data1 = sitk.GetArrayFromImage(image1[:, :, slice_no])
-        data2 = sitk.GetArrayFromImage(image2[:, :, slice_no])
-    else:
-        data1 = sitk.GetArrayFromImage(image1)
-        data2 = sitk.GetArrayFromImage(image2)
-
-    data1 = data1.flatten()
-    data2 = data2.flatten()
-
-    plt.hist(data1, bins=no_bins, alpha=0.5, label=legend1)
-    plt.hist(data2, bins=no_bins, alpha=0.5, label=legend2)
-    if legend1 or legend2: plt.legend()
-    if xaxis_log: plt.xscale('log')
-    if yaxis_log: plt.yscale('log')
-    if title: plt.title(title)
-    if xlabel: plt.xlabel(xlabel)
-    if ylabel: plt.ylabel(ylabel)
-    plt.savefig(path)
-    plt.close()
-
-
 def plot_slice(path: str, image: sitk.Image, slice_no: int) -> None:
     """Plots a slice from a 3-D image to a file.
 
@@ -130,12 +56,12 @@ def plot_2d_segmentation(path: str,
         label (int): The ground truth and segmentation label.
 
     Examples:
-        >>> img = np.random.randn(10, 15) * 0.1
+        >>> img_t2 = np.random.randn(10, 15) * 0.1
         >>> ground_truth = np.zeros((10, 15))
         >>> ground_truth[3:-3, 3:-3] = 1
         >>> segmentation = np.zeros((10, 15))
         >>> segmentation[4:-2, 4:-2] = 1
-        >>> plot_2d_segmentation('/your/path/plot_2d_segmentation.png', img, ground_truth, segmentation)
+        >>> plot_2d_segmentation('/your/path/plot_2d_segmentation.png', img_t2, ground_truth, segmentation)
     """
 
     if not image.shape == ground_truth.shape == segmentation.shape:
@@ -243,10 +169,10 @@ def plot_2d_segmentation_series(path: str,
         file_extension (str): The output file extension (with or without dot).
 
     Examples:
-        >>> img = sitk.ReadImage('your/path/image.mha')
+        >>> img_t2 = sitk.ReadImage('your/path/image.mha')
         >>> ground_truth = sitk.ReadImage('your/path/ground_truth.mha')
         >>> segmentation = sitk.ReadImage('your/path/segmentation.mha')
-        >>> plot_2d_segmentation_series('/your/path/', 'mysegmentation', img, ground_truth, segmentation)
+        >>> plot_2d_segmentation_series('/your/path/', 'mysegmentation', img_t2, ground_truth, segmentation)
     """
 
     if not image.GetSize() == ground_truth.GetSize() == segmentation.GetSize():
