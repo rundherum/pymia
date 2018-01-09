@@ -1,5 +1,7 @@
 import abc
 
+import numpy as np
+
 import miapy.data.indexexpression as util
 from . import reader as rd
 
@@ -88,10 +90,16 @@ class FilesExtractor(Extractor):
 
 class DataExtractor(Extractor):
 
-    def __init__(self, sequence_selection=None, gt_selection=None) -> None:
+    def __init__(self, gt_mode='all', gt_selection=None) -> None:
         super().__init__()
         self.entry_base_names = None
-        self.sequence_selection = sequence_selection
+        if gt_mode not in ('all', 'random', 'select'):
+            raise ValueError('gt_mode must be "all", "random" or "select"')
+        self.gt_mode = gt_mode
+        if gt_mode == 'select' and isinstance(gt_selection, (tuple, list)):
+            raise ValueError('for mode "select" the selection can only be one selection (string)')
+        if isinstance(gt_selection, str):
+            gt_selection = (gt_selection,)
         self.gt_selection = gt_selection
 
     def set_reader(self, reader: rd.Reader):
@@ -106,4 +114,22 @@ class DataExtractor(Extractor):
         base_name = self.entry_base_names[subject_index]
         extracted['images'] = self.reader.read('data/sequences/{}'.format(base_name), index_expr)
         if self.reader.has('data/gts'):
-            extracted['labels'] = self.reader.read('data/gts/{}'.format(base_name), index_expr)
+            if self.gt_mode == 'all':
+                np_gts = self.reader.read('data/gts/{}'.format(base_name), index_expr)
+            else:
+                if 'gt_names' not in extracted:
+                    raise ValueError('selection of gt requires gt_names to be extracted')
+                gt_names = extracted['gt_names']  # type: list
+                if self.gt_mode == 'random':
+                    selection_indices = [gt_names.index(s) for s in self.gt_selection]
+                    index = np.random.choice(selection_indices)
+                else:
+                    # mode == select
+                    index = gt_names.index(self.gt_selection[0])
+
+                # todo: inverse index_expr in order to add index to it
+                np_gts = self.reader.read('data/gts/{}'.format(base_name), index_expr)[..., index]
+                # maintaining gt dims
+                np_gts = np.expand_dims(np_gts, -1)
+
+            extracted['labels'] = np_gts

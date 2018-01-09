@@ -78,7 +78,7 @@ class SubjectFileTraverser(Traverser):
                     if callback:
                         callback.on_gt_file({**callback_params, **callback_subject_params, **callback_image_params})
 
-                np_gts = default_concat(subject_gts)
+                np_gts = concat_fn(subject_gts)
                 transform_params['labels'] = np_gts
 
             if transform:

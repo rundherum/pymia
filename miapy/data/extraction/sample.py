@@ -11,6 +11,9 @@ class SelectionStrategy(metaclass=abc.ABCMeta):
     def __call__(self, sample) -> bool:
         pass
 
+    def __repr__(self) -> str:
+        return self.__class__.__name__
+
 
 class NonBlackSelection(SelectionStrategy):
 
@@ -19,7 +22,10 @@ class NonBlackSelection(SelectionStrategy):
         self.black_value = black_value
 
     def __call__(self, sample) -> bool:
-        return (sample['images'] > self.black_value).all()
+        return (sample['images'] > self.black_value).any()
+
+    def __repr__(self) -> str:
+        return '{}({})'.format(self.__class__.__name__, self.black_value)
 
 
 class PercentileSelection(SelectionStrategy):
@@ -33,6 +39,9 @@ class PercentileSelection(SelectionStrategy):
 
         percentile_value = np.percentile(image_data, self.percentile)
         return (image_data >= percentile_value).all()
+
+    def __repr__(self) -> str:
+        return '{}({})'.format(self.__class__.__name__, self.percentile)
 
 
 class WithForegroundSelection(SelectionStrategy):
@@ -49,6 +58,9 @@ class SubjectSelection(SelectionStrategy):
     def __call__(self, sample) -> bool:
         return sample['subject'] in self.subjects
 
+    def __repr__(self) -> str:
+        return '{}({})'.format(self.__class__.__name__, ','.join(self.subjects))
+
 
 class ComposeSelection(SelectionStrategy):
 
@@ -57,6 +69,9 @@ class ComposeSelection(SelectionStrategy):
 
     def __call__(self, sample) -> bool:
         return all(strategy(sample) for strategy in self.strategies)
+
+    def __repr__(self) -> str:
+        return '|'.join(repr(s) for s in self.strategies)
 
 
 def select_indices(data_source: data.Dataset, selection_strategy: SelectionStrategy):

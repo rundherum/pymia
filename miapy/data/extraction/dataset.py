@@ -18,6 +18,7 @@ class ParametrizableDataset(data.Dataset):
         self.extractor = extractor
         self.extractor.set_reader(self.reader)
 
+        # todo: allow indices as argument with mutual exclusivity with strategy
         self.indices = []
         self.subject_index_to_entry = {}
         for i, subject_entry in enumerate(self.reader.get_subject_entries()):
