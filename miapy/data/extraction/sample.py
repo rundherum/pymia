@@ -15,10 +15,24 @@ class SelectionStrategy(metaclass=abc.ABCMeta):
 class NonBlackSelection(SelectionStrategy):
 
     def __init__(self, black_value: float=.0) -> None:
+        # todo: add something to do this for one sequence only, too -> loop over one dim
         self.black_value = black_value
 
     def __call__(self, sample):
         return np.any(sample['images'] > self.black_value)
+
+
+class PercentileSelection(SelectionStrategy):
+
+    def __init__(self, percentile: int) -> None:
+        # todo: add something to do this for one sequence only, too -> loop over one dim
+        self.percentile = percentile
+
+    def __call__(self, sample):
+        image_data = sample['images']
+
+        percentile_value = np.percentile(image_data, self.percentile)
+        return all(image_data >= percentile_value)
 
 
 class WithForegroundSelection(SelectionStrategy):
