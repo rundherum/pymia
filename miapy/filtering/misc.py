@@ -1,9 +1,8 @@
 """The misc (miscellaneous) module contains filters, which don't have a classical purpose."""
-
 import subprocess
 import os
 import tempfile
-from typing import Dict, Union
+import typing as t
 
 import numpy as np
 import SimpleITK as sitk
@@ -14,7 +13,7 @@ import miapy.filtering.filter as miapy_fltr
 class Relabel(miapy_fltr.IFilter):
     """Relabels the labels in the file by the provided rule"""
 
-    def __init__(self, label_changes: Dict[int, Union[int, tuple]]) -> None:
+    def __init__(self, label_changes: t.Dict[int, t.Union[int, tuple]]) -> None:
         """Initializes a new instance of the LargestNComponents class.
 
         Args:
@@ -147,7 +146,7 @@ class CmdlineExecutor(miapy_fltr.IFilter):
         """Initializes a new instance of the CmdlineExecutor class.
 
         Args:
-            executable_path (str): path to the executable to run.
+            executable_path (str): The path to the executable to run.
         """
         super().__init__()
         self.executable_path = executable_path
