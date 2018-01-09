@@ -179,7 +179,7 @@ class CmdlineExecutor(miapy_fltr.IFilter):
         temp_out = os.path.join(temp_dir, 'out.nii')
         
         cmd = [self.executable_path, temp_in, temp_out]
-        if not params is None:
+        if params is not None:
             cmd = cmd + params.arguments
         
         subprocess.run(cmd, check=True)
