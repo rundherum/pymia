@@ -1,24 +1,22 @@
-import typing as t
-
 import torch.utils.data.dataset as data
 
 import miapy.data.transformation as tfm
-import miapy.data.extraction.reader as r
-import miapy.data.extraction.indexing as idx
-import miapy.data.extraction.extractor as extr
+from . import reader as rd
+from . import indexing as idx
+from . import extractor as extr
 
 
 class ParametrizableDataset(data.Dataset):
 
-    def __init__(self, reader: r.Reader, indexing_strategy: idx.IndexingStrategy, extractors: t.List[extr.Extractor],
+    def __init__(self, reader: rd.Reader, indexing_strategy: idx.IndexingStrategy, extractor: extr.Extractor,
                  transform: tfm.Transform = None) -> None:
         self.reader = reader
-        self.extractors = extractors
+        self.extractor = extractor
         self.indexing_strategy = indexing_strategy
         self.transform = transform
 
-        for extractor in self.extractors:
-            extractor.set_reader(self.reader)
+        self.extractor = extractor
+        self.extractor.set_reader(self.reader)
 
         self.indices = []
         self.subject_index_to_entry = {}
@@ -35,8 +33,7 @@ class ParametrizableDataset(data.Dataset):
         subject_index, index_expr = self.indices[item]
         params = {'subject_index': subject_index, 'index_expr': index_expr}
         extracted = {}
-        for extractor in self.extractors:
-            extractor.extract(params, extracted)
+        self.extractor.extract(params, extracted)
 
         if self.transform:
             extracted = self.transform(extracted)

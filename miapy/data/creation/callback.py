@@ -1,7 +1,7 @@
 import os
 
 import miapy.data.utils as util
-import miapy.data.creation.writer as wr
+from . import writer as wr
 
 
 class Callback:
@@ -23,6 +23,36 @@ class Callback:
 
     def on_image_file(self, params: dict):
         pass
+
+
+class ComposeCallback(Callback):
+
+    def __init__(self, callbacks) -> None:
+        self.callbacks = callbacks
+
+    def on_start(self, params: dict):
+        for c in self.callbacks:
+            c.on_start(params)
+
+    def on_end(self, params: dict):
+        for c in self.callbacks:
+            c.on_end(params)
+
+    def on_subject_start(self, params: dict):
+        for c in self.callbacks:
+            c.on_subject_start(params)
+
+    def on_subject_end(self, params: dict):
+        for c in self.callbacks:
+            c.on_subject_end(params)
+
+    def on_gt_file(self, params: dict):
+        for c in self.callbacks:
+            c.on_gt_file(params)
+
+    def on_image_file(self, params: dict):
+        for c in self.callbacks:
+            c.on_image_file(params)
 
 
 # todo: name passed to writer is path (for hdf5 dataset entries). This is not really generic -> other solution?
