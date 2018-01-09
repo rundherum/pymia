@@ -1,5 +1,4 @@
 import typing as t
-import os
 
 
 class IndexExpression:

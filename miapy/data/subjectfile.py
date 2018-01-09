@@ -2,7 +2,7 @@ import abc
 import typing as t
 
 
-class SubjectFile(metaclass=abc.ABCMeta):
+class FileCollection(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_sequences(self) -> t.Dict[str, str]:
@@ -17,7 +17,7 @@ class SubjectFile(metaclass=abc.ABCMeta):
         pass
 
 
-class BaseSubjectFile(SubjectFile):
+class SubjectFile(FileCollection):
 
     def __init__(self, subject: str, sequence_files: dict=None, gt_files: dict=None) -> None:
         self.subject = subject

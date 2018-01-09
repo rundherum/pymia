@@ -1,6 +1,6 @@
 import abc
 
-import miapy.data.utils as util
+import miapy.data.indexexpression as util
 from . import reader as rd
 
 

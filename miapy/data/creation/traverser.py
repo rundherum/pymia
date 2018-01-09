@@ -3,7 +3,7 @@ import typing as t
 
 import numpy as np
 
-from . import subjectfile as subj
+from miapy.data import subjectfile as subj
 from . import callback as cb
 from . import fileloader as load
 import miapy.data.transformation as tfm
@@ -22,11 +22,11 @@ def default_concat(subject_data: t.List[np.ndarray]) -> np.ndarray:
 
 
 class SubjectFileTraverser(Traverser):
-    def traverse(self, files: t.List[subj.SubjectFile], loader=load.SitkLoader(), callback: cb.Callback=None,
+    def traverse(self, files: t.List[subj.FileCollection], loader=load.SitkLoader(), callback: cb.Callback=None,
                  transform: tfm.Transform=None, concat_fn=default_concat):
         if len(files) == 0:
             raise ValueError('No files')
-        if not isinstance(files[0], subj.SubjectFile):
+        if not isinstance(files[0], subj.FileCollection):
             raise ValueError('files must be of type SubjectFile')
 
         subject_files = files  # only for better readability
@@ -91,14 +91,14 @@ class SubjectFileTraverser(Traverser):
             callback.on_end(callback_params)
 
     @staticmethod
-    def _get_sequence_names(subject_files: t.List[subj.SubjectFile]) -> list:
+    def _get_sequence_names(subject_files: t.List[subj.FileCollection]) -> list:
             sequences = subject_files[0].get_sequences().keys()
             if not all(s.get_sequences().keys() == sequences for s in subject_files):
                 raise ValueError('inconsistent sequence names in the subject list')
             return list(sequences)
 
     @staticmethod
-    def _get_gt_names(subject_files: t.List[subj.SubjectFile]) -> list:
+    def _get_gt_names(subject_files: t.List[subj.FileCollection]) -> list:
         if subject_files[0].get_gts() is None:
             if not all(s.get_gts() is None for s in subject_files):
                 raise ValueError('inconsistent gt names in the subject list')

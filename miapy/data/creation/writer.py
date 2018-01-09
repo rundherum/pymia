@@ -3,7 +3,7 @@ import abc
 import numpy as np
 import h5py
 
-import miapy.data.utils as util
+import miapy.data.indexexpression as util
 
 
 class Writer(metaclass=abc.ABCMeta):

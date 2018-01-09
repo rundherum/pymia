@@ -1,6 +1,6 @@
 import os
 
-import miapy.data.utils as util
+import miapy.data.indexexpression as util
 from . import writer as wr
 
 

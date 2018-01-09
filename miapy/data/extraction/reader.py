@@ -3,7 +3,7 @@ import abc
 import h5py
 import numpy as np
 
-import miapy.data.utils as util
+import miapy.data.indexexpression as util
 
 
 class Reader(metaclass=abc.ABCMeta):
