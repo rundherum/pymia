@@ -8,7 +8,7 @@ It is possible to implement your own metrics and use them with the :class:`evalu
 Just inherit from :class:`metric.IMetric`, :class:`metric.IConfusionMatrixMetric` or :class:`ISimpleITKImageMetric`
 and implement the function :func:`calculate`.
 """
-from abc import ABCMeta, abstractmethod
+import abc
 import math
 
 import numpy as np
@@ -95,13 +95,13 @@ class ConfusionMatrix:
         self.n = prediction.size
 
 
-class IMetric(metaclass=ABCMeta):
+class IMetric(metaclass=abc.ABCMeta):
     """Represents an evaluation metric."""
 
     def __init__(self):
-        self.metric = "IMetric"
+        self.metric = 'IMetric'
 
-    @abstractmethod
+    @abc.abstractmethod
     def calculate(self):
         """Calculates the metric."""
 
@@ -126,7 +126,7 @@ class IConfusionMatrixMetric(IMetric):
         self.metric = 'IConfusionMatrixMetric'
         self.confusion_matrix = None  # ConfusionMatrix
 
-    @abstractmethod
+    @abc.abstractmethod
     def calculate(self):
         """Calculates the metric."""
 
@@ -143,7 +143,7 @@ class ISimpleITKImageMetric(IMetric):
         self.ground_truth = None  # SimpleITK.Image
         self.segmentation = None  # SimpleITK.Image
 
-    @abstractmethod
+    @abc.abstractmethod
     def calculate(self):
         """Calculates the metric."""
 
@@ -160,7 +160,7 @@ class INumpyArrayMetric(IMetric):
         self.ground_truth = None  # np.ndarray
         self.segmentation = None  # np.ndarray
 
-    @abstractmethod
+    @abc.abstractmethod
     def calculate(self):
         """Calculates the metric."""
 
@@ -175,7 +175,7 @@ class AreaMetric(ISimpleITKImageMetric):
         super().__init__()
         self.metric = 'AREA'
 
-    @abstractmethod
+    @abc.abstractmethod
     def calculate(self):
         """Calculates the metric."""
         raise NotImplementedError
@@ -206,7 +206,7 @@ class VolumeMetric(ISimpleITKImageMetric):
         super().__init__()
         self.metric = 'VOL'
 
-    @abstractmethod
+    @abc.abstractmethod
     def calculate(self):
         """Calculates the metric."""
         raise NotImplementedError
@@ -231,15 +231,15 @@ class Accuracy(IConfusionMatrixMetric):
     def __init__(self):
         """Initializes a new instance of the Accuracy class."""
         super().__init__()
-        self.metric = "ACURCY"
+        self.metric = 'ACURCY'
 
     def calculate(self):
         """Calculates the accuracy."""
 
-        sum = self.confusion_matrix.tp + self.confusion_matrix.tn + self.confusion_matrix.fp + self.confusion_matrix.fn
+        sum_ = self.confusion_matrix.tp + self.confusion_matrix.tn + self.confusion_matrix.fp + self.confusion_matrix.fn
 
-        if sum != 0:
-            return (self.confusion_matrix.tp + self.confusion_matrix.tn) / sum
+        if sum_ != 0:
+            return (self.confusion_matrix.tp + self.confusion_matrix.tn) / sum_
         else:
             return 0
 
@@ -250,7 +250,7 @@ class AdjustedRandIndex(IConfusionMatrixMetric):
     def __init__(self):
         """Initializes a new instance of the AdjustedRandIndex class."""
         super().__init__()
-        self.metric = "ADJRIND"
+        self.metric = 'ADJRIND'
 
     def calculate(self):
         """Calculates the adjusted rand index."""
@@ -291,7 +291,7 @@ class AreaUnderCurve(IConfusionMatrixMetric):
     def __init__(self):
         """Initializes a new instance of the AreaUnderCurve class."""
         super().__init__()
-        self.metric = "AUC"
+        self.metric = 'AUC'
 
     def calculate(self):
         """Calculates the area under the curve."""
@@ -322,7 +322,7 @@ class AverageDistance(ISimpleITKImageMetric):
     def __init__(self):
         """Initializes a new instance of the AverageDistance class."""
         super().__init__()
-        self.metric = "AVGDIST"
+        self.metric = 'AVGDIST'
 
     def calculate(self):
         """Calculates the average (Hausdorff) distance."""
@@ -338,7 +338,7 @@ class CohenKappaMetric(IConfusionMatrixMetric):
     def __init__(self):
         """Initializes a new instance of the CohenKappaMetric class."""
         super().__init__()
-        self.metric = "KAPPA"
+        self.metric = 'KAPPA'
 
     def calculate(self):
         """Calculates the Cohen's kappa coefficient."""
@@ -351,10 +351,10 @@ class CohenKappaMetric(IConfusionMatrixMetric):
         agreement = tp + tn
         chance0 = (tn + fn) * (tn + fp)
         chance1 = (fp + tp) * (fn + tp)
-        sum = tn + fn + fp + tp
-        chance = (chance0 + chance1) / sum
+        sum_ = tn + fn + fp + tp
+        chance = (chance0 + chance1) / sum_
 
-        return (agreement - chance) / (sum - chance)
+        return (agreement - chance) / (sum_ - chance)
 
 
 class DiceCoefficient(IConfusionMatrixMetric):
@@ -363,14 +363,13 @@ class DiceCoefficient(IConfusionMatrixMetric):
     def __init__(self):
         """Initializes a new instance of the DiceCoefficient class."""
         super().__init__()
-        self.metric = "DICE"
+        self.metric = 'DICE'
 
     def calculate(self):
         """Calculates the Dice coefficient."""
 
         return 2 * self.confusion_matrix.tp / \
-               (2 * self.confusion_matrix.tp +
-                self.confusion_matrix.fp + self.confusion_matrix.fn)
+               (2 * self.confusion_matrix.tp + self.confusion_matrix.fp + self.confusion_matrix.fn)
 
 
 class FalseNegative(IConfusionMatrixMetric):
@@ -379,7 +378,7 @@ class FalseNegative(IConfusionMatrixMetric):
     def __init__(self):
         """Initializes a new instance of the FalseNegative class."""
         super().__init__()
-        self.metric = "FN"
+        self.metric = 'FN'
 
     def calculate(self):
         """Calculates the false negatives."""
@@ -393,7 +392,7 @@ class FalsePositive(IConfusionMatrixMetric):
     def __init__(self):
         """Initializes a new instance of the FalsePositive class."""
         super().__init__()
-        self.metric = "FP"
+        self.metric = 'FP'
 
     def calculate(self):
         """Calculates the false positives."""
@@ -407,7 +406,7 @@ class Fallout(IConfusionMatrixMetric):
     def __init__(self):
         """Initializes a new instance of the Fallout class."""
         super().__init__()
-        self.metric = "FALLOUT"
+        self.metric = 'FALLOUT'
 
     def calculate(self):
         """Calculates the fallout (false positive rate)."""
@@ -436,12 +435,12 @@ class FMeasure(IConfusionMatrixMetric):
     def __init__(self):
         """Initializes a new instance of the FMeasure class."""
         super().__init__()
-        self.metric = "FMEASR"
+        self.metric = 'FMEASR'
 
     def calculate(self):
         """Calculates the F1 measure."""
 
-        beta = 1 # or 0.5 or 2 can also calculate F2 or F0.5 measure
+        beta = 1  # or 0.5 or 2 can also calculate F2 or F0.5 measure
 
         beta_squared = beta * beta
         precision = Precision()
@@ -468,7 +467,7 @@ class GlobalConsistencyError(IConfusionMatrixMetric):
     def __init__(self):
         """Initializes a new instance of the GlobalConsistencyError class."""
         super().__init__()
-        self.metric = "GCOERR"
+        self.metric = 'GCOERR'
 
     def calculate(self):
         """Calculates the global consistency error."""
@@ -502,7 +501,7 @@ class HausdorffDistance(ISimpleITKImageMetric):
     def __init__(self):
         """Initializes a new instance of the HausdorffDistance class."""
         super().__init__()
-        self.metric = "HDRFDST"
+        self.metric = 'HDRFDST'
 
     def calculate(self):
         """Calculates the Hausdorff distance."""
@@ -518,7 +517,7 @@ class InterclassCorrelation(INumpyArrayMetric):
     def __init__(self):
         """Initializes a new instance of the InterclassCorrelation class."""
         super().__init__()
-        self.metric = "ICCORR"
+        self.metric = 'ICCORR'
 
     def calculate(self):
         """Calculates the interclass correlation."""
@@ -547,7 +546,7 @@ class JaccardCoefficient(IConfusionMatrixMetric):
     def __init__(self):
         """Initializes a new instance of the JaccardCoefficient class."""
         super().__init__()
-        self.metric = "JACRD"
+        self.metric = 'JACRD'
 
     def calculate(self):
         """Calculates the Jaccard coefficient."""
@@ -570,7 +569,7 @@ class GroundTruthArea(AreaMetric):
                 Defaults to -1, which will calculate the area on the intermediate slice.
         """
         super().__init__()
-        self.metric = "GTAREA"
+        self.metric = 'GTAREA'
         self.slice_number = slice_number
 
     def calculate(self):
@@ -585,7 +584,7 @@ class GroundTruthVolume(VolumeMetric):
     def __init__(self):
         """Initializes a new instance of the GroundTruthVolume class."""
         super().__init__()
-        self.metric = "GTVOL"
+        self.metric = 'GTVOL'
 
     def calculate(self):
         """Calculates the ground truth volume in mm3."""
@@ -599,7 +598,7 @@ class MahalanobisDistance(INumpyArrayMetric):
     def __init__(self):
         """Initializes a new instance of the MahalanobisDistance class."""
         super().__init__()
-        self.metric = "MAHLNBS"
+        self.metric = 'MAHLNBS'
 
     def calculate(self):
         """Calculates the Mahalanobis distance."""
@@ -629,7 +628,7 @@ class MutualInformation(IConfusionMatrixMetric):
     def __init__(self):
         """Initializes a new instance of the MutualInformation class."""
         super().__init__()
-        self.metric = "MUTINF"
+        self.metric = 'MUTINF'
 
     def calculate(self):
         """Calculates the mutual information."""
@@ -643,10 +642,10 @@ class MutualInformation(IConfusionMatrixMetric):
         fn_tp = fn + tp
         fp_tp = fp + tp
 
-        H1 = -((fn_tp / n) * math.log2(fn_tp / n) +
+        h1 = -((fn_tp / n) * math.log2(fn_tp / n) +
                (1 - fn_tp / n) * math.log2(1 - fn_tp / n))
 
-        H2 = -((fp_tp / n) * math.log2(fp_tp / n) +
+        h2 = -((fp_tp / n) * math.log2(fp_tp / n) +
                (1 - fp_tp / n) * math.log2(1 - fp_tp / n))
 
         p00 = 1 if tn == 0 else (tn / n)
@@ -654,13 +653,13 @@ class MutualInformation(IConfusionMatrixMetric):
         p10 = 1 if fp == 0 else (fp / n)
         p11 = 1 if tp == 0 else (tp / n)
 
-        H12 = -((tn / n) * math.log2(p00) +
+        h12 = -((tn / n) * math.log2(p00) +
                 (fn / n) * math.log2(p01) +
                 (fp / n) * math.log2(p10) +
                 (tp / n) * math.log2(p11))
 
-        MI = H1 + H2 - H12
-        return MI
+        mi = h1 + h2 - h12
+        return mi
 
 
 class Precision(IConfusionMatrixMetric):
@@ -669,15 +668,15 @@ class Precision(IConfusionMatrixMetric):
     def __init__(self):
         """Initializes a new instance of the Precision class."""
         super().__init__()
-        self.metric = "PRCISON"
+        self.metric = 'PRCISON'
 
     def calculate(self):
         """Calculates the precision."""
 
-        sum = self.confusion_matrix.tp + self.confusion_matrix.fp
+        sum_ = self.confusion_matrix.tp + self.confusion_matrix.fp
 
-        if sum != 0:
-            return self.confusion_matrix.tp / sum
+        if sum_ != 0:
+            return self.confusion_matrix.tp / sum_
         else:
             return 0
 
@@ -693,7 +692,7 @@ class SegmentationArea(AreaMetric):
                 Defaults to -1, which will calculate the area on the intermediate slice.
         """
         super().__init__()
-        self.metric = "SEGAREA"
+        self.metric = 'SEGAREA'
         self.slice_number = slice_number
 
     def calculate(self):
@@ -722,7 +721,7 @@ class ProbabilisticDistance(INumpyArrayMetric):
     def __init__(self):
         """Initializes a new instance of the ProbabilisticDistance class."""
         super().__init__()
-        self.metric = "PROBDST"
+        self.metric = 'PROBDST'
 
     def calculate(self):
         """Calculates the probabilistic distance."""
@@ -745,7 +744,7 @@ class RandIndex(IConfusionMatrixMetric):
     def __init__(self):
         """Initializes a new instance of the RandIndex class."""
         super().__init__()
-        self.metric = "RNDIND"
+        self.metric = 'RNDIND'
 
     def calculate(self):
         """Calculates the rand index."""
@@ -778,15 +777,15 @@ class Recall(IConfusionMatrixMetric):
     def __init__(self):
         """Initializes a new instance of the Recall class."""
         super().__init__()
-        self.metric = "RECALL"
+        self.metric = 'RECALL'
 
     def calculate(self):
         """Calculates the recall."""
 
-        sum = self.confusion_matrix.tp + self.confusion_matrix.fn
+        sum_ = self.confusion_matrix.tp + self.confusion_matrix.fn
 
-        if sum != 0:
-            return self.confusion_matrix.tp / sum
+        if sum_ != 0:
+            return self.confusion_matrix.tp / sum_
         else:
             return 0
 
@@ -797,7 +796,7 @@ class Sensitivity(IConfusionMatrixMetric):
     def __init__(self):
         """Initializes a new instance of the Sensitivity class."""
         super().__init__()
-        self.metric = "SNSVTY"
+        self.metric = 'SNSVTY'
 
     def calculate(self):
         """Calculates the sensitivity (true positive rate)."""
@@ -811,7 +810,7 @@ class Specificity(IConfusionMatrixMetric):
     def __init__(self):
         """Initializes a new instance of the Specificity class."""
         super().__init__()
-        self.metric = "SPCFTY"
+        self.metric = 'SPCFTY'
 
     def calculate(self):
         """Calculates the specificity."""
@@ -825,7 +824,7 @@ class TrueNegative(IConfusionMatrixMetric):
     def __init__(self):
         """Initializes a new instance of the TrueNegative class."""
         super().__init__()
-        self.metric = "TN"
+        self.metric = 'TN'
 
     def calculate(self):
         """Calculates the true negatives."""
@@ -839,7 +838,7 @@ class TruePositive(IConfusionMatrixMetric):
     def __init__(self):
         """Initializes a new instance of the TruePositive class."""
         super().__init__()
-        self.metric = "TP"
+        self.metric = 'TP'
 
     def calculate(self):
         """Calculates the true positives."""
@@ -853,7 +852,7 @@ class VariationOfInformation(IConfusionMatrixMetric):
     def __init__(self):
         """Initializes a new instance of the VariationOfInformation class."""
         super().__init__()
-        self.metric = "VARINFO"
+        self.metric = 'VARINFO'
 
     def calculate(self):
         """Calculates the variation of information."""
@@ -867,10 +866,10 @@ class VariationOfInformation(IConfusionMatrixMetric):
         fn_tp = fn + tp
         fp_tp = fp + tp
 
-        H1 = -((fn_tp / n) * math.log2(fn_tp / n) +
+        h1 = -((fn_tp / n) * math.log2(fn_tp / n) +
                (1 - fn_tp / n) * math.log2(1 - fn_tp / n))
 
-        H2 = -((fp_tp / n) * math.log2(fp_tp / n) +
+        h2 = -((fp_tp / n) * math.log2(fp_tp / n) +
                (1 - fp_tp / n) * math.log2(1 - fp_tp / n))
 
         p00 = 1 if tn == 0 else (tn / n)
@@ -878,15 +877,15 @@ class VariationOfInformation(IConfusionMatrixMetric):
         p10 = 1 if fp == 0 else (fp / n)
         p11 = 1 if tp == 0 else (tp / n)
 
-        H12 = -((tn / n) * math.log2(p00) +
+        h12 = -((tn / n) * math.log2(p00) +
                 (fn / n) * math.log2(p01) +
                 (fp / n) * math.log2(p10) +
                 (tp / n) * math.log2(p11))
 
-        MI = H1 + H2 - H12
+        mi = h1 + h2 - h12
 
-        VI = H1 + H2 - 2 * MI
-        return VI
+        vi = h1 + h2 - 2 * mi
+        return vi
 
 
 class VolumeSimilarity(IConfusionMatrixMetric):
@@ -895,7 +894,7 @@ class VolumeSimilarity(IConfusionMatrixMetric):
     def __init__(self):
         """Initializes a new instance of the VolumeSimilarity class."""
         super().__init__()
-        self.metric = "VOLSMTY"
+        self.metric = 'VOLSMTY'
 
     def calculate(self):
         """Calculates the volume similarity."""
