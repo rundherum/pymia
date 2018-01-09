@@ -167,6 +167,37 @@ class INumpyArrayMetric(IMetric):
         raise NotImplementedError
 
 
+class AreaMetric(ISimpleITKImageMetric):
+    """Represents an area metric."""
+
+    def __init__(self):
+        """Initializes a new instance of the AreaMetric class."""
+        super().__init__()
+        self.metric = 'AREA'
+
+    @abstractmethod
+    def calculate(self):
+        """Calculates the metric."""
+        raise NotImplementedError
+
+    @staticmethod
+    def _calculate_area(image: sitk.Image, slice_number: int=-1) -> float:
+        """Calculates the area of a slice in a label image.
+
+        Args:
+            image (sitk.Image): The 3-D label image.
+            slice_number (int): The slice number to calculate the area.
+                Defaults to -1, which will calculate the area on the intermediate slice.
+        """
+
+        img_arr = sitk.GetArrayFromImage(image)
+
+        if slice_number == -1:
+            slice_number = int(img_arr.shape[0] / 2)  # use the intermediate slice
+
+        return img_arr[slice_number, ...].sum() * image.GetSpacing()[0] * image.GetSpacing()[1]
+
+
 class VolumeMetric(ISimpleITKImageMetric):
     """Represents a volume metric."""
 
@@ -181,8 +212,12 @@ class VolumeMetric(ISimpleITKImageMetric):
         raise NotImplementedError
 
     @staticmethod
-    def _calculate_volume(image: sitk.Image):
-        """Calculates the volume of a label image."""
+    def _calculate_volume(image: sitk.Image) -> float:
+        """Calculates the volume of a label image.
+
+        Args:
+            image (sitk.Image): The 3-D label image.
+        """
 
         voxel_volume = np.prod(image.GetSpacing())
         number_of_voxels = sitk.GetArrayFromImage(image).sum()
@@ -524,6 +559,26 @@ class JaccardCoefficient(IConfusionMatrixMetric):
         return tp / (tp + fp + fn)
 
 
+class GroundTruthArea(AreaMetric):
+    """Represents a ground truth area metric."""
+
+    def __init__(self, slice_number: int=-1):
+        """Initializes a new instance of the GroundTruthArea class.
+
+        Args:
+            slice_number (int): The slice number to calculate the area.
+                Defaults to -1, which will calculate the area on the intermediate slice.
+        """
+        super().__init__()
+        self.metric = "GTAREA"
+        self.slice_number = slice_number
+
+    def calculate(self):
+        """Calculates the ground truth area on a specified slice in mm2."""
+
+        return self._calculate_area(self.ground_truth, self.slice_number)
+
+
 class GroundTruthVolume(VolumeMetric):
     """Represents a ground truth volume metric."""
 
@@ -625,6 +680,26 @@ class Precision(IConfusionMatrixMetric):
             return self.confusion_matrix.tp / sum
         else:
             return 0
+
+
+class SegmentationArea(AreaMetric):
+    """Represents a segmentation area metric."""
+
+    def __init__(self, slice_number: int = -1):
+        """Initializes a new instance of the SegmentationArea class.
+
+        Args:
+            slice_number (int): The slice number to calculate the area.
+                Defaults to -1, which will calculate the area on the intermediate slice.
+        """
+        super().__init__()
+        self.metric = "SEGAREA"
+        self.slice_number = slice_number
+
+    def calculate(self):
+        """Calculates the segmentation area on a specified slice in mm2."""
+
+        return self._calculate_area(self.segmentation, self.slice_number)
 
 
 class SegmentationVolume(VolumeMetric):
