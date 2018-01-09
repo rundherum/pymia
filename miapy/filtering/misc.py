@@ -139,6 +139,18 @@ class SizeCorrectionFilter(miapy_fltr.IFilter):
             .format(self=self)
 
 
+class CmdlineExecutorParams(miapy_fltr.IFilterParams):
+    """Command line executor filter parameters."""
+
+    def __init__(self, arguments: t.List[str]) -> None:
+        """Initializes a new instance of the CmdlineExecutorParams class.
+
+        Args:
+            arguments (t.List[str]): Additional arguments for the command line execution.
+        """
+        self.arguments = arguments
+
+
 class CmdlineExecutor(miapy_fltr.IFilter):
     """Represents a command line executable."""
 
@@ -151,12 +163,12 @@ class CmdlineExecutor(miapy_fltr.IFilter):
         super().__init__()
         self.executable_path = executable_path
 
-    def execute(self, image: sitk.Image, params: miapy_fltr.IFilterParams=None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: CmdlineExecutorParams=None) -> sitk.Image:
         """Executes a command line program.
 
         Args:
             image (sitk.Image): The image.
-            params (miapy_fltr.IFilterParams): The parameters (unused).
+            params (CmdlineExecutorParams): The execution specific command line parameters.
 
         Returns:
             sitk.Image: The filtered image.
@@ -165,11 +177,18 @@ class CmdlineExecutor(miapy_fltr.IFilter):
         temp_in = os.path.join(temp_dir, 'in.nii')
         sitk.WriteImage(image, temp_in)
         temp_out = os.path.join(temp_dir, 'out.nii')
-        subprocess.run([self.executable_path, temp_in, temp_out], check=True)
+        
+        cmd = [self.executable_path, temp_in, temp_out]
+        if not params is None:
+            cmd = cmd + params.arguments
+        
+        subprocess.run(cmd, check=True)
         out_image = sitk.ReadImage(temp_out, image.GetPixelID())
+
         # clean up
         os.remove(temp_in)
         os.remove(temp_out)
+
         return out_image
 
     def __str__(self):
