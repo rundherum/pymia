@@ -1,4 +1,4 @@
-"""Enables the plotting of images for presentation and documentation purposes using the ``matplotlib`` library.
+"""Enables the plotting of images.
 
 Refer also to `SimpleITK Notebooks
 <http://insightsoftwareconsortium.github.io/SimpleITK-Notebooks/10_matplotlib's_imshow.html>`_."""
@@ -11,7 +11,7 @@ import SimpleITK as sitk
 
 
 def plot_slice(path: str, image: sitk.Image, slice_no: int) -> None:
-    """Plots a slice from a 3-D image to a file.
+    """Plots a slice from a 3-D image.
 
     Args:
         path (str): The output file path.
@@ -102,7 +102,7 @@ def plot_2d_segmentation_contour(path: str,
                                  segmentation: np.ndarray,
                                  alpha: float=1,
                                  label: int=1) -> None:
-    """Plots a 2-dimensional image with overlaid ground truth and segmentation contour.
+    """Plots a 2-dimensional image with overlaid ground truth and segmentation contours.
 
     The ground truth is plotted in blue and the segmentation in green.
     One can use the SimpleITK `BinaryContourImageFilter
