@@ -3,9 +3,9 @@ import typing as t
 
 import numpy as np
 
-import miapy.data.creation.subjectfile as subj
-import miapy.data.creation.callback as cb
-import miapy.data.creation.fileloader as load
+from . import subjectfile as subj
+from . import callback as cb
+from . import fileloader as load
 import miapy.data.transformation as tfm
 
 
@@ -22,7 +22,7 @@ def default_concat(subject_data: t.List[np.ndarray]) -> np.ndarray:
 
 
 class SubjectFileTraverser(Traverser):
-    def traverse(self, files: t.List[subj.SubjectFile], loader=load.SitkLoader(), callbacks: t.List[cb.Callback]=None,
+    def traverse(self, files: t.List[subj.SubjectFile], loader=load.SitkLoader(), callback: cb.Callback=None,
                  transform: tfm.Transform=None, concat_fn=default_concat):
         if len(files) == 0:
             raise ValueError('No files')
@@ -30,9 +30,6 @@ class SubjectFileTraverser(Traverser):
             raise ValueError('files must be of type SubjectFile')
 
         subject_files = files  # only for better readability
-
-        if callbacks is None:
-            callbacks = []
 
         # getting the sequence and gt names
         sequence_names = self._get_sequence_names(subject_files)
@@ -46,15 +43,15 @@ class SubjectFileTraverser(Traverser):
             gt_to_index = {name: i for i, name in enumerate(gt_names)}
             callback_params['gt_names'] = gt_names
 
-        for c in callbacks:
-            c.on_start(callback_params)
+        if callback:
+            callback.on_start(callback_params)
 
         # looping over the subject files and calling callbacks
         for subject_index, subject_file in enumerate(subject_files):
 
             callback_subject_params = {'subject': subject_file.get_subject(), 'subject_index': subject_index}
-            for c in callbacks:
-                c.on_subject_start({**callback_params, **callback_subject_params})
+            if callback:
+                callback.on_subject_start({**callback_params, **callback_subject_params})
 
             subject_sequences = len(sequence_to_index)*[None]  # type: t.List[np.ndarray]
             for sequence, sequence_file in subject_file.get_sequences().items():
@@ -64,8 +61,8 @@ class SubjectFileTraverser(Traverser):
 
                 callback_image_params = {'sequence': sequence, 'sequence_index': sequence_to_index[sequence],
                                          'file': sequence_file, 'raw_image': seq_image}
-                for c in callbacks:
-                    c.on_image_file({**callback_params, **callback_subject_params, **callback_image_params})
+                if callback:
+                    callback.on_image_file({**callback_params, **callback_subject_params, **callback_image_params})
 
             np_sequences = concat_fn(subject_sequences)
             transform_params = {'images': np_sequences}
@@ -78,8 +75,8 @@ class SubjectFileTraverser(Traverser):
 
                     callback_image_params = {'gt': gt, 'gt_index': gt_to_index[gt], 'file': gt_file,
                                              'raw_label': gt_image}
-                    for c in callbacks:
-                        c.on_gt_file({**callback_params, **callback_subject_params, **callback_image_params})
+                    if callback:
+                        callback.on_gt_file({**callback_params, **callback_subject_params, **callback_image_params})
 
                 np_gts = default_concat(subject_gts)
                 transform_params['labels'] = np_gts
@@ -87,11 +84,11 @@ class SubjectFileTraverser(Traverser):
             if transform:
                 transform_params = transform(transform_params)
 
-            for c in callbacks:
-                c.on_subject_end({**callback_params, **callback_subject_params, **transform_params})
+            if callback:
+                callback.on_subject_end({**callback_params, **callback_subject_params, **transform_params})
 
-        for c in callbacks:
-            c.on_end(callback_params)
+        if callback:
+            callback.on_end(callback_params)
 
     @staticmethod
     def _get_sequence_names(subject_files: t.List[subj.SubjectFile]) -> list:

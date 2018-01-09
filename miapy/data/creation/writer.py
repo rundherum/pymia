@@ -45,7 +45,6 @@ class Hdf5Writer(Writer):
     def __init__(self, file_name: str) -> None:
         self.h5 = None  # type: h5py.File
         self.file_name = file_name
-        util.create_dir_if_not_exists(self.file_name, is_file=True)
 
     def __del__(self):
         self.close()

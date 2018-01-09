@@ -41,7 +41,7 @@ class Reader(metaclass=abc.ABCMeta):
 
 class Hdf5Reader(Reader):
 
-    def __init__(self, file_name: str, subjects_entry: str) -> None:
+    def __init__(self, file_name: str, subjects_entry: str='data/sequences') -> None:
         self.h5 = None  # type: h5py.File
         self.file_name = file_name
         self.subjects_entry = subjects_entry

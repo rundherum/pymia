@@ -1,7 +1,7 @@
 import abc
 
 import miapy.data.utils as util
-import miapy.data.extraction.reader as r
+from . import reader as rd
 
 
 class Extractor(metaclass=abc.ABCMeta):
@@ -9,12 +9,27 @@ class Extractor(metaclass=abc.ABCMeta):
     def __init__(self) -> None:
         self.reader = None  # type: r.Reader
 
-    def set_reader(self, reader: r.Reader):
+    def set_reader(self, reader: rd.Reader):
         self.reader = reader
 
     @abc.abstractmethod
     def extract(self, params: dict, extracted: dict) -> None:
         pass
+
+
+class ComposeExtractor(Extractor):
+
+    def __init__(self, extractors) -> None:
+        super().__init__()
+        self.extractors = extractors
+
+    def set_reader(self, reader: rd.Reader):
+        for e in self.extractors:
+            e.set_reader(reader)
+
+    def extract(self, params: dict, extracted: dict) -> None:
+        for e in self.extractors:
+            e.extract(params, extracted)
 
 
 class NamesExtractor(Extractor):
@@ -79,7 +94,7 @@ class DataExtractor(Extractor):
         self.sequence_selection = sequence_selection
         self.gt_selection = gt_selection
 
-    def set_reader(self, reader: r.Reader):
+    def set_reader(self, reader: rd.Reader):
         super().set_reader(reader)
         entries = self.reader.get_subject_entries()
         self.entry_base_names = [entry.rsplit('/', maxsplit=1)[1] for entry in entries]
