@@ -8,7 +8,7 @@ import torch.utils.data.sampler as smplr
 class SelectionStrategy(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
-    def __call__(self, sample):
+    def __call__(self, sample) -> bool:
         pass
 
 
@@ -18,8 +18,8 @@ class NonBlackSelection(SelectionStrategy):
         # todo: add something to do this for one sequence only, too -> loop over one dim
         self.black_value = black_value
 
-    def __call__(self, sample):
-        return np.any(sample['images'] > self.black_value)
+    def __call__(self, sample) -> bool:
+        return (sample['images'] > self.black_value).all()
 
 
 class PercentileSelection(SelectionStrategy):
@@ -28,17 +28,17 @@ class PercentileSelection(SelectionStrategy):
         # todo: add something to do this for one sequence only, too -> loop over one dim
         self.percentile = percentile
 
-    def __call__(self, sample):
+    def __call__(self, sample) -> bool:
         image_data = sample['images']
 
         percentile_value = np.percentile(image_data, self.percentile)
-        return all(image_data >= percentile_value)
+        return (image_data >= percentile_value).all()
 
 
 class WithForegroundSelection(SelectionStrategy):
 
-    def __call__(self, sample):
-        return np.any(sample['labels'])
+    def __call__(self, sample) -> bool:
+        return (sample['labels']).any()
 
 
 class SubjectSelection(SelectionStrategy):
@@ -46,7 +46,7 @@ class SubjectSelection(SelectionStrategy):
     def __init__(self, subjects) -> None:
         self.subjects = subjects
 
-    def __call__(self, sample):
+    def __call__(self, sample) -> bool:
         return sample['subject'] in self.subjects
 
 
@@ -55,7 +55,7 @@ class ComposeSelection(SelectionStrategy):
     def __init__(self, strategies) -> None:
         self.strategies = strategies
 
-    def __call__(self, sample):
+    def __call__(self, sample) -> bool:
         return all(strategy(sample) for strategy in self.strategies)
 
 

@@ -32,3 +32,6 @@ class SubjectFile(FileCollection):
 
     def get_subject(self) -> str:
         return self.subject
+
+    def __repr__(self) -> str:
+        return self.subject
