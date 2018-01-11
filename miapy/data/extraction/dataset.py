@@ -8,15 +8,12 @@ from . import extractor as extr
 
 class ParametrizableDataset(data.Dataset):
 
-    def __init__(self, reader: rd.Reader, indexing_strategy: idx.IndexingStrategy, extractor: extr.Extractor,
+    def __init__(self, reader: rd.Reader, indexing_strategy: idx.IndexingStrategy, extractor: extr.Extractor=None,
                  transform: tfm.Transform = None) -> None:
         self.reader = reader
-        self.extractor = extractor
         self.indexing_strategy = indexing_strategy
-        self.transform = transform
-
         self.extractor = extractor
-        self.extractor.set_reader(self.reader)
+        self.transform = transform
 
         # todo: allow indices as argument with mutual exclusivity with strategy
         self.indices = []
@@ -27,6 +24,9 @@ class ParametrizableDataset(data.Dataset):
             subject_and_indices = zip(len(subject_indices) * [i], subject_indices)
             self.indices.extend(subject_and_indices)
 
+    def set_extractor(self, extractor: extr.Extractor):
+        self.extractor = extractor
+
     def __len__(self):
         return len(self.indices)
 
@@ -34,7 +34,7 @@ class ParametrizableDataset(data.Dataset):
         subject_index, index_expr = self.indices[item]
         params = {'subject_index': subject_index, 'index_expr': index_expr}
         extracted = {}
-        self.extractor.extract(params, extracted)
+        self.extractor.extract(self.reader, params, extracted)
 
         if self.transform:
             extracted = self.transform(extracted)

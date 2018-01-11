@@ -1,7 +1,8 @@
 from .reader import (Reader, Hdf5Reader)
 from .indexing import (IndexingStrategy, SliceIndexing)
 from .dataset import ParametrizableDataset
-from .extractor import (Extractor, DataExtractor, FilesExtractor, NamesExtractor, SubjectExtractor, ComposeExtractor)
+from .extractor import (Extractor, DataExtractor, FilesExtractor, NamesExtractor, SubjectExtractor, IndexingExtractor,
+                        ComposeExtractor)
 from .sample import (select_indices, SubsetSequentialSampler, NonBlackSelection, SelectionStrategy, ComposeSelection,
                      SubjectSelection, WithForegroundSelection, PercentileSelection)
 

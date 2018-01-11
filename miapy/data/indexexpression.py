@@ -30,4 +30,4 @@ class IndexExpression:
                 expr[a] = slice(start, stop)
 
         # needs to be tuple otherwise exception from h5py while slicing
-        self.expression = expr[0] if len(expr) == 1 else tuple(expr)
+        self.expression = tuple(expr)
