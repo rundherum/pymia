@@ -46,11 +46,10 @@ class Hdf5Writer(Writer):
         self.h5 = None  # type: h5py.File
         self.file_name = file_name
 
-    def __del__(self):
-        self.close()
-
     def close(self):
-        self.h5.close()
+        if self.h5 is not None:
+            self.h5.close()
+            self.h5 = None
 
     def open(self):
         self.h5 = h5py.File(self.file_name)

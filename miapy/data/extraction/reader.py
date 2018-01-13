@@ -68,4 +68,6 @@ class Hdf5Reader(Reader):
         self.h5 = h5py.File(self.file_name, 'r')
 
     def close(self):
-        self.h5.close()
+        if self.h5 is not None:
+            self.h5.close()
+            self.h5 = None

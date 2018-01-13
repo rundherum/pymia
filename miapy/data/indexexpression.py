@@ -1,6 +1,8 @@
 import typing as t
+import pickle
 
 
+# could maybe be replaced or wrapper with numpy.s_
 class IndexExpression:
 
     def __init__(self, indexing: t.Union[int, tuple, t.List[int], t.List[tuple]]=None,
@@ -21,13 +23,27 @@ class IndexExpression:
         if isinstance(axis, int):
             axis = (axis,)
 
-        expr = [None for _ in range(max(axis) + 1)]
+        expr = [slice(None) for _ in range(max(axis) + 1)]
         for a, index in zip(axis, indexing):
             if isinstance(index, int):
                 expr[a] = index
-            else:
+            elif isinstance(index, tuple):
                 start, stop = index
                 expr[a] = slice(start, stop)
 
         # needs to be tuple otherwise exception from h5py while slicing
         self.expression = tuple(expr)
+
+    def get_indexing(self):
+        indexing = []
+        for index in self.expression:
+            if index is None:
+                indexing.append(None)
+            elif isinstance(index, slice):
+                indexing.append((index.start, index.stop))
+            elif isinstance(index, int):
+                indexing.append(index)
+            else:
+                raise ValueError("only 'int', 'slice', and 'None' types possible in expression")
+        return indexing if len(indexing) > 1 else indexing[0]
+

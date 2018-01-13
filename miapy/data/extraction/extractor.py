@@ -1,8 +1,9 @@
 import abc
+import pickle
 
 import numpy as np
 
-import miapy.data.indexexpression as util
+import miapy.data.indexexpression as expr
 from . import reader as rd
 
 
@@ -53,14 +54,22 @@ class NamesExtractor(Extractor):
 class SubjectExtractor(Extractor):
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
-        subject_index_expr = util.IndexExpression(params['subject_index'])
+        subject_index_expr = expr.IndexExpression(params['subject_index'])
         extracted['subject'] = reader.read('meta/subjects', subject_index_expr)
 
 
 class IndexingExtractor(Extractor):
 
+    def __init__(self, do_pickle_expression=True) -> None:
+        self.do_pickle_expression = do_pickle_expression
+
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
-        extracted['index_expr'] = params['index_expr']
+        extracted['subject_index'] = params['subject_index']
+        index_expression = params['index_expr']
+        if self.do_pickle_expression:
+            # pickle to prevent from problems since own class
+            index_expression = pickle.dumps(index_expression)
+        extracted['index_expr'] = index_expression
 
 
 class FilesExtractor(Extractor):
@@ -71,7 +80,7 @@ class FilesExtractor(Extractor):
         self.cached_file_root = None
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
-        subject_index_expr = util.IndexExpression(params['subject_index'])
+        subject_index_expr = expr.IndexExpression(params['subject_index'])
 
         if not self.cache or self.cached_file_root is None:
             file_root = reader.read('meta/file_root')
@@ -85,19 +94,11 @@ class FilesExtractor(Extractor):
             extracted['gt_files'] = reader.read('meta/gt_files', subject_index_expr)
 
 
-class DataExtractor(Extractor):
+class ImageExtractor(Extractor):
 
-    def __init__(self, gt_mode='all', gt_selection=None) -> None:
+    def __init__(self) -> None:
         super().__init__()
         self.entry_base_names = None
-        if gt_mode not in ('all', 'random', 'select'):
-            raise ValueError('gt_mode must be "all", "random" or "select"')
-        self.gt_mode = gt_mode
-        if gt_mode == 'select' and isinstance(gt_selection, (tuple, list)):
-            raise ValueError('for mode "select" the selection can only be one selection (string)')
-        if isinstance(gt_selection, str):
-            gt_selection = (gt_selection,)
-        self.gt_selection = gt_selection
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
         if self.entry_base_names is None:
@@ -109,24 +110,55 @@ class DataExtractor(Extractor):
 
         base_name = self.entry_base_names[subject_index]
         extracted['images'] = reader.read('data/sequences/{}'.format(base_name), index_expr)
-        if reader.has('data/gts'):
+
+
+class LabelExtractor(Extractor):
+
+    def __init__(self, gt_mode='all', gt_selection=None, entire_subject=False) -> None:
+        super().__init__()
+        self.entry_base_names = None
+        if gt_mode not in ('all', 'random', 'select'):
+            raise ValueError('gt_mode must be "all", "random" or "select"')
+        self.gt_mode = gt_mode
+        if gt_mode == 'select' and isinstance(gt_selection, (tuple, list)):
+            raise ValueError('for mode "select" the selection can only be one selection (string)')
+        if isinstance(gt_selection, str):
+            gt_selection = (gt_selection,)
+        self.gt_selection = gt_selection
+        self.entire_subject = entire_subject
+
+    def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
+        if self.entry_base_names is None:
+            entries = reader.get_subject_entries()
+            self.entry_base_names = [entry.rsplit('/', maxsplit=1)[1] for entry in entries]
+
+        if not reader.has('data/gts'):
+            raise ValueError('FullSubjectExtractor requires GT to exist')
+
+        subject_index = params['subject_index']
+        index_expr = params['index_expr']
+
+        base_name = self.entry_base_names[subject_index]
+
+        if self.entire_subject:
+            np_gts = reader.read('data/gts/{}'.format(base_name))
+        else:
             np_gts = reader.read('data/gts/{}'.format(base_name), index_expr)
 
-            if self.gt_mode != 'all':
-                if 'gt_names' not in extracted:
-                    raise ValueError('selection of gt requires gt_names to be extracted')
-                gt_names = extracted['gt_names']  # type: list
-                if self.gt_mode == 'random':
-                    selection_indices = [gt_names.index(s) for s in self.gt_selection]
-                    index = np.random.choice(selection_indices)
-                else:
-                    # mode == 'select'
-                    index = gt_names.index(self.gt_selection[0])
+        if self.gt_mode != 'all':
+            if 'gt_names' not in extracted:
+                raise ValueError('selection of gt requires gt_names to be extracted')
+            gt_names = extracted['gt_names']  # type: list
+            if self.gt_mode == 'random':
+                selection_indices = [gt_names.index(s) for s in self.gt_selection]
+                index = np.random.choice(selection_indices)
+            else:
+                # mode == 'select'
+                index = gt_names.index(self.gt_selection[0])
 
-                # todo: inverse index_expr in order to add index to it
-                np_gts = np_gts[..., index]
-                # maintaining gt dims
-                np_gts = np.expand_dims(np_gts, -1)
+            # todo: inverse index_expr in order to add index to it
+            np_gts = np_gts[..., index]
+            # maintaining gt dims
+            np_gts = np.expand_dims(np_gts, -1)
 
-            extracted['labels'] = np_gts
-
+        extracted['labels'] = np_gts
