@@ -72,6 +72,16 @@ class IndexingExtractor(Extractor):
         extracted['index_expr'] = index_expression
 
 
+class ImageInformationExtractor(Extractor):
+
+    def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
+        subject_index_expr = expr.IndexExpression(params['subject_index'])
+
+        extracted['shape'] = tuple(reader.read('meta/shapes', subject_index_expr))
+        extracted['direction'] = tuple(reader.read('meta/directions', subject_index_expr))
+        extracted['spacing'] = tuple(reader.read('meta/spacing', subject_index_expr))
+
+
 class FilesExtractor(Extractor):
 
     def __init__(self, cache=True) -> None:

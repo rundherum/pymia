@@ -1,5 +1,8 @@
 import os
 
+import numpy as np
+import SimpleITK as sitk
+
 import miapy.data.indexexpression as util
 from . import writer as wr
 
@@ -91,6 +94,38 @@ class WriteSubjectCallback(Callback):
         subject = params['subject']
         subject_index = params['subject_index']
         self.writer.fill(self.SUBJECT, subject, util.IndexExpression(subject_index))
+
+
+class WriteImageInformationCallback(Callback):
+    SHAPE = 'meta/shapes'
+    DIRECTION = 'meta/directions'
+    SPACING = 'meta/spacing'
+
+    def __init__(self, writer: wr.Writer) -> None:
+        self.writer = writer
+        self.prev_subject_index = None
+
+    def on_start(self, params: dict):
+        subject_count = len(params['subject_files'])
+        self.writer.reserve(self.SHAPE, (subject_count, 3), dtype=np.uint8)
+        self.writer.reserve(self.DIRECTION, (subject_count, 9), dtype=np.float)
+        self.writer.reserve(self.SPACING, (subject_count, 3), dtype=np.float)
+
+    def on_image_file(self, params: dict):
+        subject_index = params['subject_index']
+        # only write once for each subject -> every sequence must have equal image information
+        if self.prev_subject_index == subject_index:
+            return
+
+        raw_image = params['raw_image']
+        if not isinstance(raw_image, sitk.Image):
+            raise ValueError("'raw_image' must be of type '{}'".format(sitk.Image.__name__))
+
+        self.writer.fill(self.SHAPE, raw_image.GetSize(), util.IndexExpression(subject_index))
+        self.writer.fill(self.DIRECTION, raw_image.GetDirection(), util.IndexExpression(subject_index))
+        self.writer.fill(self.SPACING, raw_image.GetSpacing(), util.IndexExpression(subject_index))
+
+        self.prev_subject_index = subject_index
 
 
 class WriteNamesCallback(Callback):
