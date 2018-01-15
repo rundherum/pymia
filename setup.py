@@ -15,7 +15,8 @@ REQUIRED_PACKAGES = [
     'numpy >= 1.12.1',
     'SimpleITK >= 1.0.0',
     'sphinx >= 1.6',
-    'sphinx_rtd_theme >= 0.2.4'
+    'sphinx_rtd_theme >= 0.2.4',
+    'vtk >= 7.1.0'
 ]
 
 TEST_PACKAGES = [
