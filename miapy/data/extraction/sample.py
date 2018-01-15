@@ -15,6 +15,34 @@ class SelectionStrategy(metaclass=abc.ABCMeta):
         return self.__class__.__name__
 
 
+class NonConstantSelection(SelectionStrategy):
+
+    def __init__(self, loop_axis=None) -> None:
+        super().__init__()
+        self.loop_axis = loop_axis
+
+    def __call__(self, sample) -> bool:
+        image_data = sample['images']
+
+        if self.loop_axis is None:
+            return not self._all_equal(image_data)
+
+        slicing = [slice(None) for _ in range(image_data.ndim)]
+        for i in range(image_data.shape[self.loop_axis]):
+            slicing[self.loop_axis] = i
+            slice_data = image_data[slicing]
+            if self._all_equal(slice_data):
+                return False
+        return True
+
+    @staticmethod
+    def _all_equal(image_data):
+        return np.all(image_data == image_data.ravel()[0])
+
+    def __repr__(self) -> str:
+        return '{}({})'.format(self.__class__.__name__, self.loop_axis)
+
+
 class NonBlackSelection(SelectionStrategy):
 
     def __init__(self, black_value: float=.0) -> None:

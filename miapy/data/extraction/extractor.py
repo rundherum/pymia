@@ -117,9 +117,10 @@ class FilesExtractor(Extractor):
 
 class ImageExtractor(Extractor):
 
-    def __init__(self) -> None:
+    def __init__(self, entire_subject=False) -> None:
         super().__init__()
         self.entry_base_names = None
+        self.entire_subject = entire_subject
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
         if self.entry_base_names is None:
@@ -130,7 +131,11 @@ class ImageExtractor(Extractor):
         index_expr = params['index_expr']
 
         base_name = self.entry_base_names[subject_index]
-        extracted['images'] = reader.read('data/sequences/{}'.format(base_name), index_expr)
+        if self.entire_subject:
+            np_sequence = reader.read('data/sequences/{}'.format(base_name))
+        else:
+            np_sequence = reader.read('data/sequences/{}'.format(base_name), index_expr)
+        extracted['images'] = np_sequence
 
 
 class LabelExtractor(Extractor):
