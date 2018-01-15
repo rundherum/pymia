@@ -31,9 +31,9 @@ class NonConstantSelection(SelectionStrategy):
         for i in range(image_data.shape[self.loop_axis]):
             slicing[self.loop_axis] = i
             slice_data = image_data[slicing]
-            if self._all_equal(slice_data):
-                return False
-        return True
+            if not self._all_equal(slice_data):
+                return True
+        return False
 
     @staticmethod
     def _all_equal(image_data):
@@ -58,7 +58,7 @@ class NonBlackSelection(SelectionStrategy):
 
 class PercentileSelection(SelectionStrategy):
 
-    def __init__(self, percentile: int) -> None:
+    def __init__(self, percentile: float) -> None:
         # todo: add something to do this for one sequence only, too -> loop over one dim
         self.percentile = percentile
 
