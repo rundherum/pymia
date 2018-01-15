@@ -61,6 +61,7 @@ class SubjectExtractor(Extractor):
 class IndexingExtractor(Extractor):
 
     def __init__(self, do_pickle_expression=True) -> None:
+        super().__init__()
         self.do_pickle_expression = do_pickle_expression
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
@@ -74,12 +75,22 @@ class IndexingExtractor(Extractor):
 
 class ImageInformationExtractor(Extractor):
 
+    def __init__(self, shape_numpy_format=True) -> None:
+        super().__init__()
+        self.shape_numpy_format = shape_numpy_format
+
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
         subject_index_expr = expr.IndexExpression(params['subject_index'])
 
-        extracted['shape'] = tuple(reader.read('meta/shapes', subject_index_expr))
-        extracted['direction'] = tuple(reader.read('meta/directions', subject_index_expr))
-        extracted['spacing'] = tuple(reader.read('meta/spacing', subject_index_expr))
+        shape = reader.read('meta/shapes', subject_index_expr)
+        if self.shape_numpy_format:
+            tmp = shape[0]
+            shape[0] = shape[-1]
+            shape[-1] = tmp
+
+        extracted['shape'] = tuple(shape.tolist())
+        extracted['direction'] = tuple(reader.read('meta/directions', subject_index_expr).tolist())
+        extracted['spacing'] = tuple(reader.read('meta/spacing', subject_index_expr).tolist())
 
 
 class FilesExtractor(Extractor):
