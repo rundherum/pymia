@@ -104,6 +104,7 @@ class WriteImageInformationCallback(Callback):
     def __init__(self, writer: wr.Writer) -> None:
         self.writer = writer
         self.prev_subject_index = None
+        self.new_subject = False
 
     def on_start(self, params: dict):
         subject_count = len(params['subject_files'])
@@ -111,12 +112,16 @@ class WriteImageInformationCallback(Callback):
         self.writer.reserve(self.DIRECTION, (subject_count, 9), dtype=np.float)
         self.writer.reserve(self.SPACING, (subject_count, 3), dtype=np.float)
 
-    def on_image_file(self, params: dict):
-        subject_index = params['subject_index']
+    def on_subject_start(self, params: dict):
         # only write once for each subject -> every sequence must have equal image information
-        if self.prev_subject_index == subject_index:
-            return
+        self.new_subject = True
 
+    def on_image_file(self, params: dict):
+        if not self.new_subject:
+            return
+        self.new_subject = False
+
+        subject_index = params['subject_index']
         raw_image = params['raw_image']
         if not isinstance(raw_image, sitk.Image):
             raise ValueError("'raw_image' must be of type '{}'".format(sitk.Image.__name__))
