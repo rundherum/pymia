@@ -55,7 +55,7 @@ class SubjectFileTraverser(Traverser):
 
             subject_sequences = len(sequence_to_index)*[None]  # type: t.List[np.ndarray]
             for sequence, sequence_file in subject_file.get_sequences().items():
-                seq_image = loader.load_image(sequence_file)
+                seq_image = loader.load_image(sequence_file, sequence)
                 np_seq_image = loader.get_ndarray(seq_image)
                 subject_sequences[sequence_to_index[sequence]] = np_seq_image
 
@@ -70,7 +70,7 @@ class SubjectFileTraverser(Traverser):
             if has_gt:
                 subject_gts = len(gt_to_index) * [None]  # type: t.List[np.ndarray]
                 for gt, gt_file in subject_file.get_gts().items():
-                    gt_image = loader.load_label(gt_file)
+                    gt_image = loader.load_label(gt_file, gt)
                     subject_gts[gt_to_index[gt]] = loader.get_ndarray(gt_image)
 
                     callback_image_params = {'gt': gt, 'gt_index': gt_to_index[gt], 'file': gt_file,
