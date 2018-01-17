@@ -19,4 +19,4 @@ class SliceIndexing(IndexingStrategy):
 
     def __call__(self, shape, offset=0) -> t.List[util.IndexExpression]:
         count = shape[self.slice_axis]
-        return [util.IndexExpression(i) for i in range(offset, offset + count)]
+        return [util.IndexExpression(i, self.slice_axis) for i in range(offset, offset + count)]
