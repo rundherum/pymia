@@ -25,24 +25,28 @@ class Compose(Transform):
 
 class IntensityRescale(Transform):
 
-    def __init__(self, lower, upper, loop_axis=None) -> None:
+    def __init__(self, lower, upper, loop_axis=None, entries=('images',)) -> None:
         super().__init__()
         self.lower = lower
         self.upper = upper
         self.loop_axis = loop_axis
+        self.entries = entries
 
     def __call__(self, sample: dict) -> dict:
-        np_image = _check_and_return(sample['images'], np.ndarray)
+        for entry in self.entries:
+            if entry not in sample:
+                continue
 
-        if self.loop_axis is None:
-            np_image = self._normalize(np_image, self.lower, self.upper)
-        else:
-            slicing = [slice(None) for _ in range(np_image.ndim)]
-            for i in range(np_image.shape[self.loop_axis]):
-                slicing[self.loop_axis] = i
-                np_image[slicing] = self._normalize(np_image[slicing], self.lower, self.upper)
+            np_entry = _check_and_return(sample[entry], np.ndarray)
+            if self.loop_axis is None:
+                np_entry = self._normalize(np_entry, self.lower, self.upper)
+            else:
+                slicing = [slice(None) for _ in range(np_entry.ndim)]
+                for i in range(np_entry.shape[self.loop_axis]):
+                    slicing[self.loop_axis] = i
+                    np_entry[slicing] = self._normalize(np_entry[slicing], self.lower, self.upper)
 
-        sample['images'] = np_image
+            sample[entry] = np_entry
         return sample
 
     @staticmethod
@@ -56,22 +60,26 @@ class IntensityRescale(Transform):
 
 class IntensityNormalization(Transform):
 
-    def __init__(self, loop_axis=None) -> None:
+    def __init__(self, loop_axis=None, entries=('images',)) -> None:
         super().__init__()
         self.loop_axis = loop_axis
+        self.entries = entries
 
     def __call__(self, sample: dict) -> dict:
-        np_image = _check_and_return(sample['images'], np.ndarray)
+        for entry in self.entries:
+            if entry not in sample:
+                continue
 
-        if self.loop_axis is None:
-            np_image = self._normalize(np_image)
-        else:
-            slicing = [slice(None) for _ in range(np_image.ndim)]
-            for i in range(np_image.shape[self.loop_axis]):
-                slicing[self.loop_axis] = i
-                np_image[slicing] = self._normalize(np_image[slicing])
+            np_entry = _check_and_return(sample[entry], np.ndarray)
 
-        sample['images'] = np_image
+            if self.loop_axis is None:
+                np_entry = self._normalize(np_entry)
+            else:
+                slicing = [slice(None) for _ in range(np_entry.ndim)]
+                for i in range(np_entry.shape[self.loop_axis]):
+                    slicing[self.loop_axis] = i
+                    np_entry[slicing] = self._normalize(np_entry[slicing])
+            sample[entry] = np_entry
         return sample
 
     @staticmethod
@@ -81,81 +89,91 @@ class IntensityNormalization(Transform):
 
 class ClipPercentile(Transform):
 
-    def __init__(self, upper_percentile: float, lower_percentile: float = None) -> None:
+    def __init__(self, upper_percentile: float, lower_percentile: float = None, entries=('images',)) -> None:
         super().__init__()
         self.upper_percentile = upper_percentile
         self.lower_percentile = lower_percentile
+        self.entries = entries
 
     def __call__(self, sample: dict) -> dict:
-        np_image = _check_and_return(sample['images'], np.ndarray)
+        for entry in self.entries:
+            if entry not in sample:
+                continue
 
-        upper_max = np.percentile(np_image, self.upper_percentile)
-        np_image[np_image > upper_max] = upper_max
-        lower_max = np.percentile(np_image, self.lower_percentile)
-        np_image[np_image < lower_max] = lower_max
+            np_entry = _check_and_return(sample[entry], np.ndarray)
 
-        sample['images'] = np_image
+            upper_max = np.percentile(np_entry, self.upper_percentile)
+            np_entry[np_entry > upper_max] = upper_max
+            lower_max = np.percentile(np_entry, self.lower_percentile)
+            np_entry[np_entry < lower_max] = lower_max
+
+            sample[entry] = np_entry
         return sample
 
 
 class Relabel(Transform):
 
-    def __init__(self, label_changes: t.Dict[int, int]) -> None:
+    def __init__(self, label_changes: t.Dict[int, int], entries=('labels',)) -> None:
         super().__init__()
         self.label_changes = label_changes
+        self.entries = entries
 
     def __call__(self, sample: dict) -> dict:
-        np_label = _check_and_return(sample['labels'], np.ndarray)
-        for new_label, old_label in self.label_changes.items():
-            np_label[np_label == old_label] = new_label
-
-        sample['labels'] = np_label
+        for entry in self.entries:
+            if entry not in sample:
+                continue
+            np_entry = _check_and_return(sample[entry], np.ndarray)
+            for new_label, old_label in self.label_changes.items():
+                np_entry[np_entry == old_label] = new_label
+            sample[entry] = np_entry
         return sample
 
 
 class ToTensor(Transform):
 
-    def __init__(self, image_dims: int=3) -> None:
+    def __init__(self, entries=('images', 'labels')) -> None:
         super().__init__()
-        self.image_dims = image_dims
+        self.entries = entries
 
     def __call__(self, sample: dict) -> dict:
-        np_image = _check_and_return(sample['images'], np.ndarray)
-        sample['images'] = torch.from_numpy(np_image)
-        if 'labels' in sample:
-            np_label = _check_and_return(sample['labels'], np.ndarray)
-            sample['labels'] = torch.from_numpy(np_label)
+        for entry in self.entries:
+            if entry not in sample:
+                continue
+
+            np_entry = _check_and_return(sample[entry], np.ndarray)
+            sample[entry] = torch.from_numpy(np_entry)
         return sample
 
 
 class Permute(Transform):
 
-    def __init__(self, permutation: tuple, label_permutation=None) -> None:
+    def __init__(self, permutation: tuple, entries=('images', 'labels')) -> None:
         super().__init__()
         self.permutation = permutation
-        if label_permutation is None:
-            label_permutation = self.permutation
-        self.label_permutation = label_permutation
+        self.entries = entries
 
     def __call__(self, sample: dict) -> dict:
-        np_image = _check_and_return(sample['images'], np.ndarray)
-        sample['images'] = np.transpose(np_image, self.permutation)
-
-        if 'labels' in sample:
-            np_label = _check_and_return(sample['labels'], np.ndarray)
-            sample['labels'] = np.transpose(np_label, self.label_permutation)
+        for entry in self.entries:
+            if entry not in sample:
+                continue
+            np_entry = _check_and_return(sample[entry], np.ndarray)
+            sample[entry] = np.transpose(np_entry, self.permutation)
         return sample
 
 
 class Squeeze(Transform):
 
-    def __call__(self, sample: dict) -> dict:
-        np_image = _check_and_return(sample['images'], np.ndarray)
-        sample['images'] = np_image.squeeze()
+    def __init__(self, entries=('images', 'labels')) -> None:
+        super().__init__()
+        self.entries = entries
 
-        if 'labels' in sample:
-            np_label = _check_and_return(sample['labels'], np.ndarray)
-            sample['labels'] = np_label.squeeze()
+    def __call__(self, sample: dict) -> dict:
+        for entry in self.entries:
+            if entry not in sample:
+                continue
+
+            np_entry = _check_and_return(sample[entry], np.ndarray)
+            sample[entry] = np_entry.squeeze()
         return sample
 
 
