@@ -23,6 +23,14 @@ class Reader(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
+    def get_shape(self, entry: str) -> list:
+        pass
+
+    @abc.abstractmethod
+    def get_subjects(self) -> list:
+        pass
+
+    @abc.abstractmethod
     def read(self, entry: str, index: util.IndexExpression=None):
         pass
 
@@ -41,13 +49,20 @@ class Reader(metaclass=abc.ABCMeta):
 
 class Hdf5Reader(Reader):
 
-    def __init__(self, file_name: str, subjects_entry: str='data/sequences') -> None:
+    def __init__(self, file_name: str) -> None:
         self.h5 = None  # type: h5py.File
         self.file_name = file_name
-        self.subjects_entry = subjects_entry
+        self.subject_entry = 'meta/subjects'
+        self.sequence_entry = 'data/sequences'
 
     def get_subject_entries(self) -> list:
-        return ['{}/{}'.format(self.subjects_entry, k) for k in self.h5[self.subjects_entry].keys()]
+        return ['{}/{}'.format(self.sequence_entry, k) for k in self.h5[self.sequence_entry].keys()]
+
+    def get_shape(self, entry: str) -> list:
+        return self.h5[entry].shape
+
+    def get_subjects(self) -> list:
+        return self.read(self.subject_entry)
 
     def read(self, entry: str, index: util.IndexExpression=None):
         if index is None:

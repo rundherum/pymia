@@ -18,8 +18,8 @@ class ParametrizableDataset(data.Dataset):
 
         # todo: allow indices as argument with mutual exclusivity with strategy
         self.indices = []
-        for i, subject_entry in enumerate(self.reader.get_subject_entries()):
-            subject_indices = self.indexing_strategy(self.reader.read(subject_entry).shape)
+        for i, subject in enumerate(reader.get_subject_entries()):
+            subject_indices = self.indexing_strategy(self.reader.get_shape(subject))
             subject_and_indices = zip(len(subject_indices) * [i], subject_indices)
             self.indices.extend(subject_and_indices)
 
