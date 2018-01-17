@@ -1,5 +1,4 @@
 import typing as t
-import pickle
 
 
 # could maybe be replaced or wrapper with numpy.s_
