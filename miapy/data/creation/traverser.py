@@ -17,8 +17,10 @@ class Traverser(metaclass=abc.ABCMeta):
         pass
 
 
-def default_concat(subject_data: t.List[np.ndarray]) -> np.ndarray:
-    return np.stack(subject_data, axis=-1)
+def default_concat(data: t.List[np.ndarray]) -> np.ndarray:
+    if len(data) == 1:
+        return data[0]
+    return np.stack(data, axis=-1)
 
 
 class SubjectFileTraverser(Traverser):
