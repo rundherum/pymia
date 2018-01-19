@@ -10,6 +10,32 @@ import numpy as np
 import SimpleITK as sitk
 
 
+def plot_2d_image(path: str, image: np.ndarray) -> None:
+    """Plots a 2-D image.
+
+    Args:
+        path (str): The output file path.
+        image (np.ndarray): The 2-D image.
+    """
+
+    fig = plt.figure(figsize=image.shape[::-1], dpi=2)  # figure is twice as large as array (in pixels)
+    # configure axes such that no boarder is plotted
+    # refer to https://github.com/matplotlib/matplotlib/issues/7940/ about how to remove axis from plot
+    ax = plt.Axes(fig, [0., 0., 1., 1.])
+    ax.set_axis_off()
+    ax.margins(0)
+    ax.tick_params(which='both', direction='in')
+
+    # plot image
+    ax.imshow(image, 'gray', interpolation='none')
+
+    fig.add_axes(ax)
+
+    extent = ax.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
+    plt.savefig(path, bbox_inches=extent)
+    plt.close()
+
+
 def plot_slice(path: str, image: sitk.Image, slice_no: int) -> None:
     """Plots a slice from a 3-D image.
 
@@ -20,23 +46,7 @@ def plot_slice(path: str, image: sitk.Image, slice_no: int) -> None:
     """
 
     slice_ = sitk.GetArrayFromImage(image[:, :, slice_no])
-
-    fig = plt.figure(figsize=slice_.shape[::-1], dpi=2)  # figure is twice as large as array (in pixels)
-    # configure axes such that no boarder is plotted
-    # refer to https://github.com/matplotlib/matplotlib/issues/7940/ about how to remove axis from plot
-    ax = plt.Axes(fig, [0., 0., 1., 1.])
-    ax.set_axis_off()
-    ax.margins(0)
-    ax.tick_params(which='both', direction='in')
-
-    # plot image
-    ax.imshow(slice_, 'gray', interpolation='none')
-
-    fig.add_axes(ax)
-
-    extent = ax.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
-    plt.savefig(path, bbox_inches=extent)
-    plt.close()
+    plot_2d_image(path, slice_)
 
 
 def plot_2d_segmentation(path: str,
