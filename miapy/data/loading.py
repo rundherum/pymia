@@ -152,7 +152,7 @@ class FileSystemDataCrawler:
         """
 
         if not os.path.isdir(self.root_dir):
-            raise ValueError('root_dir should point to an existing directory')
+            raise ValueError('root_dir {} does not exist'.format(self.root_dir))
 
         # search the root directory for data directories
         data_dirs = next(os.walk(self.root_dir))[1]
