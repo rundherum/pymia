@@ -4,6 +4,8 @@ Refer also to `SimpleITK Notebooks
 <http://insightsoftwareconsortium.github.io/SimpleITK-Notebooks/10_matplotlib's_imshow.html>`_."""
 import os
 
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.colors as plt_colors
 import matplotlib.pyplot as plt
 import numpy as np
