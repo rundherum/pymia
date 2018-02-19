@@ -29,6 +29,8 @@ class IndexExpression:
             elif isinstance(index, tuple):
                 start, stop = index
                 expr[a] = slice(start, stop)
+            else:
+                raise ValueError('Unknown format of index')
 
         # needs to be tuple otherwise exception from h5py while slicing
         self.expression = tuple(expr)
@@ -45,4 +47,3 @@ class IndexExpression:
             else:
                 raise ValueError("only 'int', 'slice', and 'None' types possible in expression")
         return indexing if len(indexing) > 1 else indexing[0]
-
