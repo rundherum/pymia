@@ -6,7 +6,7 @@ from . import reader as rd
 from . import indexing as idx
 from . import extractor as extr
 
-
+# todo: fix typo (ParametErizableDataset) or rename because parameterizable is not in Webster dictionary
 class ParametrizableDataset(data.Dataset):
 
     def __init__(self, reader: rd.Reader, indexing_strategy: idx.IndexingStrategy, extractor: extr.Extractor=None,
