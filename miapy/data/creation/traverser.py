@@ -67,7 +67,7 @@ class SubjectFileTraverser(Traverser):
                     callback.on_image_file({**callback_params, **callback_subject_params, **callback_image_params})
 
             np_sequences = concat_fn(subject_sequences)
-            transform_params = {'images': np_sequences}
+            transform_params = {**callback_subject_params, 'images': np_sequences}
 
             if has_gt:
                 subject_gts = len(gt_to_index) * [None]  # type: t.List[np.ndarray]
