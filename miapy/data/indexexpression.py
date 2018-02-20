@@ -1,7 +1,7 @@
 import typing as t
 
 
-# could maybe be replaced or wrapper with numpy.s_
+# todo: could maybe be replaced or wrapper with numpy.s_
 class IndexExpression:
 
     def __init__(self, indexing: t.Union[int, tuple, t.List[int], t.List[tuple]]=None,
@@ -30,7 +30,7 @@ class IndexExpression:
                 start, stop = index
                 expr[a] = slice(start, stop)
             else:
-                raise ValueError('Unknown format of index')
+                raise ValueError('Unknown type "{}" of index'.format(type(index)))
 
         # needs to be tuple otherwise exception from h5py while slicing
         self.expression = tuple(expr)
