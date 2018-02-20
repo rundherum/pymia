@@ -144,10 +144,9 @@ class LabelExtractor(Extractor):
         super().__init__()
         self.entry_base_names = None
         if gt_mode not in ('all', 'random', 'select'):
-            raise ValueError('gt_mode must be "all", "random" or "select"')
+            raise ValueError('gt_mode must be "all", "random", or "select"')
+
         self.gt_mode = gt_mode
-        if gt_mode == 'select' and isinstance(gt_selection, (tuple, list)):
-            raise ValueError('for mode "select" the selection can only be one selection (string)')
         if isinstance(gt_selection, str):
             gt_selection = (gt_selection,)
         self.gt_selection = gt_selection
@@ -178,6 +177,10 @@ class LabelExtractor(Extractor):
             if self.gt_mode == 'random':
                 selection_indices = [gt_names.index(s) for s in self.gt_selection]
                 index = np.random.choice(selection_indices)
+            elif self.gt_mode == 'select' and isinstance(self.gt_selection, (tuple, list)):
+                selection_indices = np.array([gt_names.index(s) for s in self.gt_selection])
+                extracted['labels'] = np.take(np_gts, selection_indices, axis=-1)
+                return
             else:
                 # mode == 'select'
                 index = gt_names.index(self.gt_selection[0])
