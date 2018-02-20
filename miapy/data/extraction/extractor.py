@@ -172,7 +172,7 @@ class LabelExtractor(Extractor):
 
         if self.gt_mode != 'all':
             if 'gt_names' not in extracted:
-                raise ValueError('selection of gt requires gt_names to be extracted')
+                raise ValueError('selection of labels requires gt_names to be extracted (use NamesExtractor)')
             gt_names = extracted['gt_names']  # type: list
             if self.gt_mode == 'random':
                 selection_indices = [gt_names.index(s) for s in self.gt_selection]
