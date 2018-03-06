@@ -27,7 +27,8 @@ sys.path.insert(0, os.path.abspath('.'))  # docs directory
 sys.path.insert(0, os.path.abspath('..'))  # root directory of project
 #sys.path.insert(0, os.path.abspath('../miapy'))  # root directory of miapy package
 
-MOCK_MODULES = ['numpy', 'SimpleITK', 'matplotlib', 'matplotlib.colors', 'matplotlib.pyplot']
+MOCK_MODULES = ['h5py', 'matplotlib', 'matplotlib.colors', 'matplotlib.pyplot', 'numpy', 'SimpleITK',
+                'torch', 'torch.utils.data', 'torch.utils.data.dataset', 'torch.utils.data.sampler']
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()
 
