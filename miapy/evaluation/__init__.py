@@ -1,4 +1,8 @@
 """
+
+.. module:: miapy.evaluation
+   :synopsis: Evaluation metrics for medical image analysis.
+
 ======================================
 Evaluation (:mod:`evaluation` package)
 ======================================
