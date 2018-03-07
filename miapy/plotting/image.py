@@ -25,7 +25,7 @@ def plot_2d_image(path: str, image: np.ndarray) -> None:
     # refer to https://github.com/matplotlib/matplotlib/issues/7940/ about how to remove axis from plot
     ax = plt.Axes(fig, [0., 0., 1., 1.])
     ax.set_axis_off()
-    # ax.margins(0)
+    ax.margins(0)
     ax.tick_params(which='both', direction='in')
 
     # plot image
