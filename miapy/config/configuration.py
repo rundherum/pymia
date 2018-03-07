@@ -54,17 +54,16 @@ class ConfigurationBase(Dictable, metaclass=abc.ABCMeta):
 
     def from_dict(self, d: dict, **kwargs):
         version = kwargs.get('version', self.version())
-        self.handle_version(version, d, **kwargs)
+        self.handle_version(version, d)
 
         dict_to_member(self, d)
 
-    def handle_version(self, version, d: dict, **kwargs):
+    def handle_version(self, version, d: dict):
         """ Version handling. To be overwritten if version has to be verified.
 
         Args:
             version(int): The version
             d: The configuration dict
-            **kwargs: Additional arguments
         """
         pass
 
@@ -149,7 +148,8 @@ class JSONConfigurationParser(ConfigurationParser):
         if not os.path.isfile(file_path):
             raise ValueError('File {} does not exist'.format(file_path))
 
-        d = json.load(file_path)
+        with open(file_path, 'r') as f:
+            d = json.load(f)
 
         meta_dict = d['meta']
         config_dict = d['config']
@@ -169,7 +169,9 @@ class JSONConfigurationParser(ConfigurationParser):
     def save(file_path: str, config: ConfigurationBase):
         meta = MetaData(config.version(), config.type())
         d = {'meta': meta.to_dict(), 'config': config.to_dict()}
-        json.dump(d, file_path, sort_keys=True, indent=4)
+
+        with open(file_path, 'w') as f:
+            json.dump(d, f, sort_keys=True, indent=4)
 
 
 def load(file_path: str, config_cls) -> ConfigurationBase:
