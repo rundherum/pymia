@@ -49,11 +49,14 @@ class Reader(metaclass=abc.ABCMeta):
 
 class Hdf5Reader(Reader):
 
-    def __init__(self, file_name: str) -> None:
+    def __init__(self, file_name: str, open_file: bool=False) -> None:
         self.h5 = None  # type: h5py.File
         self.file_name = file_name
         self.subject_entry = 'meta/subjects'
         self.sequence_entry = 'data/sequences'
+
+        if open_file:
+            self.open()
 
     def get_subject_entries(self) -> list:
         return ['{}/{}'.format(self.sequence_entry, k) for k in self.h5[self.sequence_entry].keys()]
