@@ -104,12 +104,15 @@ class JSONConfigurationParser:
     """Represents a JSON configuration parser."""
 
     @staticmethod
-    def load(file_path: str, config: ConfigurationBase):
-        """Load the configuration file content.
+    def load(file_path: str, config_type):
+        """Load the configuration file.
 
         Args:
             file_path(str): The configuration file path
-            config(ConfigurationBase): The configuration instance to be updated
+            config_type: The type of the configuration
+
+        Returns:
+            ConfigurationBase: The configuration
         """
         if not os.path.isfile(file_path):
             raise ValueError('File {} does not exist'.format(file_path))
@@ -122,11 +125,13 @@ class JSONConfigurationParser:
         meta = MetaData()
         meta.from_dict(meta_dict)
 
+        config = config_type()
         if meta.type != config.type():
-            raise ValueError('configuration type "{}" does not fit the instance type "{}"'.format(
+            raise ValueError('configuration type "{}" does not fit the configuration instance "{}"'.format(
                 meta.type, config.__class__.__name__))
 
         config.from_dict(config_dict, version=meta.version)
+        return config
 
     @staticmethod
     def save(file_path: str, config: ConfigurationBase):
