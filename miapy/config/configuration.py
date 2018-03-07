@@ -68,6 +68,18 @@ class ConfigurationBase(Dictable, metaclass=abc.ABCMeta):
         """
         pass
 
+    def __str__(self):
+        """Gets a printable string representation.
+
+        Returns:
+            str: String representation.
+        """
+        dict_as_string = str(self.to_dict())
+        dict_as_string = dict_as_string.replace('{', '').replace('}', '').replace(',', '\n')
+        return '{}:\n' \
+               ' {}\n' \
+            .format(type(self).__name__, dict_as_string)
+
 
 def combine_dicts(target, source):
     for key, value in source.items():
