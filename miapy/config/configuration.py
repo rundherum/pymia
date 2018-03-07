@@ -54,17 +54,16 @@ class ConfigurationBase(Dictable, metaclass=abc.ABCMeta):
 
     def from_dict(self, d: dict, **kwargs):
         version = kwargs.get('version', self.version())
-        self.handle_version(version, d, **kwargs)
+        self.handle_version(version, d)
 
         dict_to_member(self, d)
 
-    def handle_version(self, version, d: dict, **kwargs):
+    def handle_version(self, version, d: dict):
         """ Version handling. To be overwritten if version has to be verified.
 
         Args:
             version(int): The version
             d: The configuration dict
-            **kwargs: Additional arguments
         """
         pass
 
