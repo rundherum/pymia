@@ -100,20 +100,40 @@ class MetaData(Dictable):
         self.type = d.get('type')
 
 
-class JSONConfigurationParser:
-    """Represents a JSON configuration parser."""
+class ConfigurationParser(metaclass=abc.ABCMeta):
+    """Represents the configuration parser interface."""
 
     @staticmethod
-    def load(file_path: str, config_type):
+    @abc.abstractmethod
+    def load(file_path: str, config_cls):
         """Load the configuration file.
 
         Args:
             file_path(str): The configuration file path
-            config_type: The type of the configuration
+            config_cls: The type of the configuration
 
         Returns:
             ConfigurationBase: The configuration
         """
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
+    def save(file_path: str, config: ConfigurationBase):
+        """Save the configuration to file.
+
+        Args:
+            file_path: The configuration file path
+            config: The configuration
+        """
+        pass
+
+
+class JSONConfigurationParser(ConfigurationParser):
+    """Represents a JSON configuration parser."""
+
+    @staticmethod
+    def load(file_path: str, config_cls):
         if not os.path.isfile(file_path):
             raise ValueError('File {} does not exist'.format(file_path))
 
@@ -125,7 +145,7 @@ class JSONConfigurationParser:
         meta = MetaData()
         meta.from_dict(meta_dict)
 
-        config = config_type()
+        config = config_cls()
         if meta.type != config.type():
             raise ValueError('configuration type "{}" does not fit the configuration instance "{}"'.format(
                 meta.type, config.__class__.__name__))
@@ -135,15 +155,44 @@ class JSONConfigurationParser:
 
     @staticmethod
     def save(file_path: str, config: ConfigurationBase):
-        """Save the configuration to file.
-
-        Args:
-            file_path: The configuration file path
-            config: The configuration
-        """
-        if not os.path.splitext(file_path)[1] == '.json':
-            file_path += '.json'
-
         meta = MetaData(config.version(), config.type())
         d = {'meta': meta.to_dict(), 'config': config.to_dict()}
         json.dump(d, file_path, sort_keys=True, indent=4)
+
+
+def load(file_path: str, config_cls) -> ConfigurationBase:
+    """Load the configuration file.
+
+    Args:
+        file_path(str): The configuration file path
+        config_cls: The configuration class type
+
+    Returns:
+        ConfigurationBase: The configuration
+    """
+    extension = os.path.splitext(file_path)[1]
+    if extension not in __extension_to_parser:
+        raise ValueError('unknown configuration file extension "{}"'.format(extension))
+
+    return __extension_to_parser[extension].load(file_path, config_cls)
+
+
+def save(file_path: str, config: ConfigurationBase) -> None:
+    """Save the configuration to file.
+
+    Args:
+        file_path: The configuration file path
+        config: The configuration
+    """
+
+    extension = os.path.splitext(file_path)[1]
+    if extension not in __extension_to_parser:
+        raise ValueError('unknown configuration file extension "{}"'.format(extension))
+
+    return __extension_to_parser[extension].save(file_path, config)
+
+
+__extension_to_parser = {'.json': JSONConfigurationParser}
+
+
+
