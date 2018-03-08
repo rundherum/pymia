@@ -23,11 +23,14 @@ class FileTypes(enum.Enum):
 class Subject(miapy_data.SubjectFile):
 
     def __init__(self, subject: str, files: dict):
-        super().__init__(subject, {})
+        super().__init__(subject,
+                         {FileTypes.T1.name: files[FileTypes.T1],
+                          FileTypes.T2.name: files[FileTypes.T2]},
+                         {FileTypes.GT.name: files[FileTypes.GT]},
+                         {FileTypes.MASK.name: files[FileTypes.MASK],
+                          FileTypes.AGE.name: files[FileTypes.AGE],
+                          FileTypes.SEX.name: files[FileTypes.SEX]})
         self.subject_path = files.pop(subject, '')
-        self.sequence_files = {FileTypes.T1.name: files[FileTypes.T1], FileTypes.T2.name: files[FileTypes.T2]}
-        self.gt_files = {FileTypes.GT.name: files[FileTypes.GT]}
-        self.mask_files = {FileTypes.MASK.name: files[FileTypes.MASK]}
 
 
 class DataSetFilePathGenerator(miapy_load.FilePathGenerator):
