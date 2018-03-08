@@ -99,13 +99,13 @@ class DirectoryFilter(miapy_load.DirectoryFilter):
 
 class DataSetLoader(miapy_crt.Loader):
 
-    def load_image(self, file_name: str, id_: str=None):
+    def load_images(self, file_name: str, id_: str=None):
         return sitk.ReadImage(file_name, sitk.sitkFloat32)
 
-    def load_label(self, file_name: str, id_: str=None):
+    def load_image_labels(self, file_name: str, id_: str=None):
         return sitk.ReadImage(file_name, sitk.sitkUInt8)
 
-    def load_additional(self, file_name: str):  # todo we need enum here...
+    def load_supplementaries(self, file_name: str, id_: str=None):
         return None  # todo: loading additional items
 
     def get_ndarray(self, image):

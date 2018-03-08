@@ -7,11 +7,15 @@ import SimpleITK as sitk
 class Loader(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
-    def load_image(self, file_name: str, id_: str=None):
+    def load_images(self, file_name: str, id_: str=None):
         pass
 
     @abc.abstractmethod
-    def load_label(self, file_name: str, id_: str=None):
+    def load_image_labels(self, file_name: str, id_: str=None):
+        pass
+
+    @abc.abstractmethod
+    def load_supplementaries(self, file_name: str, id_: str = None):
         pass
 
     @abc.abstractmethod
@@ -22,10 +26,13 @@ class Loader(metaclass=abc.ABCMeta):
 class NumPyLoader(Loader):
     """A NumPy loader."""
 
-    def load_image(self, file_name: str, id_: str=None):
+    def load_images(self, file_name: str, id_: str=None):
         return np.load(file_name)
 
-    def load_label(self, file_name: str, id_: str=None):
+    def load_image_labels(self, file_name: str, id_: str=None):
+        return np.load(file_name)
+
+    def load_supplementaries(self, file_name: str, id_: str=None):
         return np.load(file_name)
 
     def get_ndarray(self, image):
@@ -33,12 +40,16 @@ class NumPyLoader(Loader):
 
 
 class SitkLoader(Loader):
+    """A SimpleITK loader."""
 
-    def load_image(self, file_name: str, id_: str=None):
-        return sitk.ReadImage(file_name, sitk.sitkFloat32)
+    def load_images(self, file_name: str, id_: str=None):
+        return sitk.ReadImage(file_name)
 
-    def load_label(self, file_name: str, id_: str=None):
-        return sitk.ReadImage(file_name, sitk.sitkUInt8)
+    def load_image_labels(self, file_name: str, id_: str=None):
+        return sitk.ReadImage(file_name)
+
+    def load_supplementaries(self, file_name: str, id_: str=None):
+        return sitk.ReadImage(file_name)
 
     def get_ndarray(self, image):
         return sitk.GetArrayFromImage(image)
