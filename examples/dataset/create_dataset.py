@@ -30,7 +30,7 @@ class Subject(miapy_data.SubjectFile):
         self.mask_files = {FileTypes.MASK.name: files[FileTypes.MASK]}
 
 
-class NerveDataSetFilePathGenerator(miapy_load.FilePathGenerator):
+class DataSetFilePathGenerator(miapy_load.FilePathGenerator):
     """Represents a brain image file path generator.
 
     The generator is used to convert a human readable image identifier to an image file path,
@@ -38,7 +38,7 @@ class NerveDataSetFilePathGenerator(miapy_load.FilePathGenerator):
     """
 
     def __init__(self):
-        """Initializes a new instance of the NerveDataSetFilePathGenerator class."""
+        """Initializes a new instance of the DataSetFilePathGenerator class."""
         pass
 
     @staticmethod
@@ -55,13 +55,13 @@ class NerveDataSetFilePathGenerator(miapy_load.FilePathGenerator):
         add_file_extension = True
 
         if file_key == FileTypes.T1:
-            file_name = 'T1'
+            file_name = '{}_T1'.format(id_)
         elif file_key == FileTypes.T2:
-            file_name = 'T2'
+            file_name = '{}_T2'.format(id_)
         elif file_key == FileTypes.GT:
-            file_name = 'GT'
+            file_name = '{}_GT'.format(id_)
         elif file_key == FileTypes.MASK:
-            file_name = 'MASK.nii.gz'
+            file_name = '{}_MASK.nii.gz'.format(id_)
             add_file_extension = False
         elif file_key == FileTypes.AGE or file_key == FileTypes.SEX:
             file_name = 'demographic.txt'
@@ -73,7 +73,7 @@ class NerveDataSetFilePathGenerator(miapy_load.FilePathGenerator):
         return os.path.join(root_dir, file_name)
 
 
-class NerveDirectoryFilter(miapy_load.DirectoryFilter):
+class DirectoryFilter(miapy_load.DirectoryFilter):
     """Represents a data directory filter."""
 
     def __init__(self):
@@ -94,7 +94,7 @@ class NerveDirectoryFilter(miapy_load.DirectoryFilter):
         return sorted(dirs)
 
 
-class NerveDataSetLoader(miapy_crt.Loader):
+class DataSetLoader(miapy_crt.Loader):
 
     def load_image(self, file_name: str, id_: str=None):
         return sitk.ReadImage(file_name, sitk.sitkFloat32)
@@ -113,8 +113,8 @@ def main(hdf_file: str, data_dir: str):
     keys = [FileTypes.T1, FileTypes.T2, FileTypes.GT, FileTypes.MASK, FileTypes.AGE, FileTypes.SEX]
     crawler = miapy_load.FileSystemDataCrawler(data_dir,
                                                keys,
-                                               NerveDataSetFilePathGenerator(),
-                                               NerveDirectoryFilter(),
+                                               DataSetFilePathGenerator(),
+                                               DirectoryFilter(),
                                                '.mha')
 
     subjects = [Subject(id_, file_dict) for id_, file_dict in crawler.data.items()]
@@ -129,7 +129,7 @@ def main(hdf_file: str, data_dir: str):
         #transform = miapy_tfm.Compose([])
 
         traverser = miapy_crt.SubjectFileTraverser()
-        traverser.traverse(subjects, callback=callbacks, loader=NerveDataSetLoader(), transform=transform)
+        traverser.traverse(subjects, callback=callbacks, loader=DataSetLoader(), transform=transform)
 
 if __name__ == '__main__':
     """The program's entry point.
