@@ -112,7 +112,8 @@ def select_indices(data_source: data.Dataset, selection_strategy: SelectionStrat
 
 class SubsetSequentialSampler(smplr.Sampler):
 
-    def __init__(self, indices):
+    def __init__(self, indices, data_source):
+        super().__init__(data_source)
         self.indices = indices
 
     def __iter__(self):

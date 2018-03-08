@@ -28,7 +28,7 @@ def main(config_file: str):
                                                    miapy_extr.LabelExtractor(gt_mode='select',
                                                                              gt_selection=config.maps)])  # gt_selection=('B0map', 'PDmap', 'T1map', 'T2map')
 
-    dataset = miapy_extr.ParametrizableDataset(reader, indexing_strategy, transform=extraction_transform)
+    dataset = miapy_extr.ParameterizableDataset(reader, indexing_strategy, transform=extraction_transform)
     dataset.set_extractor(train_extractor)
 
 

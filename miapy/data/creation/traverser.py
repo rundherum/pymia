@@ -24,11 +24,11 @@ def default_concat(data: t.List[np.ndarray]) -> np.ndarray:
 
 
 class SubjectFileTraverser(Traverser):
-    def traverse(self, files: t.List[subj.FileCollection], loader=load.SitkLoader(), callback: cb.Callback=None,
+    def traverse(self, files: t.List[subj.SubjectFile], loader=load.SitkLoader(), callback: cb.Callback=None,
                  transform: tfm.Transform=None, concat_fn=default_concat):
         if len(files) == 0:
             raise ValueError('No files')
-        if not isinstance(files[0], subj.FileCollection):
+        if not isinstance(files[0], subj.SubjectFile):
             raise ValueError('files must be of type SubjectFile')
 
         subject_files = files  # only for better readability
@@ -51,12 +51,12 @@ class SubjectFileTraverser(Traverser):
         # looping over the subject files and calling callbacks
         for subject_index, subject_file in enumerate(subject_files):
 
-            callback_subject_params = {'subject': subject_file.get_subject(), 'subject_index': subject_index}
+            callback_subject_params = {'subject': subject_file.subject, 'subject_index': subject_index}
             if callback:
                 callback.on_subject_start({**callback_params, **callback_subject_params})
 
             subject_sequences = len(sequence_to_index)*[None]  # type: t.List[np.ndarray]
-            for sequence, sequence_file in subject_file.get_sequences().items():
+            for sequence, sequence_file in subject_file.images.items():
                 seq_image = loader.load_image(sequence_file, sequence)
                 np_seq_image = loader.get_ndarray(seq_image)
                 subject_sequences[sequence_to_index[sequence]] = np_seq_image
@@ -71,7 +71,7 @@ class SubjectFileTraverser(Traverser):
 
             if has_gt:
                 subject_gts = len(gt_to_index) * [None]  # type: t.List[np.ndarray]
-                for gt, gt_file in subject_file.get_gts().items():
+                for gt, gt_file in subject_file.label_images.items():
                     gt_image = loader.load_label(gt_file, gt)
                     subject_gts[gt_to_index[gt]] = loader.get_ndarray(gt_image)
 
@@ -93,19 +93,19 @@ class SubjectFileTraverser(Traverser):
             callback.on_end(callback_params)
 
     @staticmethod
-    def _get_sequence_names(subject_files: t.List[subj.FileCollection]) -> list:
-            sequences = subject_files[0].get_sequences().keys()
-            if not all(s.get_sequences().keys() == sequences for s in subject_files):
+    def _get_sequence_names(subject_files: t.List[subj.SubjectFile]) -> list:
+            sequences = subject_files[0].images.keys()
+            if not all(s.images.keys() == sequences for s in subject_files):
                 raise ValueError('inconsistent sequence names in the subject list')
             return list(sequences)
 
     @staticmethod
-    def _get_gt_names(subject_files: t.List[subj.FileCollection]) -> list:
-        if subject_files[0].get_gts() is None:
-            if not all(s.get_gts() is None for s in subject_files):
+    def _get_gt_names(subject_files: t.List[subj.SubjectFile]) -> list:
+        if subject_files[0].label_images is None:
+            if not all(s.label_images is None for s in subject_files):
                 raise ValueError('inconsistent gt names in the subject list')
             return []
-        gts = subject_files[0].get_gts().keys()
-        if not all(s.get_gts().keys() == gts for s in subject_files):
+        gts = subject_files[0].label_images.keys()
+        if not all(s.label_images.keys() == gts for s in subject_files):
             raise ValueError('inconsistent gt names in the subject list')
         return list(gts)
