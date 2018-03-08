@@ -12,8 +12,7 @@ class Transform(metaclass=abc.ABCMeta):
         pass
 
 
-# todo: rename to ComposeTransform for consistency (see ComposeCallback)
-class Compose(Transform):
+class ComposeTransform(Transform):
 
     def __init__(self, transforms: t.Iterable[Transform]) -> None:
         self.transforms = transforms
