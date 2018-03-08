@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 import SimpleITK as sitk
 
-import miapy.image.image as img
+import miapy.data.conversion as img
 
 
 class TestImageProperties(unittest.TestCase):
