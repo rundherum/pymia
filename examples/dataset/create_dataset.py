@@ -4,11 +4,14 @@ import os
 import typing
 
 import SimpleITK as sitk
+import numpy as np
 
 import miapy.data as miapy_data
+import miapy.data.conversion as conv
 import miapy.data.creation as miapy_crt
 import miapy.data.loading as miapy_load
 import miapy.data.transformation as miapy_tfm
+import miapy.data.creation.fileloader as file_load
 
 
 class FileTypes(enum.Enum):
@@ -18,6 +21,22 @@ class FileTypes(enum.Enum):
     MASK = 4  # The foreground mask
     AGE = 5  # The age
     SEX = 6  # The sex
+
+
+class LoadData(file_load.Load):
+
+    def __call__(self, file_name: str, id_: str) -> typing.Tuple[np.ndarray, typing.Union[conv.ImageProperties, None]]:
+        if id_ == FileTypes.AGE.name:
+            with open(file_name, 'r') as f:
+                value = np.asarray([int(f.readline().split(':')[1].strip())])
+                return value, None
+        if id_ == FileTypes.SEX.name:
+            with open(file_name, 'r') as f:
+                value = np.asarray([f.readlines()[1].split(':')[1].strip()])
+                return value, None
+
+        img = sitk.ReadImage(file_name)
+        return sitk.GetArrayFromImage(img), conv.ImageProperties(img)
 
 
 class Subject(miapy_data.SubjectFile):
@@ -97,21 +116,6 @@ class DirectoryFilter(miapy_load.DirectoryFilter):
         return sorted(dirs)
 
 
-class DataSetLoader(miapy_crt.Loader):
-
-    def load_images(self, file_name: str, id_: str=None):
-        return sitk.ReadImage(file_name, sitk.sitkFloat32)
-
-    def load_image_labels(self, file_name: str, id_: str=None):
-        return sitk.ReadImage(file_name, sitk.sitkUInt8)
-
-    def load_supplementaries(self, file_name: str, id_: str=None):
-        return None  # todo: loading additional items
-
-    def get_ndarray(self, image):
-        return sitk.GetArrayFromImage(image)
-
-
 def main(hdf_file: str, data_dir: str):
     keys = [FileTypes.T1, FileTypes.T2, FileTypes.GT, FileTypes.MASK, FileTypes.AGE, FileTypes.SEX]
     crawler = miapy_load.FileSystemDataCrawler(data_dir,
@@ -122,17 +126,22 @@ def main(hdf_file: str, data_dir: str):
 
     subjects = [Subject(id_, file_dict) for id_, file_dict in crawler.data.items()]
 
+    if os.path.exists(hdf_file):
+        os.remove(hdf_file)
+
     with miapy_crt.Hdf5Writer(hdf_file) as writer:
         callbacks = miapy_crt.ComposeCallback([miapy_crt.WriteDataCallback(writer),
                                                miapy_crt.WriteFilesCallback(writer),
                                                miapy_crt.WriteNamesCallback(writer),
+                                               miapy_crt.WriteImageInformationCallback(writer),
                                                miapy_crt.WriteSubjectCallback(writer)])
 
         transform = miapy_tfm.IntensityRescale(0, 1)
         #transform = miapy_tfm.Compose([])
 
         traverser = miapy_crt.SubjectFileTraverser()
-        traverser.traverse(subjects, callback=callbacks, loader=DataSetLoader(), transform=transform)
+        traverser.traverse(subjects, callback=callbacks, load=LoadData(), transform=transform)
+
 
 if __name__ == '__main__':
     """The program's entry point.
@@ -145,14 +154,14 @@ if __name__ == '__main__':
     parser.add_argument(
         '--hdf_file',
         type=str,
-        default='/home/fbalsiger/Documents/test/test.h5',
+        default='out/test/test.h5',
         help='Path to the dataset file.'
     )
 
     parser.add_argument(
         '--data_dir',
         type=str,
-        default='/home/fbalsiger/Documents/test',
+        default='out/test',
         help='Path to the data directory.'
     )
 

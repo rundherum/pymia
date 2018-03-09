@@ -44,7 +44,7 @@ class NamesExtractor(Extractor):
 
     @staticmethod
     def _extract(reader: rd.Reader):
-        sequence_names = reader.read('meta/sequence_names')
+        sequence_names = reader.read('meta/names/sequence_names')
         d = {'sequence_names': sequence_names}
         if reader.has('meta/gt_names'):
             d['gt_names'] = reader.read('meta/gt_names')

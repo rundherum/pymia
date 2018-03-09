@@ -1,55 +1,24 @@
 import abc
+import typing as t
 
 import numpy as np
 import SimpleITK as sitk
 
+import miapy.data.conversion as conv
 
-class Loader(metaclass=abc.ABCMeta):
 
-    @abc.abstractmethod
-    def load_images(self, file_name: str, id_: str=None):
-        pass
+class Load(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
-    def load_image_labels(self, file_name: str, id_: str=None):
-        pass
-
-    @abc.abstractmethod
-    def load_supplementaries(self, file_name: str, id_: str = None):
-        pass
-
-    @abc.abstractmethod
-    def get_ndarray(self, image):
+    def __call__(self, file_name: str, id_: str) -> t.Tuple[np.ndarray, t.Union[conv.ImageProperties, None]]:
         pass
 
 
-class NumPyLoader(Loader):
-    """A NumPy loader."""
+class LoadDefault(Load):
 
-    def load_images(self, file_name: str, id_: str=None):
-        return np.load(file_name)
-
-    def load_image_labels(self, file_name: str, id_: str=None):
-        return np.load(file_name)
-
-    def load_supplementaries(self, file_name: str, id_: str=None):
-        return np.load(file_name)
-
-    def get_ndarray(self, image):
-        return image
+    def __call__(self, file_name: str, id_: str) -> t.Tuple[np.ndarray, t.Union[conv.ImageProperties, None]]:
+        img = sitk.ReadImage(file_name)
+        return sitk.GetArrayFromImage(img), conv.ImageProperties(img)
 
 
-class SitkLoader(Loader):
-    """A SimpleITK loader."""
 
-    def load_images(self, file_name: str, id_: str=None):
-        return sitk.ReadImage(file_name)
-
-    def load_image_labels(self, file_name: str, id_: str=None):
-        return sitk.ReadImage(file_name)
-
-    def load_supplementaries(self, file_name: str, id_: str=None):
-        return sitk.ReadImage(file_name)
-
-    def get_ndarray(self, image):
-        return sitk.GetArrayFromImage(image)

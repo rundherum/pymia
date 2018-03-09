@@ -49,7 +49,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--data_dir',
         type=str,
-        default='/home/fbalsiger/Documents/test',
+        default='out/test',
         help='Path to the data directory.'
     )
 

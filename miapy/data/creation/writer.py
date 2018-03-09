@@ -3,7 +3,7 @@ import abc
 import numpy as np
 import h5py
 
-import miapy.data.indexexpression as util
+import miapy.data.indexexpression as expr
 
 
 class Writer(metaclass=abc.ABCMeta):
@@ -31,7 +31,7 @@ class Writer(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def fill(self, entry: str, data, index: util.IndexExpression=None):
+    def fill(self, entry: str, data, index: expr.IndexExpression=None):
         pass
 
     @abc.abstractmethod
@@ -56,23 +56,23 @@ class Hdf5Writer(Writer):
 
     def reserve(self, entry: str, shape: tuple, dtype=None):
         # special string handling (in order not to use length limited strings)
-        if dtype is str or dtype == 'str':
+        if dtype is str or dtype == 'str' or (isinstance(dtype, np.dtype) and dtype.type == np.str_):
             dtype = self.str_type
         self.h5.create_dataset(entry, shape, dtype=dtype)
 
-    def fill(self, entry: str, data, index: util.IndexExpression=None):
+    def fill(self, entry: str, data, index: expr.IndexExpression=None):
         # special string handling (in order not to use length limited strings)
         if self.h5[entry].dtype is self.str_type:
             data = np.asarray(data, dtype=object)
 
         if index is None:
-            index = util.IndexExpression()
+            index = expr.IndexExpression()
 
         self.h5[entry][index.expression] = data
 
     def write(self, entry: str, data, dtype=None):
         # special string handling (in order not to use length limited strings)
-        if dtype is str or dtype == 'str':
+        if dtype is str or dtype == 'str' or (isinstance(dtype, np.dtype) and dtype.type == np.str_):
             dtype = self.str_type
             data = np.asarray(data, dtype=object)
         if entry in self.h5:

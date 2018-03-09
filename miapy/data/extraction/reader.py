@@ -3,7 +3,7 @@ import abc
 import h5py
 import numpy as np
 
-import miapy.data.indexexpression as util
+import miapy.data.indexexpression as expr
 
 
 class Reader(metaclass=abc.ABCMeta):
@@ -31,7 +31,7 @@ class Reader(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def read(self, entry: str, index: util.IndexExpression=None):
+    def read(self, entry: str, index: expr.IndexExpression=None):
         pass
 
     @abc.abstractmethod
@@ -67,7 +67,7 @@ class Hdf5Reader(Reader):
     def get_subjects(self) -> list:
         return self.read(self.subject_entry)
 
-    def read(self, entry: str, index: util.IndexExpression=None):
+    def read(self, entry: str, index: expr.IndexExpression=None):
         if index is None:
             data = self.h5[entry][()]  # need () instead of util.IndexExpression(None) [which is equal to slice(None)]
         else:
