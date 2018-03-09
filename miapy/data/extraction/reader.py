@@ -4,6 +4,7 @@ import h5py
 import numpy as np
 
 import miapy.data.indexexpression as expr
+import miapy.data.definition as df
 
 
 class Reader(metaclass=abc.ABCMeta):
@@ -52,20 +53,18 @@ class Hdf5Reader(Reader):
     def __init__(self, file_name: str, open_file: bool=False) -> None:
         self.h5 = None  # type: h5py.File
         self.file_name = file_name
-        self.subject_entry = 'meta/subjects'
-        self.sequence_entry = 'data/sequences'
 
         if open_file:
             self.open()
 
     def get_subject_entries(self) -> list:
-        return ['{}/{}'.format(self.sequence_entry, k) for k in self.h5[self.sequence_entry].keys()]
+        return ['{}/{}'.format(df.DATA_IMAGE, k) for k in self.h5[df.DATA_IMAGE].keys()]
 
     def get_shape(self, entry: str) -> list:
         return self.h5[entry].shape
 
     def get_subjects(self) -> list:
-        return self.read(self.subject_entry)
+        return self.read(df.SUBJECT)
 
     def read(self, entry: str, index: expr.IndexExpression=None):
         if index is None:

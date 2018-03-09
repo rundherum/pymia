@@ -4,6 +4,7 @@ import pickle
 import numpy as np
 
 import miapy.data.indexexpression as expr
+import miapy.data.definition as df
 from . import reader as rd
 
 
@@ -44,10 +45,12 @@ class NamesExtractor(Extractor):
 
     @staticmethod
     def _extract(reader: rd.Reader):
-        sequence_names = reader.read('meta/names/sequence_names')
-        d = {'sequence_names': sequence_names}
-        if reader.has('meta/gt_names'):
-            d['gt_names'] = reader.read('meta/gt_names')
+        image_names = reader.read(df.NAMES_IMAGE)
+        d = {'image_names': image_names}
+        if reader.has(df.NAMES_LABEL):
+            d['label_names'] = reader.read(df.NAMES_LABEL)
+        if reader.has(df.NAMES_SUPPL):
+            d['supplementary_names'] = reader.read(df.NAMES_SUPPL)
         return d
 
 
@@ -55,7 +58,7 @@ class SubjectExtractor(Extractor):
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
         subject_index_expr = expr.IndexExpression(params['subject_index'])
-        extracted['subject'] = reader.read('meta/subjects', subject_index_expr)
+        extracted['subject'] = reader.read(df.SUBJECT, subject_index_expr)
 
 
 class IndexingExtractor(Extractor):
@@ -82,15 +85,16 @@ class ImageInformationExtractor(Extractor):
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
         subject_index_expr = expr.IndexExpression(params['subject_index'])
 
-        shape = reader.read('meta/shapes', subject_index_expr)
+        shape = reader.read(df.INFO_SHAPE, subject_index_expr)
         if self.shape_numpy_format:
             tmp = shape[0]
             shape[0] = shape[-1]
             shape[-1] = tmp
 
         extracted['shape'] = tuple(shape.tolist())
-        extracted['direction'] = tuple(reader.read('meta/directions', subject_index_expr).tolist())
-        extracted['spacing'] = tuple(reader.read('meta/spacing', subject_index_expr).tolist())
+        extracted['direction'] = tuple(reader.read(df.INFO_DIRECTION, subject_index_expr).tolist())
+        extracted['spacing'] = tuple(reader.read(df.INFO_SPACING, subject_index_expr).tolist())
+        extracted['origin'] = tuple(reader.read(df.INFO_ORIGIN, subject_index_expr).tolist())
 
 
 class FilesExtractor(Extractor):
@@ -104,15 +108,17 @@ class FilesExtractor(Extractor):
         subject_index_expr = expr.IndexExpression(params['subject_index'])
 
         if not self.cache or self.cached_file_root is None:
-            file_root = reader.read('meta/file_root')
+            file_root = reader.read(df.FILES_ROOT)
             self.cached_file_root = file_root
         else:
             file_root = self.cached_file_root
 
         extracted['file_root'] = file_root
-        extracted['sequence_files'] = reader.read('meta/sequence_files', subject_index_expr)
-        if reader.has('meta/gt_files'):
-            extracted['gt_files'] = reader.read('meta/gt_files', subject_index_expr)
+        extracted['image_files'] = reader.read(df.FILES_IMAGE, subject_index_expr)
+        if reader.has(df.FILES_LABEL):
+            extracted['label_files'] = reader.read(df.FILES_LABEL, subject_index_expr)
+        if reader.has(df.FILES_SUPPL):
+            extracted['supplementary_files'] = reader.read(df.FILES_SUPPL, subject_index_expr)
 
 
 class ImageExtractor(Extractor):
@@ -132,9 +138,9 @@ class ImageExtractor(Extractor):
 
         base_name = self.entry_base_names[subject_index]
         if self.entire_subject:
-            np_sequence = reader.read('data/sequences/{}'.format(base_name))
+            np_sequence = reader.read('{}/{}'.format(df.DATA_IMAGE, base_name))
         else:
-            np_sequence = reader.read('data/sequences/{}'.format(base_name), index_expr)
+            np_sequence = reader.read('{}/{}'.format(df.DATA_IMAGE, base_name), index_expr)
         extracted['images'] = np_sequence
 
 
@@ -157,7 +163,7 @@ class LabelExtractor(Extractor):
             entries = reader.get_subject_entries()
             self.entry_base_names = [entry.rsplit('/', maxsplit=1)[1] for entry in entries]
 
-        if not reader.has('data/gts'):
+        if not reader.has(df.DATA_LABEL):
             raise ValueError('FullSubjectExtractor requires GT to exist')
 
         subject_index = params['subject_index']
@@ -166,9 +172,9 @@ class LabelExtractor(Extractor):
         base_name = self.entry_base_names[subject_index]
 
         if self.entire_subject:
-            np_gts = reader.read('data/gts/{}'.format(base_name))
+            np_gts = reader.read('{}/{}'.format(df.DATA_LABEL, base_name))
         else:
-            np_gts = reader.read('data/gts/{}'.format(base_name), index_expr)
+            np_gts = reader.read('{}/{}'.format(df.DATA_LABEL, base_name), index_expr)
 
         if self.gt_mode != 'all':
             if 'gt_names' not in extracted:
@@ -191,3 +197,27 @@ class LabelExtractor(Extractor):
             np_gts = np.expand_dims(np_gts, -1)
 
         extracted['labels'] = np_gts
+
+
+class SupplementaryExtractor(Extractor):
+
+    def __init__(self, entries: tuple, entire_subject=False) -> None:
+        super().__init__()
+        self.entries = entries
+        self.entire_subject = entire_subject
+        self.entry_base_names = None
+
+    def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
+        if self.entry_base_names is None:
+            entries = reader.get_subject_entries()
+            self.entry_base_names = [entry.rsplit('/', maxsplit=1)[1] for entry in entries]
+
+        subject_index = params['subject_index']
+        index_expr = params['index_expr']
+
+        base_name = self.entry_base_names[subject_index]
+        for entry in self.entries:
+            if self.entire_subject:
+                extracted[entry] = reader.read('{}/{}/{}'.format(df.DATA, entry, base_name))
+            else:
+                extracted[entry] = reader.read('{}/{}/{}'.format(df.DATA, entry, base_name), index_expr)
