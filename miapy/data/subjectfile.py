@@ -1,3 +1,12 @@
+import enum
+
+
+class FileType(enum.Enum):
+    IMAGE = 1
+    LABEL = 2
+    SUPPLEMENTARY = 3
+
+
 class SubjectFile:
 
     def __init__(self, subject: str, images: dict, label_images: dict=None, supplementaries: dict=None) -> None:

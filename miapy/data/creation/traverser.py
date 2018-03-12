@@ -57,7 +57,7 @@ class SubjectFileTraverser(Traverser):
             images_list = []
             image_property = None  # type: conv.ImageProperties
             for id_, image_path in subject_file.images.items():
-                np_img, img_property = load(image_path, id_)
+                np_img, img_property = load(image_path, id_, subj.FileType.IMAGE)
                 images_list.append(np_img)
                 if image_property is None:  # only required once
                     image_property = img_property
@@ -69,7 +69,7 @@ class SubjectFileTraverser(Traverser):
                 label_image_list = []
                 label_image_property = None  # type: conv.ImageProperties
                 for id_, label_image_path in subject_file.label_images.items():
-                    np_label_img, label_property = load(label_image_path, id_)
+                    np_label_img, label_property = load(label_image_path, id_, subj.FileType.LABEL)
                     label_image_list.append(np_label_img)
                     if label_image_property is None:
                         label_image_property = label_property
@@ -83,7 +83,8 @@ class SubjectFileTraverser(Traverser):
                 supplementary_properties = {}
                 for id_, supplementary_path in subject_file.supplementaries.items():
                     props_key = '{}_properties'.format(id_)
-                    supplementaries[id_], supplementary_properties[props_key] = load(supplementary_path, id_)
+                    supplementaries[id_], supplementary_properties[props_key] = load(supplementary_path, id_,
+                                                                                     subj.FileType.SUPPLEMENTARY)
 
                 transform_params = {**transform_params, 'supplementaries': supplementaries,
                                     'supplementary_properties': supplementary_properties}

@@ -7,6 +7,7 @@ import SimpleITK as sitk
 import numpy as np
 
 import miapy.data as miapy_data
+import miapy.data.subjectfile as subj
 import miapy.data.conversion as conv
 import miapy.data.creation as miapy_crt
 import miapy.data.loading as miapy_load
@@ -25,7 +26,8 @@ class FileTypes(enum.Enum):
 
 class LoadData(file_load.Load):
 
-    def __call__(self, file_name: str, id_: str) -> typing.Tuple[np.ndarray, typing.Union[conv.ImageProperties, None]]:
+    def __call__(self, file_name: str, id_: str, file_type: subj.FileType) -> \
+            typing.Tuple[np.ndarray, typing.Union[conv.ImageProperties, None]]:
         if id_ == FileTypes.AGE.name:
             with open(file_name, 'r') as f:
                 value = np.asarray([int(f.readline().split(':')[1].strip())])
