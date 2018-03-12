@@ -11,6 +11,15 @@ import miapy.data.definition as df
 class Reader(metaclass=abc.ABCMeta):
     """Represents the abstract dataset reader."""
 
+    def __init__(self, file_path: str) -> None:
+        """Initializes a new instance.
+
+        Args:
+            file_path(str): The path to the dataset file.
+        """
+        super().__init__()
+        self.file_path = file_path
+
     def __enter__(self):
         self.open()
         return self
@@ -96,8 +105,8 @@ class Hdf5Reader(Reader):
         Args:
             file_path(str): The path to the dataset file.
         """
+        super().__init__(file_path)
         self.h5 = None  # type: h5py.File
-        self.file_path = file_path
 
     def get_subject_entries(self) -> list:
         return ['{}/{}'.format(df.DATA_IMAGE, k) for k in self.h5[df.DATA_IMAGE].keys()]
