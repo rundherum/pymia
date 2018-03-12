@@ -16,7 +16,7 @@ import miapy.data.creation.fileloader as file_load
 
 def main(hdf_file: str):
 
-    with extr.Hdf5Reader(hdf_file) as reader:
+    with extr.get_reader(hdf_file) as reader:
         extractor = extr.ComposeExtractor([extr.NamesExtractor(),
                                            extr.ImageExtractor(),
                                            extr.LabelExtractor(),

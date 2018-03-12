@@ -129,7 +129,7 @@ def main(hdf_file: str, data_dir: str):
     if os.path.exists(hdf_file):
         os.remove(hdf_file)
 
-    with miapy_crt.Hdf5Writer(hdf_file) as writer:
+    with miapy_crt.get_writer(hdf_file) as writer:
         callbacks = miapy_crt.ComposeCallback([miapy_crt.WriteDataCallback(writer),
                                                miapy_crt.WriteFilesCallback(writer),
                                                miapy_crt.WriteNamesCallback(writer),

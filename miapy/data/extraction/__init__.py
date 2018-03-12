@@ -1,4 +1,4 @@
-from .reader import (Reader, Hdf5Reader)
+from .reader import (Reader, Hdf5Reader, get_reader)
 from .indexing import (IndexingStrategy, SliceIndexing)
 from .dataset import ParameterizableDataset
 from .extractor import (Extractor, ImageExtractor, FilesExtractor, NamesExtractor, SubjectExtractor, IndexingExtractor,

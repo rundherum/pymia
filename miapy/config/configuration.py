@@ -185,10 +185,10 @@ def load(file_path: str, config_cls) -> ConfigurationBase:
         ConfigurationBase: The configuration
     """
     extension = os.path.splitext(file_path)[1]
-    if extension not in __extension_to_parser:
+    if extension not in parser_registry:
         raise ValueError('unknown configuration file extension "{}"'.format(extension))
 
-    return __extension_to_parser[extension].load(file_path, config_cls)
+    return parser_registry[extension].load(file_path, config_cls)
 
 
 def save(file_path: str, config: ConfigurationBase) -> None:
@@ -200,13 +200,13 @@ def save(file_path: str, config: ConfigurationBase) -> None:
     """
 
     extension = os.path.splitext(file_path)[1]
-    if extension not in __extension_to_parser:
+    if extension not in parser_registry:
         raise ValueError('unknown configuration file extension "{}"'.format(extension))
 
-    return __extension_to_parser[extension].save(file_path, config)
+    return parser_registry[extension].save(file_path, config)
 
 
-__extension_to_parser = {'.json': JSONConfigurationParser}
+parser_registry = {'.json': JSONConfigurationParser}
 
 
 
