@@ -2,14 +2,14 @@ import argparse
 
 import miapy.data.extraction as miapy_extr
 
-import nerve.configuration.config as cfg
+import examples.dataset.config as cfg
 
 
 def train():
     pass
 
-def test():
 
+def test():
     pass
 
 
@@ -17,7 +17,7 @@ def main(config_file: str):
     config = cfg.load(config_file, cfg.Configuration)
     print(config)
 
-    reader = miapy_extr.Hdf5Reader(config.database_file, open_file=True)
+    reader = miapy_extr.get_reader(config.database_file, direct_open=True)
 
     indexing_strategy = miapy_extr.SliceIndexing()
     extraction_transform = None
