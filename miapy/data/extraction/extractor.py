@@ -177,19 +177,19 @@ class LabelExtractor(Extractor):
             np_gts = reader.read('{}/{}'.format(df.DATA_LABEL, base_name), index_expr)
 
         if self.gt_mode != 'all':
-            if 'gt_names' not in extracted:
-                raise ValueError('selection of labels requires gt_names to be extracted (use NamesExtractor)')
-            gt_names = extracted['gt_names']  # type: list
+            if 'label_names' not in extracted:
+                raise ValueError('selection of labels requires label_names to be extracted (use NamesExtractor)')
+            label_names = extracted['label_names']  # type: list
             if self.gt_mode == 'random':
-                selection_indices = [gt_names.index(s) for s in self.gt_selection]
+                selection_indices = [label_names.index(s) for s in self.gt_selection]
                 index = np.random.choice(selection_indices)
             elif self.gt_mode == 'select' and isinstance(self.gt_selection, (tuple, list)):
-                selection_indices = np.array([gt_names.index(s) for s in self.gt_selection])
+                selection_indices = np.array([label_names.index(s) for s in self.gt_selection])
                 extracted['labels'] = np.take(np_gts, selection_indices, axis=-1)
                 return
             else:
                 # mode == 'select'
-                index = gt_names.index(self.gt_selection[0])
+                index = label_names.index(self.gt_selection[0])
 
             # todo: inverse index_expr in order to add index to it
             np_gts = np_gts[..., index]
