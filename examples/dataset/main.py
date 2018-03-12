@@ -62,7 +62,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--config_file',
         type=str,
-        default='/home/fbalsiger/Documents/config_ds2-balsiger.json',
+        default='config.json',
         help='Path to the configuration file.'
     )
 
