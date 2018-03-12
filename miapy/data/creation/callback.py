@@ -159,12 +159,14 @@ class WriteFilesCallback(Callback):
             index_expr = expr.IndexExpression(indexing=[subject_index, image_index], axis=(0, 1))
             self.writer.fill(df.FILES_IMAGE, relative_path, index_expr)
 
-        for label_index, key in enumerate(subject_file.label_images):
-            relative_path = os.path.relpath(subject_file.label_images[key], self.file_root)
-            index_expr = expr.IndexExpression(indexing=[subject_index, label_index], axis=(0, 1))
-            self.writer.fill(df.FILES_LABEL, relative_path, index_expr)
+        if subject_file.label_images is not None:
+            for label_index, key in enumerate(subject_file.label_images):
+                relative_path = os.path.relpath(subject_file.label_images[key], self.file_root)
+                index_expr = expr.IndexExpression(indexing=[subject_index, label_index], axis=(0, 1))
+                self.writer.fill(df.FILES_LABEL, relative_path, index_expr)
 
-        for supplementary_index, key in enumerate(subject_file.supplementaries):
-            relative_path = os.path.relpath(subject_file.supplementaries[key], self.file_root)
-            index_expr = expr.IndexExpression(indexing=[subject_index, supplementary_index], axis=(0, 1))
-            self.writer.fill(df.FILES_SUPPL, relative_path, index_expr)
+        if subject_file.supplementaries is not None:
+            for supplementary_index, key in enumerate(subject_file.supplementaries):
+                relative_path = os.path.relpath(subject_file.supplementaries[key], self.file_root)
+                index_expr = expr.IndexExpression(indexing=[subject_index, supplementary_index], axis=(0, 1))
+                self.writer.fill(df.FILES_SUPPL, relative_path, index_expr)
