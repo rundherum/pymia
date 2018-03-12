@@ -1,4 +1,4 @@
-NAMES_IMAGE = 'meta/names/images_names'
+NAMES_IMAGE = 'meta/names/image_names'
 NAMES_LABEL = 'meta/names/label_names'
 NAMES_SUPPL = 'meta/names/supplementary_names'
 

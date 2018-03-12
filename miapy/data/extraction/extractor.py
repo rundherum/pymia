@@ -138,10 +138,10 @@ class ImageExtractor(Extractor):
 
         base_name = self.entry_base_names[subject_index]
         if self.entire_subject:
-            np_sequence = reader.read('{}/{}'.format(df.DATA_IMAGE, base_name))
+            np_image = reader.read('{}/{}'.format(df.DATA_IMAGE, base_name))
         else:
-            np_sequence = reader.read('{}/{}'.format(df.DATA_IMAGE, base_name), index_expr)
-        extracted['images'] = np_sequence
+            np_image = reader.read('{}/{}'.format(df.DATA_IMAGE, base_name), index_expr)
+        extracted['images'] = np_image
 
 
 class LabelExtractor(Extractor):
