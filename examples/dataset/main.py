@@ -9,7 +9,6 @@ import miapy.data.assembler as miapy_asmbl
 import miapy.evaluation.evaluator as miapy_eval
 import miapy.evaluation.metric as miapy_metric
 
-
 import examples.dataset.config as cfg
 
 
@@ -22,7 +21,7 @@ def batch_to_feed_dict(x_placeholder, y_placeholder, batch, is_train: bool=True)
 
 
 def collate_batch(batch) -> dict:
-    # batch is a list of dicts -> change to dict of list
+    # batch is a list of dicts -> change to dict of lists
     return dict(zip(batch[0], zip(*[d.values() for d in batch])))
 
 
