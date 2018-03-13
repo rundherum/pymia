@@ -111,6 +111,7 @@ def select_indices(data_source: data.Dataset, selection_strategy: SelectionStrat
 
 
 class SubsetSequentialSampler(smplr.Sampler):
+    """Samples elements sequential from a given list of indices, without replacement."""
 
     def __init__(self, indices):
         super().__init__(None)
