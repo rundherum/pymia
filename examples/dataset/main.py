@@ -3,6 +3,7 @@ import argparse
 import numpy as np
 import tensorflow as tf
 
+import miapy.data.conversion as miapy_conv
 import miapy.data.extraction as miapy_extr
 import miapy.data.assembler as miapy_asmbl
 import miapy.evaluation.evaluator as miapy_eval
@@ -49,7 +50,8 @@ def main(config_file: str):
     test_extractor = miapy_extr.ComposeExtractor([miapy_extr.SubjectExtractor(),
                                                   miapy_extr.IndexingExtractor(),
                                                   miapy_extr.ImageExtractor(),
-                                                  miapy_extr.LabelExtractor()])
+                                                  miapy_extr.LabelExtractor(),
+                                                  miapy_extr.ImagePropertiesExtractor()])
 
     # define the data set
     dataset = miapy_extr.ParameterizableDataset(config.database_file,
@@ -101,9 +103,13 @@ def main(config_file: str):
             prediction = np.stack(batch['labels'], axis=0)  # we use the labels as predictions such that we can validate the assembler
             subject_assembler.add_sample(prediction, batch)
 
-        # evaluate prediction
+        # convert prediction and labels back to SimpleITK images
         sample = dataset.direct_extract(test_extractor, test_id)
-        evaluator.evaluate(subject_assembler.get_subject(sample['subject']), sample['labels'], sample['subject'])
+        label_image = miapy_conv.NumpySimpleITKImageBridge.convert(sample['labels'],
+                                                                   sample['image_properties'])
+        prediction_image = miapy_conv.NumpySimpleITKImageBridge.convert(subject_assembler.get_subject(sample['subject']),
+                                                                        sample['image_properties'])
+        evaluator.evaluate(prediction_image, label_image, sample['subject'])  # evaluate prediction
 
 
 if __name__ == '__main__':

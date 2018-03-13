@@ -2,9 +2,11 @@ import abc
 import pickle
 
 import numpy as np
+import SimpleITK as sitk
 
-import miapy.data.indexexpression as expr
+import miapy.data.conversion as conv
 import miapy.data.definition as df
+import miapy.data.indexexpression as expr
 from . import reader as rd
 
 
@@ -95,6 +97,29 @@ class ImageInformationExtractor(Extractor):
         extracted['direction'] = tuple(reader.read(df.INFO_DIRECTION, subject_index_expr).tolist())
         extracted['spacing'] = tuple(reader.read(df.INFO_SPACING, subject_index_expr).tolist())
         extracted['origin'] = tuple(reader.read(df.INFO_ORIGIN, subject_index_expr).tolist())
+
+
+class ImagePropertiesExtractor(Extractor):
+    """Extracts the image properties."""
+
+    def __init__(self) -> None:
+        super().__init__()
+
+    def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
+        subject_index_expr = expr.IndexExpression(params['subject_index'])
+
+        shape = reader.read(df.INFO_SHAPE, subject_index_expr).tolist()
+        direction = reader.read(df.INFO_DIRECTION, subject_index_expr).tolist()
+        spacing = reader.read(df.INFO_SPACING, subject_index_expr).tolist()
+        origin = reader.read(df.INFO_ORIGIN, subject_index_expr).tolist()
+
+        image = sitk.Image(shape, sitk.sitkUInt8)
+        image.SetDirection(direction)
+        image.SetSpacing(spacing)
+        image.SetOrigin(origin)
+        # todo number_of_components_per_pixel and pixel_id
+
+        extracted['image_properties'] = conv.ImageProperties(image)
 
 
 class FilesExtractor(Extractor):
