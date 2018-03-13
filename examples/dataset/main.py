@@ -1,54 +1,109 @@
 import argparse
 
+import numpy as np
+import tensorflow as tf
+
 import miapy.data.extraction as miapy_extr
+import miapy.data.assembler as miapy_asmbl
+import miapy.evaluation.evaluator as miapy_eval
+import miapy.evaluation.metric as miapy_metric
+
 
 import examples.dataset.config as cfg
 
 
-def train():
-    pass
+def batch_to_feed_dict(x_placeholder, y_placeholder, batch, is_train: bool=True) -> dict:
+    feed_dict = {x_placeholder: np.stack(batch['images'], axis=0).astype(np.float32)}
+    if is_train:
+        feed_dict[y_placeholder] = np.stack(batch['labels'], axis=0).astype(np.int16)
+
+    return feed_dict
 
 
-def test():
-    pass
+def collate_batch(batch) -> dict:
+    # batch is a list of dicts -> change to dict of list
+    return dict(zip(batch[0], zip(*[d.values() for d in batch])))
+
+
+def init_evaluator() -> miapy_eval.Evaluator:
+    evaluator = miapy_eval.Evaluator(miapy_eval.ConsoleEvaluatorWriter(5))
+    evaluator.add_label(1, 'Structure 1')
+    evaluator.add_label(2, 'Structure 2')
+    evaluator.add_label(3, 'Structure 3')
+    evaluator.add_label(4, 'Structure 4')
+    evaluator.metrics = [miapy_metric.DiceCoefficient()]
+    return evaluator
 
 
 def main(config_file: str):
     config = cfg.load(config_file, cfg.Configuration)
     print(config)
 
-    reader = miapy_extr.get_reader(config.database_file, direct_open=True)
+    indexing_strategy = miapy_extr.SliceIndexing()  # slice-wise extraction
+    extraction_transform = None  # we do not want to apply any transformation on the slices after extraction
+    # define an extractor, i.e. what information we would like to extract per sample
+    train_extractor = miapy_extr.ComposeExtractor([miapy_extr.ImageExtractor(),
+                                                   miapy_extr.LabelExtractor()])
 
-    indexing_strategy = miapy_extr.SliceIndexing()
-    extraction_transform = None
-    train_extractor = miapy_extr.ComposeExtractor([miapy_extr.NamesExtractor(),
-                                                   miapy_extr.SubjectExtractor(),
-                                                   miapy_extr.IndexingExtractor(),
-                                                   miapy_extr.ImageExtractor(),
-                                                   miapy_extr.LabelExtractor(gt_mode='select',
-                                                                             gt_selection=config.maps)])  # gt_selection=('B0map', 'PDmap', 'T1map', 'T2map')
+    # define an extractor, i.e. what information we would like to extract per sample
+    test_extractor = miapy_extr.ComposeExtractor([miapy_extr.SubjectExtractor(),
+                                                  miapy_extr.IndexingExtractor(),
+                                                  miapy_extr.ImageExtractor(),
+                                                  miapy_extr.LabelExtractor()])
 
-    dataset = miapy_extr.ParameterizableDataset(reader, indexing_strategy, transform=extraction_transform)
-    dataset.set_extractor(train_extractor)
+    # define the data set
+    dataset = miapy_extr.ParameterizableDataset(config.database_file,
+                                                indexing_strategy,
+                                                train_extractor,
+                                                extraction_transform)
 
+    # generate train / test split for data set
+    train_ids = (0, 1, 2)  # we use Subject_0, Subject_1 and Subject_2 for training
+    test_id = 3  # Subject_3 is used for testing
+    samples_per_subject = int(len(dataset) / (len(train_ids) + 1))
+    sampler_ids_train = []
+    for train_id in train_ids:
+        sampler_ids_train.extend(list(range(samples_per_subject * train_id, samples_per_subject * (train_id + 1))))
+    sampler_ids_test = list(range(samples_per_subject * test_id, samples_per_subject * (test_id + 1)))
 
+    # set up training data loader
     training_sampler = miapy_extr.SubsetRandomSampler(sampler_ids_train)
-    training_loader = miapy_extr.DataLoader(dataset, config.batch_size, sampler=training_sampler,
-                                            collate_fn=ext.collate_batch, num_workers=1)
+    training_loader = miapy_extr.DataLoader(dataset, config.batch_size_training, sampler=training_sampler,
+                                            collate_fn=collate_batch, num_workers=1)
 
+    # set up testing data loader
     testing_sampler = miapy_extr.SubsetSequentialSampler(sampler_ids_test)
-    testing_loader = miapy_extr.DataLoader(dataset, 200, sampler=testing_sampler,
-                                           collate_fn=ext.collate_batch, num_workers=1)
+    testing_loader = miapy_extr.DataLoader(dataset, config.batch_size_testing, sampler=testing_sampler,
+                                           collate_fn=collate_batch, num_workers=1)
 
-    for epoch in range(1):  # epochs loop
-        for batch in training_loader:
-            feed_dict = mdl_general.batch_to_feed_dict2(x, y, batch, dtype, phase_train, True, y_mask)
-            # train model
+    # define TensorFlow placeholders
+    sample = dataset.direct_extract(train_extractor, 0)
+    x = tf.placeholder(tf.float32, (None, ) + sample['images'].shape[1:])
+    y = tf.placeholder(tf.int16, (None, ) + sample['labels'].shape[1:] + (1, ))
 
-        # subject assembler
-        for batch in testing_loader:
-            feed_dict = mdl_general.batch_to_feed_dict2(x, y, batch, dtype, phase_train, False, y_mask)
-            # test model
+    evaluator = init_evaluator()  # initialize evaluator
+
+    for epoch in range(config.epochs):  # epochs loop
+        dataset.set_extractor(train_extractor)
+        for batch in training_loader:  # batches for training
+            feed_dict = batch_to_feed_dict(x, y, batch, True)
+            # train model, e.g.:
+            # sess.run([train_op, loss], feed_dict=feed_dict)
+
+        # subject assembler for testing
+        subject_assembler = miapy_asmbl.SubjectAssembler(sample['labels'].shape)
+
+        dataset.set_extractor(test_extractor)
+        for batch in testing_loader:  # batches for testing
+            feed_dict = batch_to_feed_dict(x, y, batch, False)
+            # test model, e.g.:
+            # prediction = sess.run(y_model, feed_dict=feed_dict)
+            prediction = np.stack(batch['labels'], axis=0)  # we use the labels as predictions such that we can validate the assembler
+            subject_assembler.add_sample(prediction, batch)
+
+        # evaluate prediction
+        sample = dataset.direct_extract(test_extractor, test_id)
+        evaluator.evaluate(subject_assembler.get_subject(sample['subject']), sample['labels'], sample['subject'])
 
 
 if __name__ == '__main__':
