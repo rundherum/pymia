@@ -25,7 +25,7 @@ def main(hdf_file: str):
                                            extr.SubjectExtractor(),
                                            extr.FilesExtractor(),
                                            extr.IndexingExtractor(do_pickle_expression=False),
-                                           extr.ImageInformationExtractor(shape_numpy_format=False)])
+                                           extr.ImagePropertiesExtractor()])
         dataset = extr.ParameterizableDataset(reader, extr.SliceIndexing(), extractor)
 
         for i in range(len(dataset)):
@@ -44,14 +44,10 @@ def main(hdf_file: str):
                     raise ValueError('slice not equal')
 
             # for any image
-            origin = np.asarray(image.GetOrigin())
-            shape = np.asarray(image.GetSize())
-            spacing = np.asarray(image.GetSpacing())
-            direction = np.asarray(image.GetDirection())
+            image_properties = conv.ImageProperties(image)
 
-            if (origin != item['origin']).any() or (shape != item['shape']).any() or (spacing != item['spacing']).any()\
-                    or (direction != item['direction']).any():
-                raise ValueError('info not equal')
+            if image_properties != item['image_properties']:
+                raise ValueError('image properties not equal')
 
             for i, file in enumerate(item['label_files']):
                 image = sitk.ReadImage(os.path.join(root, file))
