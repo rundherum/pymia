@@ -45,5 +45,11 @@ class SubjectAssembler(Assembler):
         Returns:
             np.ndarray: The prediction of the subject.
         """
-        self.subjects_ready.remove(subject)
+        try:
+            self.subjects_ready.remove(subject)
+        except KeyError:
+            # check if subject is assembled but not listed as ready
+            # this can happen if only one subject was assembled
+            if not subject in self.predictions:
+                raise ValueError('Subject "{}" not in assembler'.format(subject))
         return self.predictions.pop(subject)
