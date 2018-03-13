@@ -21,9 +21,9 @@ class SubjectAssembler(Assembler):
 
     def add_sample(self, prediction, batch: dict):
         if not 'subject' in batch:
-            raise ValueError('"batch" does not contain key "subject"')
+            raise ValueError('SubjectAssembler requires "subject" to be extracted (use SubjectExtractor)')
         if not 'index_expr' in batch:
-            raise ValueError('"batch" does not contain key "index_expr"')
+            raise ValueError('SubjectAssembler requires "index_expr" to be extracted (use IndexingExtractor)')
 
         for idx, subject in enumerate(batch['subject']):
             # initialize subject
