@@ -129,7 +129,7 @@ class Relabel(Transform):
         return sample
 
 
-class ToTensor(Transform):
+class ToTorchTensor(Transform):
 
     def __init__(self, entries=('images', 'labels')) -> None:
         super().__init__()
