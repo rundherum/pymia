@@ -9,7 +9,7 @@ import miapy.data.indexexpression as expr
 class IndexingStrategy(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
-    def __call__(self, shape, offset) -> t.List[expr.IndexExpression]:
+    def __call__(self, shape, offset=0) -> t.List[expr.IndexExpression]:
         # return list of indexes by giving shape
         pass
 
