@@ -133,7 +133,7 @@ class Hdf5Reader(Reader):
         return entry in self.h5
 
     def open(self):
-        self.h5 = h5py.File(self.file_path, 'r', libver='latest')
+        self.h5 = h5py.File(self.file_path, libver='latest')
 
     def close(self):
         if self.h5 is not None:

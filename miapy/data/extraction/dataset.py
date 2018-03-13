@@ -9,19 +9,29 @@ from . import extractor as extr
 
 class ParameterizableDataset(data.Dataset):
 
-    def __init__(self, reader: rd.Reader, indexing_strategy: idx.IndexingStrategy, extractor: extr.Extractor=None,
-                 transform: tfm.Transform = None) -> None:
-        self.reader = reader
+    def __init__(self, dataset_path: str, indexing_strategy: idx.IndexingStrategy, extractor: extr.Extractor=None,
+                 transform: tfm.Transform = None, init_reader_once=True) -> None:
+        self.dataset_path = dataset_path
         self.indexing_strategy = indexing_strategy
         self.extractor = extractor
         self.transform = transform
+        self.init_reader_once=init_reader_once
 
-        # todo: allow indices as argument with mutual exclusivity with strategy
         self.indices = []
-        for i, subject in enumerate(reader.get_subject_entries()):
-            subject_indices = self.indexing_strategy(self.reader.get_shape(subject))
-            subject_and_indices = zip(len(subject_indices) * [i], subject_indices)
-            self.indices.extend(subject_and_indices)
+        self.reader = None
+        with rd.get_reader(dataset_path) as reader:
+            for i, subject in enumerate(reader.get_subject_entries()):
+                subject_indices = self.indexing_strategy(reader.get_shape(subject))
+                subject_and_indices = zip(len(subject_indices) * [i], subject_indices)
+                self.indices.extend(subject_and_indices)
+
+    def __del__(self):
+        self.close_reader()
+
+    def close_reader(self):
+        if self.reader is not None:
+            self.reader.close()
+            self.reader = None
 
     def set_extractor(self, extractor: extr.Extractor):
         self.extractor = extractor
@@ -33,7 +43,14 @@ class ParameterizableDataset(data.Dataset):
 
         params = {'subject_index': subject_index, 'index_expr': index_expr}
         extracted = {}
-        extractor.extract(self.reader, params, extracted)
+
+        if not self.init_reader_once:
+            with rd.get_reader(self.dataset_path) as reader:
+                extractor.extract(reader, params, extracted)
+        else:
+            if self.reader is None:
+                self.reader = rd.get_reader(self.dataset_path, direct_open=True)
+            extractor.extract(self.reader, params, extracted)
 
         if transform:
             extracted = transform(extracted)
