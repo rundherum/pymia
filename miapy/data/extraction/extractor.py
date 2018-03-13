@@ -78,27 +78,6 @@ class IndexingExtractor(Extractor):
         extracted['index_expr'] = index_expression
 
 
-class ImageInformationExtractor(Extractor):
-
-    def __init__(self, shape_numpy_format=True) -> None:
-        super().__init__()
-        self.shape_numpy_format = shape_numpy_format
-
-    def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
-        subject_index_expr = expr.IndexExpression(params['subject_index'])
-
-        shape = reader.read(df.INFO_SHAPE, subject_index_expr)
-        if self.shape_numpy_format:
-            tmp = shape[0]
-            shape[0] = shape[-1]
-            shape[-1] = tmp
-
-        extracted['shape'] = tuple(shape.tolist())
-        extracted['direction'] = tuple(reader.read(df.INFO_DIRECTION, subject_index_expr).tolist())
-        extracted['spacing'] = tuple(reader.read(df.INFO_SPACING, subject_index_expr).tolist())
-        extracted['origin'] = tuple(reader.read(df.INFO_ORIGIN, subject_index_expr).tolist())
-
-
 class ImagePropertiesExtractor(Extractor):
     """Extracts the image properties."""
 
