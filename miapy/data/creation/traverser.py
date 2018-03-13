@@ -32,7 +32,7 @@ class SubjectFileTraverser(Traverser):
         if not isinstance(subject_files[0], subj.SubjectFile):
             raise ValueError('files must be of type {}'.format(subj.SubjectFile.__class__.__name__))
 
-        # getting the sequence and gt names
+        # get the image, label, and supplementary names
         image_names = self._get_image_names(subject_files)
 
         label_image_names = self._get_label_image_names(subject_files)
@@ -100,30 +100,59 @@ class SubjectFileTraverser(Traverser):
 
     @staticmethod
     def _get_image_names(subject_files: t.List[subj.SubjectFile]) -> list:
-            images_names = subject_files[0].images.keys()
-            if not all(s.images.keys() == images_names for s in subject_files):
-                raise ValueError('inconsistent image identifiers in the subject list')
-            return list(images_names)
+        """Gets the image names from a list of subjects and checks the consistency of the image names.
+
+        For consistency, each subject must have the same image identifiers.
+
+        Args:
+            subject_files (list of SubjectFile): The subject files.
+
+        Returns:
+            list(str): List of image names.
+        """
+        images_names = subject_files[0].images.keys()
+        if not all(s.images.keys() == images_names for s in subject_files):
+            raise ValueError('Inconsistent image identifiers in the subject list')
+        return list(images_names)
 
     @staticmethod
     def _get_label_image_names(subject_files: t.List[subj.SubjectFile]) -> list:
+        """Gets the label names from a list of subjects and checks the consistency of the label names.
+
+        For consistency, each subject must have the same label identifiers.
+
+        Args:
+            subject_files (list of SubjectFile): The subject files.
+
+        Returns:
+            list(str): List of label names (can be empty).
+        """
         if subject_files[0].label_images is None:
             if not all(s.label_images is None for s in subject_files):
-                raise ValueError('inconsistent label image identifiers in the subject list')
+                raise ValueError('Inconsistent label image identifiers in the subject list')
             return []
         label_image_names = subject_files[0].label_images.keys()
         if not all(s.label_images.keys() == label_image_names for s in subject_files):
-            raise ValueError('inconsistent label image identifiers in the subject list')
+            raise ValueError('Inconsistent label image identifiers in the subject list')
         return list(label_image_names)
 
     @staticmethod
     def _get_supplementary_names(subject_files: t.List[subj.SubjectFile]) -> list:
+        """Gets the supplementary names from a list of subjects and checks the consistency of the supplementary names.
+
+        For consistency, each subject must have the same supplementary identifiers.
+
+        Args:
+            subject_files (list of SubjectFile): The subject files.
+
+        Returns:
+            list(str): List of supplementary names (can be empty).
+        """
         if subject_files[0].supplementaries is None:
             if not all(s.supplementaries is None for s in subject_files):
-                raise ValueError('inconsistent supplementary identifiers in the subject list')
+                raise ValueError('Inconsistent supplementary identifiers in the subject list')
             return []
         supplementary_names = subject_files[0].supplementaries.keys()
         if not all(s.supplementaries.keys() == supplementary_names for s in subject_files):
-            raise ValueError('inconsistent supplementary identifiers in the subject list')
+            raise ValueError('Inconsistent supplementary identifiers in the subject list')
         return list(supplementary_names)
-
