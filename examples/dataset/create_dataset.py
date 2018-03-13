@@ -138,8 +138,8 @@ def main(hdf_file: str, data_dir: str):
                                                miapy_crt.WriteImageInformationCallback(writer),
                                                miapy_crt.WriteSubjectCallback(writer)])
 
-        transform = miapy_tfm.IntensityRescale(0, 1)
-        #transform = miapy_tfm.Compose([])
+        transform = miapy_tfm.IntensityNormalization(loop_axis=3, entries=('images',))
+        # we can apply multiple transformations using miapy_tfm.ComposeTransform([...])
 
         traverser = miapy_crt.SubjectFileTraverser()
         traverser.traverse(subjects, callback=callbacks, load=LoadData(), transform=transform)
