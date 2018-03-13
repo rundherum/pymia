@@ -16,6 +16,10 @@ class Configuration(miapy_cfg.ConfigurationBase):
     def __init__(self):
         self.database_file = '/home/fbalsiger/Documents/config.json'
 
+        self.batch_size_training = 10
+        self.batch_size_testing = 10
+        self.epochs = 20
+
 
 def load(path: str, config_cls):
     """Loads a configuration file.
