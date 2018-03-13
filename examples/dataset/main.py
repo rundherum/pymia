@@ -42,14 +42,19 @@ def main(config_file: str):
 
     indexing_strategy = miapy_extr.SliceIndexing()  # slice-wise extraction
     extraction_transform = None  # we do not want to apply any transformation on the slices after extraction
-    # define an extractor, i.e. what information we would like to extract per sample
+    # define an extractor for training, i.e. what information we would like to extract per sample
     train_extractor = miapy_extr.ComposeExtractor([miapy_extr.ImageExtractor(),
                                                    miapy_extr.LabelExtractor()])
 
-    # define an extractor, i.e. what information we would like to extract per sample
+    # define an extractor for testing, i.e. what information we would like to extract per sample
     test_extractor = miapy_extr.ComposeExtractor([miapy_extr.SubjectExtractor(),
                                                   miapy_extr.IndexingExtractor(),
                                                   miapy_extr.ImageExtractor(),
+                                                  miapy_extr.LabelExtractor(),
+                                                  miapy_extr.LabelShapeExtractor()])
+
+    # define an extractor for evaluation, i.e. what information we would like to extract per sample
+    eval_extractor = miapy_extr.ComposeExtractor([miapy_extr.SubjectExtractor(),
                                                   miapy_extr.LabelExtractor(),
                                                   miapy_extr.ImagePropertiesExtractor()])
 
@@ -93,7 +98,7 @@ def main(config_file: str):
             # sess.run([train_op, loss], feed_dict=feed_dict)
 
         # subject assembler for testing
-        subject_assembler = miapy_asmbl.SubjectAssembler(sample['labels'].shape)
+        subject_assembler = miapy_asmbl.SubjectAssembler()
 
         dataset.set_extractor(test_extractor)
         for batch in testing_loader:  # batches for testing
@@ -104,7 +109,7 @@ def main(config_file: str):
             subject_assembler.add_sample(prediction, batch)
 
         # convert prediction and labels back to SimpleITK images
-        sample = dataset.direct_extract(test_extractor, test_id)
+        sample = dataset.direct_extract(eval_extractor, test_id)
         label_image = miapy_conv.NumpySimpleITKImageBridge.convert(sample['labels'],
                                                                    sample['image_properties'])
         prediction_image = miapy_conv.NumpySimpleITKImageBridge.convert(subject_assembler.get_subject(sample['subject']),

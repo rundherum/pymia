@@ -14,8 +14,7 @@ class Assembler(metaclass=abc.ABCMeta):
 class SubjectAssembler(Assembler):
     """Assembles predictions of one or multiple subjects."""
 
-    def __init__(self, shape):
-        self.shape = shape
+    def __init__(self):
         self.predictions = {}
         self.subjects_ready = set()
 
@@ -24,14 +23,16 @@ class SubjectAssembler(Assembler):
             raise ValueError('SubjectAssembler requires "subject" to be extracted (use SubjectExtractor)')
         if not 'index_expr' in batch:
             raise ValueError('SubjectAssembler requires "index_expr" to be extracted (use IndexingExtractor)')
+        if not 'shape' in batch:
+            raise ValueError('SubjectAssembler requires "shape" to be extracted (use ShapeExtractor)')
 
         for idx, subject in enumerate(batch['subject']):
             # initialize subject
             if not subject in self.predictions and not self.predictions:
-                self.predictions[subject] = np.zeros(self.shape)
+                self.predictions[subject] = np.zeros(batch['shape'][idx])
             elif not subject in self.predictions:
                 self.subjects_ready = set(self.predictions.keys())
-                self.predictions[subject] = np.zeros(self.shape)
+                self.predictions[subject] = np.zeros(batch['shape'][idx])
 
             index_expr = pickle.loads(batch['index_expr'][idx])
             self.predictions[subject][index_expr.expression] = prediction[index_expr.expression]
