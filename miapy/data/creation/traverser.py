@@ -31,6 +31,8 @@ class SubjectFileTraverser(Traverser):
             raise ValueError('No files')
         if not isinstance(subject_files[0], subj.SubjectFile):
             raise ValueError('files must be of type {}'.format(subj.SubjectFile.__class__.__name__))
+        if callback is None:
+            raise ValueError('callback can not be None')
 
         # get the image, label, and supplementary names
         image_names = self._get_image_names(subject_files)
@@ -48,8 +50,7 @@ class SubjectFileTraverser(Traverser):
         if has_supplemenatries:
             callback_params['supplementary_names'] = supplementary_names
 
-        if callback:
-            callback.on_start(callback_params)
+        callback.on_start(callback_params)
 
         # looping over the subject files and calling callbacks
         for subject_index, subject_file in enumerate(subject_files):
@@ -92,11 +93,9 @@ class SubjectFileTraverser(Traverser):
             if transform:
                 transform_params = transform(transform_params)
 
-            if callback:
-                callback.on_subject({**transform_params, **callback_params})
+            callback.on_subject({**transform_params, **callback_params})
 
-        if callback:
-            callback.on_end(callback_params)
+        callback.on_end(callback_params)
 
     @staticmethod
     def _get_image_names(subject_files: t.List[subj.SubjectFile]) -> list:
