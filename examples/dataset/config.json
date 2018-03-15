@@ -2,8 +2,8 @@
     "config": {
         "database_file": "out/test/test.h5",
         "batch_size_training": 10,
-        "self.batch_size_testing": 10,
-        "self.epochs": 20
+        "batch_size_testing": 10,
+        "epochs": 20
     },
     "meta": {
         "type": "",
