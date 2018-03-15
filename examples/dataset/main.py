@@ -46,8 +46,7 @@ def main(config_file: str):
                                                    miapy_extr.LabelExtractor()])
 
     # define an extractor for testing, i.e. what information we would like to extract per sample
-    test_extractor = miapy_extr.ComposeExtractor([miapy_extr.SubjectExtractor(),
-                                                  miapy_extr.IndexingExtractor(),
+    test_extractor = miapy_extr.ComposeExtractor([miapy_extr.IndexingExtractor(),
                                                   miapy_extr.ImageExtractor(),
                                                   miapy_extr.LabelExtractor(),
                                                   miapy_extr.LabelShapeExtractor()])
@@ -111,8 +110,9 @@ def main(config_file: str):
         sample = dataset.direct_extract(eval_extractor, test_id)
         label_image = miapy_conv.NumpySimpleITKImageBridge.convert(sample['labels'],
                                                                    sample['image_properties'])
-        prediction_image = miapy_conv.NumpySimpleITKImageBridge.convert(subject_assembler.get_subject(sample['subject']),
-                                                                        sample['image_properties'])
+
+        assembled = subject_assembler.get_assembled_subject(sample['subject_index'])
+        prediction_image = miapy_conv.NumpySimpleITKImageBridge.convert(assembled, sample['image_properties'])
         evaluator.evaluate(prediction_image, label_image, sample['subject'])  # evaluate prediction
 
 

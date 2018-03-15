@@ -59,6 +59,7 @@ class NamesExtractor(Extractor):
 class SubjectExtractor(Extractor):
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
+        extracted['subject_index'] = params['subject_index']
         subject_index_expr = expr.IndexExpression(params['subject_index'])
         extracted['subject'] = reader.read(df.SUBJECT, subject_index_expr)
 
