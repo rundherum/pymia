@@ -132,11 +132,7 @@ def main(hdf_file: str, data_dir: str):
         os.remove(hdf_file)
 
     with miapy_crt.get_writer(hdf_file) as writer:
-        callbacks = miapy_crt.ComposeCallback([miapy_crt.WriteDataCallback(writer),
-                                               miapy_crt.WriteFilesCallback(writer),
-                                               miapy_crt.WriteNamesCallback(writer),
-                                               miapy_crt.WriteImageInformationCallback(writer),
-                                               miapy_crt.WriteSubjectCallback(writer)])
+        callbacks = miapy_crt.get_default_callbacks(writer)
 
         transform = miapy_tfm.IntensityNormalization(loop_axis=3, entries=('images',))
         # we can apply multiple transformations using miapy_tfm.ComposeTransform([...])
