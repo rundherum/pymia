@@ -19,18 +19,18 @@ class SubjectAssembler(Assembler):
         self.subjects_ready = set()
 
     def add_sample(self, prediction, batch: dict):
-        if not 'subject' in batch:
+        if 'subject' not in batch:
             raise ValueError('SubjectAssembler requires "subject" to be extracted (use SubjectExtractor)')
-        if not 'index_expr' in batch:
+        if 'index_expr' not in batch:
             raise ValueError('SubjectAssembler requires "index_expr" to be extracted (use IndexingExtractor)')
-        if not 'shape' in batch:
+        if 'shape' not in batch:
             raise ValueError('SubjectAssembler requires "shape" to be extracted (use ShapeExtractor)')
 
         for idx, subject in enumerate(batch['subject']):
             # initialize subject
-            if not subject in self.predictions and not self.predictions:
+            if subject not in self.predictions and not self.predictions:
                 self.predictions[subject] = np.zeros(batch['shape'][idx])
-            elif not subject in self.predictions:
+            elif subject not in self.predictions:
                 self.subjects_ready = set(self.predictions.keys())
                 self.predictions[subject] = np.zeros(batch['shape'][idx])
 
@@ -54,6 +54,6 @@ class SubjectAssembler(Assembler):
         except KeyError:
             # check if subject is assembled but not listed as ready
             # this can happen if only one subject was assembled
-            if not subject in self.predictions:
+            if subject not in self.predictions:
                 raise ValueError('Subject "{}" not in assembler'.format(subject))
         return self.predictions.pop(subject)
