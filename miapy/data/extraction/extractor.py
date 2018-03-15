@@ -65,14 +65,14 @@ class SubjectExtractor(Extractor):
 
 class IndexingExtractor(Extractor):
 
-    def __init__(self, do_pickle_expression=True) -> None:
+    def __init__(self, do_pickle=False) -> None:
         super().__init__()
-        self.do_pickle_expression = do_pickle_expression
+        self.do_pickle = do_pickle
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
         extracted['subject_index'] = params['subject_index']
         index_expression = params['index_expr']
-        if self.do_pickle_expression:
+        if self.do_pickle:
             # pickle to prevent from problems since own class
             index_expression = pickle.dumps(index_expression)
         extracted['index_expr'] = index_expression
@@ -81,8 +81,9 @@ class IndexingExtractor(Extractor):
 class ImagePropertiesExtractor(Extractor):
     """Extracts the image properties."""
 
-    def __init__(self) -> None:
+    def __init__(self, do_pickle=False) -> None:
         super().__init__()
+        self.do_pickle = do_pickle
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
         subject_index_expr = expr.IndexExpression(params['subject_index'])
@@ -92,13 +93,18 @@ class ImagePropertiesExtractor(Extractor):
         spacing = reader.read(df.INFO_SPACING, subject_index_expr).tolist()
         origin = reader.read(df.INFO_ORIGIN, subject_index_expr).tolist()
 
+        # todo: everything in memory?
         image = sitk.Image(shape, sitk.sitkUInt8)
         image.SetDirection(direction)
         image.SetSpacing(spacing)
         image.SetOrigin(origin)
         # todo number_of_components_per_pixel and pixel_id
 
-        extracted['image_properties'] = conv.ImageProperties(image)
+        img_properties = conv.ImageProperties(image)
+        if self.do_pickle:
+            # pickle to prevent from problems since own class
+            img_properties = pickle.dumps(img_properties)
+        extracted['image_properties'] = img_properties
 
 
 class FilesExtractor(Extractor):

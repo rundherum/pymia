@@ -16,7 +16,7 @@ def main(hdf_file: str):
                                        extr.SupplementaryExtractor(('MASK',), entire_subject=False),
                                        extr.SubjectExtractor(),
                                        extr.FilesExtractor(),
-                                       extr.IndexingExtractor(do_pickle_expression=False),
+                                       extr.IndexingExtractor(),
                                        extr.ImagePropertiesExtractor()])
     dataset = extr.ParameterizableDataset(hdf_file, extr.SliceIndexing(), extractor)
 
