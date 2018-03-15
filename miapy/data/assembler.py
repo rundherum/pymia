@@ -1,5 +1,4 @@
 import abc
-import pickle
 
 import numpy as np
 
@@ -34,7 +33,7 @@ class SubjectAssembler(Assembler):
                 self.subjects_ready = set(self.predictions.keys())
                 self.predictions[subject] = np.zeros(batch['shape'][idx])
 
-            index_expr = pickle.loads(batch['index_expr'][idx])
+            index_expr = batch['index_expr'][idx]
             self.predictions[subject][index_expr.expression] = prediction[index_expr.expression]
 
     def get_subject(self, subject: str):
