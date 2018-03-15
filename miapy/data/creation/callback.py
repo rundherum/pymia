@@ -3,6 +3,7 @@ import os
 import numpy as np
 
 import miapy.data.indexexpression as expr
+import miapy.data.creation as crt
 import miapy.data.conversion as conv
 import miapy.data.subjectfile as subj
 import miapy.data.definition as df
@@ -170,3 +171,11 @@ class WriteFilesCallback(Callback):
                 relative_path = os.path.relpath(subject_file.supplementaries[key], self.file_root)
                 index_expr = expr.IndexExpression(indexing=[subject_index, supplementary_index], axis=(0, 1))
                 self.writer.fill(df.FILES_SUPPL, relative_path, index_expr)
+
+
+def get_default_callbacks(writer: crt.Writer):
+    return ComposeCallback([WriteDataCallback(writer),
+                            WriteFilesCallback(writer),
+                            WriteNamesCallback(writer),
+                            WriteImageInformationCallback(writer),
+                            WriteSubjectCallback(writer)])
