@@ -34,7 +34,10 @@ class SubjectAssembler(Assembler):
                 self.subjects_ready = set(self.predictions.keys())
                 self.predictions[subject] = np.zeros(batch['shape'][idx])
 
-            index_expr = pickle.loads(batch['index_expr'][idx])
+            index_expr = batch['index_expr'][idx]
+            if isinstance(index_expr, str):
+                # is pickled
+                index_expr = pickle.loads(index_expr)
             self.predictions[subject][index_expr.expression] = prediction[index_expr.expression]
 
     def get_subject(self, subject: str):
