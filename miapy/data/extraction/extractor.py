@@ -210,54 +210,22 @@ class LabelExtractor(Extractor):
         extracted['labels'] = np_gts
 
 
-class LabelShapeExtractor(Extractor):
+class ImageShapeExtractor(Extractor):
 
-    def __init__(self, gt_mode='all', gt_selection=None) -> None:
+    def __init__(self, numpy_format=True) -> None:
         super().__init__()
-        self.entry_base_names = None
-        if gt_mode not in ('all', 'random', 'select'):
-            raise ValueError('gt_mode must be "all", "random", or "select"')
-
-        self.gt_mode = gt_mode
-        if isinstance(gt_selection, str):
-            gt_selection = (gt_selection,)
-        self.gt_selection = gt_selection
+        self.numpy_format = numpy_format
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
-        if self.entry_base_names is None:
-            entries = reader.get_subject_entries()
-            self.entry_base_names = [entry.rsplit('/', maxsplit=1)[1] for entry in entries]
+        subject_index_expr = expr.IndexExpression(params['subject_index'])
 
-        if not reader.has(df.DATA_LABEL):
-            raise ValueError('ShapeExtractor requires GT to exist')
+        shape = reader.read(df.INFO_SHAPE, subject_index_expr)
+        if self.numpy_format:
+            tmp = shape[0]
+            shape[0] = shape[-1]
+            shape[-1] = tmp
 
-        subject_index = params['subject_index']
-
-        base_name = self.entry_base_names[subject_index]
-
-        np_gts = reader.read('{}/{}'.format(df.DATA_LABEL, base_name))
-
-        if self.gt_mode != 'all':
-            if 'label_names' not in extracted:
-                raise ValueError('selection of labels requires label_names to be extracted (use NamesExtractor)')
-            label_names = extracted['label_names']  # type: list
-            if self.gt_mode == 'random':
-                selection_indices = [label_names.index(s) for s in self.gt_selection]
-                index = np.random.choice(selection_indices)
-            elif self.gt_mode == 'select' and isinstance(self.gt_selection, (tuple, list)):
-                selection_indices = np.array([label_names.index(s) for s in self.gt_selection])
-                extracted['shape'] = np.take(np_gts, selection_indices, axis=-1).shape
-                return
-            else:
-                # mode == 'select'
-                index = label_names.index(self.gt_selection[0])
-
-            # todo: inverse index_expr in order to add index to it
-            np_gts = np_gts[..., index]
-            # maintaining gt dims
-            np_gts = np.expand_dims(np_gts, -1)
-
-        extracted['shape'] = np_gts.shape
+        extracted['shape'] = tuple(shape.tolist())
 
 
 class SupplementaryExtractor(Extractor):

@@ -49,7 +49,7 @@ def main(config_file: str):
     test_extractor = miapy_extr.ComposeExtractor([miapy_extr.IndexingExtractor(),
                                                   miapy_extr.ImageExtractor(),
                                                   miapy_extr.LabelExtractor(),
-                                                  miapy_extr.LabelShapeExtractor()])
+                                                  miapy_extr.ShapeExtractor()])
 
     # define an extractor for evaluation, i.e. what information we would like to extract per sample
     eval_extractor = miapy_extr.ComposeExtractor([miapy_extr.SubjectExtractor(),
