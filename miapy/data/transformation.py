@@ -60,17 +60,18 @@ class IntensityRescale(Transform):
 
 class IntensityNormalization(Transform):
 
-    def __init__(self, loop_axis=None, entries=('images',)) -> None:
+    def __init__(self, loop_axis=None, entries=('images',), cast_to=np.float32) -> None:
         super().__init__()
         self.loop_axis = loop_axis
         self.entries = entries
+        self.cast_to = cast_to
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
             if entry not in sample:
                 continue
 
-            np_entry = _check_and_return(sample[entry], np.ndarray)
+            np_entry = _check_and_return(sample[entry], np.ndarray).astype(self.cast_to)
 
             if self.loop_axis is None:
                 np_entry = self._normalize(np_entry)

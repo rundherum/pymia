@@ -2,6 +2,7 @@ import argparse
 import os
 
 import SimpleITK as sitk
+import numpy as np
 
 import miapy.data as miapy_data
 import miapy.data.conversion as conv
@@ -29,9 +30,9 @@ def main(hdf_file: str):
         image = None  # type: sitk.Image
         for i, file in enumerate(item['image_files']):
             image = sitk.ReadImage(os.path.join(root, file))
-            np_img = sitk.GetArrayFromImage(image)
+            np_img = sitk.GetArrayFromImage(image).astype(np.float32)
+            np_img = (np_img - np_img.mean()) / np_img.std()
             np_slice = np_img[index_expr.expression]
-            np_slice = np_slice / np_slice.max()  # normalize
             if (np_slice != item['images'][..., i]).any():
                 raise ValueError('slice not equal')
 
