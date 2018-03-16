@@ -6,7 +6,7 @@ import SimpleITK as sitk
 
 
 def create_and_save_image(path: str, shape: tuple, low: int, high: int):
-    img_arr = np.random.randint(low, high + 1, shape)
+    img_arr = np.random.randint(low, high + 1, shape).astype(np.int16)
     img = sitk.GetImageFromArray(img_arr)
     sitk.WriteImage(img, path)
 
