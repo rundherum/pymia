@@ -49,7 +49,7 @@ def main(config_file: str):
     test_extractor = miapy_extr.ComposeExtractor([miapy_extr.IndexingExtractor(),
                                                   miapy_extr.ImageExtractor(),
                                                   miapy_extr.LabelExtractor(),
-                                                  miapy_extr.ShapeExtractor()])
+                                                  miapy_extr.ImageShapeExtractor()])
 
     # define an extractor for evaluation, i.e. what information we would like to extract per sample
     eval_extractor = miapy_extr.ComposeExtractor([miapy_extr.SubjectExtractor(),
@@ -57,19 +57,18 @@ def main(config_file: str):
                                                   miapy_extr.ImagePropertiesExtractor()])
 
     # define the data set
+    # Note that we use SubjectExtractor for select_indices() below
     dataset = miapy_extr.ParameterizableDataset(config.database_file,
                                                 indexing_strategy,
-                                                train_extractor,
+                                                miapy_extr.SubjectExtractor(),
                                                 extraction_transform)
 
     # generate train / test split for data set
-    train_ids = (0, 1, 2)  # we use Subject_0, Subject_1 and Subject_2 for training
-    test_id = 3  # Subject_3 is used for testing
-    samples_per_subject = int(len(dataset) / (len(train_ids) + 1))
-    sampler_ids_train = []
-    for train_id in train_ids:
-        sampler_ids_train.extend(list(range(samples_per_subject * train_id, samples_per_subject * (train_id + 1))))
-    sampler_ids_test = list(range(samples_per_subject * test_id, samples_per_subject * (test_id + 1)))
+    # we use Subject_0, Subject_1 and Subject_2 for training and Subject_3 for testing
+    sampler_ids_train = miapy_extr.select_indices(dataset,
+                                                  miapy_extr.SubjectSelection(('Subject_0', 'Subject_1', 'Subject_2')))
+    sampler_ids_test = miapy_extr.select_indices(dataset,
+                                                 miapy_extr.SubjectSelection(('Subject_3')))
 
     # set up training data loader
     training_sampler = miapy_extr.SubsetRandomSampler(sampler_ids_train)
@@ -82,7 +81,7 @@ def main(config_file: str):
                                            collate_fn=collate_batch, num_workers=1)
 
     # define TensorFlow placeholders
-    sample = dataset.direct_extract(train_extractor, 0)
+    sample = dataset.direct_extract(train_extractor, 0)  # extract a subject to obtain shape
     x = tf.placeholder(tf.float32, (None, ) + sample['images'].shape[1:])
     y = tf.placeholder(tf.int16, (None, ) + sample['labels'].shape[1:] + (1, ))
 
@@ -106,14 +105,16 @@ def main(config_file: str):
             prediction = np.stack(batch['labels'], axis=0)  # we use the labels as predictions such that we can validate the assembler
             subject_assembler.add_sample(prediction, batch)
 
-        # convert prediction and labels back to SimpleITK images
-        sample = dataset.direct_extract(eval_extractor, test_id)
-        label_image = miapy_conv.NumpySimpleITKImageBridge.convert(sample['labels'],
-                                                                   sample['image_properties'])
+        # evaluate all test images
+        for subject_idx in subject_assembler.predictions.keys():
+            # convert prediction and labels back to SimpleITK images
+            sample = dataset.direct_extract(eval_extractor, subject_idx)
+            label_image = miapy_conv.NumpySimpleITKImageBridge.convert(sample['labels'],
+                                                                       sample['image_properties'])
 
-        assembled = subject_assembler.get_assembled_subject(sample['subject_index'])
-        prediction_image = miapy_conv.NumpySimpleITKImageBridge.convert(assembled, sample['image_properties'])
-        evaluator.evaluate(prediction_image, label_image, sample['subject'])  # evaluate prediction
+            assembled = subject_assembler.get_assembled_subject(sample['subject_index'])
+            prediction_image = miapy_conv.NumpySimpleITKImageBridge.convert(assembled, sample['image_properties'])
+            evaluator.evaluate(prediction_image, label_image, sample['subject'])  # evaluate prediction
 
 
 if __name__ == '__main__':
