@@ -57,10 +57,9 @@ def main(config_file: str):
                                                   miapy_extr.ImagePropertiesExtractor()])
 
     # define the data set
-    # Note that we use SubjectExtractor for select_indices() below
     dataset = miapy_extr.ParameterizableDataset(config.database_file,
                                                 indexing_strategy,
-                                                miapy_extr.SubjectExtractor(),
+                                                miapy_extr.SubjectExtractor(),  # for select_indices() below
                                                 extraction_transform)
 
     # generate train / test split for data set
@@ -106,7 +105,7 @@ def main(config_file: str):
             subject_assembler.add_sample(prediction, batch)
 
         # evaluate all test images
-        for subject_idx in subject_assembler.predictions.keys():
+        for subject_idx in list(subject_assembler.predictions.keys()):
             # convert prediction and labels back to SimpleITK images
             sample = dataset.direct_extract(eval_extractor, subject_idx)
             label_image = miapy_conv.NumpySimpleITKImageBridge.convert(sample['labels'],
