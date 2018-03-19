@@ -1,4 +1,8 @@
 # Created by .ignore support plugin (hsz.mobi)
+
+### Project specific
+examples/dataset/out/*
+
 ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/
