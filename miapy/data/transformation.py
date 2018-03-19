@@ -228,8 +228,6 @@ class SizeCorrection(Transform):
         return sample
 
 
-# todo: move to Transform class (or remove _) since using this function outside of module
-# shows "Access to protected member of module" in PyCharm
 def _check_and_return(obj, type_):
     if not isinstance(obj, type_):
         raise ValueError("entry must be '{}'".format(type_.__name__))

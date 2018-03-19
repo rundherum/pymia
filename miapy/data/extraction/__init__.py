@@ -3,7 +3,7 @@ from .indexing import (IndexingStrategy, SliceIndexing, VoxelWiseIndexing)
 from .dataset import ParameterizableDataset
 from .extractor import (Extractor, ImageExtractor, FilesExtractor, NamesExtractor, SubjectExtractor, IndexingExtractor,
                         LabelExtractor, ComposeExtractor, SupplementaryExtractor, ImagePropertiesExtractor,
-                        LabelShapeExtractor)
+                        ImageShapeExtractor)
 from .sample import (select_indices, SubsetSequentialSampler, NonBlackSelection, SelectionStrategy, ComposeSelection,
                      SubjectSelection, WithForegroundSelection, PercentileSelection, NonConstantSelection)
 
