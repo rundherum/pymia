@@ -177,6 +177,57 @@ class Squeeze(Transform):
             sample[entry] = np_entry.squeeze()
         return sample
 
+
+class SizeCorrection(Transform):
+    """Size correction transformation.
+
+    Corrects the size, i.e. shape, of an array to a given reference shape.
+    """
+
+    def __init__(self, shape: t.Tuple[None, int], pad_value: int=0, entries=('images', 'labels')) -> None:
+        """Initializes a new instance of the SizeCorrection class.
+
+        Args:
+            shape (tuple of ints): The reference shape in NumPy format, i.e. z-, y-, x-order. To not correct an axis
+                dimension, set the axis value to None.
+            pad_value (int): The value to set the padded values of the array.
+            entries ():
+        """
+        super().__init__()
+        self.entries = entries
+        self.shape = shape
+        self.pad_value = pad_value
+
+    def __call__(self, sample: dict) -> dict:
+        for entry in self.entries:
+            if entry not in sample:
+                continue
+
+            np_entry = _check_and_return(sample[entry], np.ndarray)
+            if not len(self.shape) <= len(np_entry.shape):
+                raise ValueError('Shape dimension needs to be less or equal to {}'.format(len(np_entry.shape)))
+
+            for idx, size in enumerate(self.shape):
+                if size is not None and size < np_entry.shape[idx]:
+                    # crop current dimension
+                    before = (np_entry.shape[idx] - size) // 2
+                    after = np_entry.shape[idx] - (np_entry.shape[idx] - size) // 2 + ((np_entry.shape[idx] - size) % 2)
+                    slicing = [slice(None)] * np_entry.ndim
+                    slicing[idx] = slice(before, after)
+                    np_entry = np_entry[slicing]
+                elif size is not None and size > np_entry.shape[idx]:
+                    # pad current dimension
+                    before = (size - np_entry.shape[idx]) // 2
+                    after = (size - np_entry.shape[idx]) // 2 + ((size - np_entry.shape[idx]) % 2)
+                    pad_width = [(0, 0)] * np_entry.ndim
+                    pad_width[idx] = (before, after)
+                    np_entry = np.pad(np_entry, pad_width, mode='constant', constant_values=self.pad_value)
+
+            sample[entry] = np_entry
+
+        return sample
+
+
 # todo: move to Transform class (or remove _) since using this function outside of module
 # shows "Access to protected member of module" in PyCharm
 def _check_and_return(obj, type_):
