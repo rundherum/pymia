@@ -58,7 +58,7 @@ class SubjectAssembler(Assembler):
         subject_prediction = {}
         for key in to_assemble:
             prediction_shape = batch['shape'][idx]
-            if to_assemble[key].shape[-1] > 1:
+            if to_assemble[key].shape != prediction_shape and to_assemble[key].shape[-1] > 1:
                 prediction_shape += (to_assemble[key].shape[-1],)
             subject_prediction[key] = self.zero_fn(prediction_shape, key)
         return subject_prediction
@@ -78,7 +78,7 @@ class SubjectAssembler(Assembler):
             # check if subject is assembled but not listed as ready
             # this can happen if only one subject was assembled or last
             if subject_index not in self.predictions:
-                raise ValueError('Subject "{}" not in assembler'.format(subject_index))
+                raise ValueError('Subject with index {} not in assembler'.format(subject_index))
         assembled = self.predictions.pop(subject_index)
         if '__prediction' in assembled:
             return assembled['__prediction']
