@@ -46,10 +46,12 @@ class ConfigurationBase(Dictable, metaclass=abc.ABCMeta):
         pass
 
     def to_dict(self, **kwargs):
-        d = vars(self)
-        for k, v in d.items():
+        d = {}
+        for k, v in vars(self).items():
             if isinstance(v, Dictable):
                 d[k] = v.to_dict()
+            else:
+                d[k] = v
         return d
 
     def from_dict(self, d: dict, **kwargs):
