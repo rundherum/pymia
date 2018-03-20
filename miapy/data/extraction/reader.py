@@ -109,7 +109,7 @@ class Hdf5Reader(Reader):
         self.h5 = None  # type: h5py.File
 
     def get_subject_entries(self) -> list:
-        return sorted(['{}/{}'.format(df.DATA_IMAGE, k) for k in self.h5[df.DATA_IMAGE].keys()])
+        return ['{}/{}'.format(df.DATA_IMAGE, k) for k in sorted(self.h5[df.DATA_IMAGE].keys())]
 
     def get_shape(self, entry: str) -> list:
         return self.h5[entry].shape
