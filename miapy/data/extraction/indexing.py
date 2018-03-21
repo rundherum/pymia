@@ -9,19 +9,23 @@ import miapy.data.indexexpression as expr
 class IndexingStrategy(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
-    def __call__(self, shape, offset=0) -> t.List[expr.IndexExpression]:
+    def __call__(self, shape) -> t.List[expr.IndexExpression]:
         # return list of indexes by giving shape
         pass
 
 
 class SliceIndexing(IndexingStrategy):
 
-    def __init__(self, slice_axis=0) -> None:
+    def __init__(self, slice_axis: t.Union[int, tuple]=0) -> None:
+        if isinstance(slice_axis, int):
+            slice_axis = (slice_axis,)
         self.slice_axis = slice_axis
 
-    def __call__(self, shape, offset=0) -> t.List[expr.IndexExpression]:
-        count = shape[self.slice_axis]
-        return [expr.IndexExpression(i, self.slice_axis) for i in range(offset, offset + count)]
+    def __call__(self, shape) -> t.List[expr.IndexExpression]:
+        indexing = []
+        for axis in self.slice_axis:
+            indexing.extend(expr.IndexExpression(i, axis) for i in range(shape[axis]))
+        return indexing
 
 
 class VoxelWiseIndexing(IndexingStrategy):

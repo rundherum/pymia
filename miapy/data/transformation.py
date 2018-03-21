@@ -184,7 +184,7 @@ class SizeCorrection(Transform):
     Corrects the size, i.e. shape, of an array to a given reference shape.
     """
 
-    def __init__(self, shape: t.Tuple[None, int], pad_value: int=0, entries=('images', 'labels')) -> None:
+    def __init__(self, shape: t.Tuple[t.Union[None, int], ...], pad_value: int=0, entries=('images', 'labels')) -> None:
         """Initializes a new instance of the SizeCorrection class.
 
         Args:
