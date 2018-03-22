@@ -14,6 +14,12 @@ class IndexingStrategy(metaclass=abc.ABCMeta):
         pass
 
 
+class EmptyIndexing(IndexingStrategy):
+
+    def __call__(self, shape) -> t.List[expr.IndexExpression]:
+        return [expr.IndexExpression()]
+
+
 class SliceIndexing(IndexingStrategy):
 
     def __init__(self, slice_axis: t.Union[int, tuple]=0) -> None:

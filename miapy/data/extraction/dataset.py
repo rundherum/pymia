@@ -9,9 +9,11 @@ from . import extractor as extr
 
 class ParameterizableDataset(data.Dataset):
 
-    def __init__(self, dataset_path: str, indexing_strategy: idx.IndexingStrategy, extractor: extr.Extractor=None,
+    def __init__(self, dataset_path: str, indexing_strategy: idx.IndexingStrategy=None, extractor: extr.Extractor=None,
                  transform: tfm.Transform = None, init_reader_once=True) -> None:
         self.dataset_path = dataset_path
+        if indexing_strategy is None:
+            indexing_strategy = idx.EmptyIndexing()
         self.indexing_strategy = indexing_strategy
         self.extractor = extractor
         self.transform = transform

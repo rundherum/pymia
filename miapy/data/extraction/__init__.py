@@ -1,5 +1,5 @@
 from .reader import (Reader, Hdf5Reader, get_reader)
-from .indexing import (IndexingStrategy, SliceIndexing, VoxelWiseIndexing)
+from .indexing import (IndexingStrategy, SliceIndexing, VoxelWiseIndexing, EmptyIndexing)
 from .dataset import ParameterizableDataset
 from .extractor import (Extractor, DataExtractor, FilesExtractor, NamesExtractor, SubjectExtractor, IndexingExtractor,
                         SelectiveDataExtractor, ComposeExtractor, ImagePropertiesExtractor,
