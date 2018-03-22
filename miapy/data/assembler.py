@@ -7,7 +7,7 @@ import numpy as np
 class Assembler(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
-    def add_sample(self, prediction, batch: dict):
+    def add_batch(self, prediction, batch: dict):
         pass
 
 
@@ -23,7 +23,7 @@ class SubjectAssembler(Assembler):
         self.subjects_ready = set()
         self.zero_fn = zero_fn
 
-    def add_sample(self, to_assemble, batch: dict, last_batch=False):
+    def add_batch(self, to_assemble, batch: dict, last_batch=False):
         if 'subject_index' not in batch:
             raise ValueError('SubjectAssembler requires "subject_index" to be extracted (use IndexingExtractor)')
         if 'index_expr' not in batch:
@@ -34,25 +34,30 @@ class SubjectAssembler(Assembler):
         if not isinstance(to_assemble, dict):
             to_assemble = {'__prediction': to_assemble}
 
-        for idx, subject_index in enumerate(batch['subject_index']):
-            # initialize subject
-            if subject_index not in self.predictions and not self.predictions:
-                self.predictions[subject_index] = self._init_new_subject(batch, to_assemble, idx)
-            elif subject_index not in self.predictions:
-                self.subjects_ready = set(self.predictions.keys())
-                self.predictions[subject_index] = self._init_new_subject(batch, to_assemble, idx)
+        for idx in range(len(batch['subject_index'])):
+            self.add_sample(to_assemble, batch, idx)
 
-            index_expr = batch['index_expr'][idx]
-            if isinstance(index_expr, bytes):
-                # is pickled
-                index_expr = pickle.loads(index_expr)
+        if last_batch:
+            # to prevent from last batch to be ignored
+            self.subjects_ready = set(self.predictions.keys())
 
-            for key in to_assemble:
-                self.predictions[subject_index][key][index_expr.expression] = to_assemble[key][idx]
+    def add_sample(self, to_assemble, batch, idx):
+        # initialize subject
+        subject_index = batch['subject_index'][idx]
 
-            if last_batch:
-                # to prevent from last batch to be ignored
-                self.subjects_ready = set(self.predictions.keys())
+        if subject_index not in self.predictions and not self.predictions:
+            self.predictions[subject_index] = self._init_new_subject(batch, to_assemble, idx)
+        elif subject_index not in self.predictions:
+            self.subjects_ready = set(self.predictions.keys())
+            self.predictions[subject_index] = self._init_new_subject(batch, to_assemble, idx)
+
+        index_expr = batch['index_expr'][idx]
+        if isinstance(index_expr, bytes):
+            # is pickled
+            index_expr = pickle.loads(index_expr)
+
+        for key in to_assemble:
+            self.predictions[subject_index][key][index_expr.expression] = to_assemble[key][idx]
 
     def _init_new_subject(self, batch, to_assemble, idx):
         subject_prediction = {}

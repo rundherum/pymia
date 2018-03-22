@@ -102,7 +102,7 @@ def main(config_file: str):
             # test model, e.g.:
             # prediction = sess.run(y_model, feed_dict=feed_dict)
             prediction = np.stack(batch['labels'], axis=0)  # we use the labels as predictions such that we can validate the assembler
-            subject_assembler.add_sample(prediction, batch)
+            subject_assembler.add_batch(prediction, batch)
 
         # evaluate all test images
         for subject_idx in list(subject_assembler.predictions.keys()):
