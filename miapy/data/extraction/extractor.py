@@ -150,7 +150,7 @@ class SelectiveDataExtractor(Extractor):
             self.entry_base_names = [entry.rsplit('/', maxsplit=1)[1] for entry in entries]
 
         if not reader.has(df.DATA_PLACEHOLDER.format(self.category)):
-            raise ValueError('FullSubjectExtractor requires GT to exist')
+            raise ValueError('FullSubjectExtractor requires {} to exist'.format(self.category))
 
         subject_index = params['subject_index']
         index_expr = params['index_expr']
@@ -163,15 +163,15 @@ class SelectiveDataExtractor(Extractor):
             np_gts = reader.read('{}/{}'.format(df.DATA_PLACEHOLDER.format(self.category), base_name), index_expr)
 
         if self.gt_mode != 'all':
-            if 'label_names' not in extracted:
+            if '{}_names'.format(self.category) not in extracted:
                 raise ValueError('selection of labels requires label_names to be extracted (use NamesExtractor)')
-            label_names = extracted['label_names']  # type: list
+            label_names = extracted['{}_names'.format(self.category)]  # type: list
             if self.gt_mode == 'random':
                 selection_indices = [label_names.index(s) for s in self.gt_selection]
                 index = np.random.choice(selection_indices)
             elif self.gt_mode == 'select' and isinstance(self.gt_selection, (tuple, list)):
                 selection_indices = np.array([label_names.index(s) for s in self.gt_selection])
-                extracted['labels'] = np.take(np_gts, selection_indices, axis=-1)
+                extracted[self.category] = np.take(np_gts, selection_indices, axis=-1)
                 return
             else:
                 # mode == 'select'
@@ -182,7 +182,7 @@ class SelectiveDataExtractor(Extractor):
             # maintaining gt dims
             np_gts = np.expand_dims(np_gts, -1)
 
-        extracted['labels'] = np_gts
+        extracted[self.category] = np_gts
 
 
 class ImageShapeExtractor(Extractor):
