@@ -7,7 +7,6 @@ import SimpleITK as sitk
 import numpy as np
 
 import miapy.data as miapy_data
-import miapy.data.subjectfile as subj
 import miapy.data.conversion as conv
 import miapy.data.creation as miapy_crt
 import miapy.data.loading as miapy_load
@@ -21,20 +20,25 @@ class FileTypes(enum.Enum):
     GT = 3  # The ground truth image
     MASK = 4  # The foreground mask
     AGE = 5  # The age
-    SEX = 6  # The sex
+    GPA = 6  # The GPA
+    SEX = 7  # The sex
 
 
 class LoadData(file_load.Load):
 
-    def __call__(self, file_name: str, id_: str, file_type: subj.FileType) -> \
+    def __call__(self, file_name: str, id_: str, category: str) -> \
             typing.Tuple[np.ndarray, typing.Union[conv.ImageProperties, None]]:
         if id_ == FileTypes.AGE.name:
             with open(file_name, 'r') as f:
                 value = np.asarray([int(f.readline().split(':')[1].strip())])
                 return value, None
+        if id_ == FileTypes.GPA.name:
+            with open(file_name, 'r') as f:
+                value = np.asarray([float(f.readlines()[1].split(':')[1].strip())])
+                return value, None
         if id_ == FileTypes.SEX.name:
             with open(file_name, 'r') as f:
-                value = np.asarray([f.readlines()[1].split(':')[1].strip()])
+                value = np.asarray([f.readlines()[2].split(':')[1].strip()])
                 return value, None
 
         img = sitk.ReadImage(file_name)
@@ -45,13 +49,12 @@ class Subject(miapy_data.SubjectFile):
 
     def __init__(self, subject: str, files: dict):
         super().__init__(subject,
-                         {FileTypes.T1.name: files[FileTypes.T1],
-                          FileTypes.T2.name: files[FileTypes.T2]},
-                         {FileTypes.GT.name: files[FileTypes.GT]},
-                         {FileTypes.MASK.name: files[FileTypes.MASK],
-                          FileTypes.AGE.name: files[FileTypes.AGE],
-                          FileTypes.SEX.name: files[FileTypes.SEX]})
-        self.subject_path = files.pop(subject, '')
+                         images={FileTypes.T1.name: files[FileTypes.T1], FileTypes.T2.name: files[FileTypes.T2]},
+                         labels={FileTypes.GT.name: files[FileTypes.GT]},
+                         mask={FileTypes.MASK.name: files[FileTypes.MASK]},
+                         numerical={FileTypes.AGE.name: files[FileTypes.AGE], FileTypes.GPA.name: files[FileTypes.GPA]},
+                         sex={FileTypes.SEX.name: files[FileTypes.SEX]})
+        self.subject_path = files.get(subject, '')
 
 
 class DataSetFilePathGenerator(miapy_load.FilePathGenerator):
@@ -87,7 +90,7 @@ class DataSetFilePathGenerator(miapy_load.FilePathGenerator):
         elif file_key == FileTypes.MASK:
             file_name = '{}_MASK.nii.gz'.format(id_)
             add_file_extension = False
-        elif file_key == FileTypes.AGE or file_key == FileTypes.SEX:
+        elif file_key == FileTypes.AGE or file_key == FileTypes.GPA or file_key == FileTypes.SEX:
             file_name = 'demographic.txt'
             add_file_extension = False
         else:
@@ -119,7 +122,7 @@ class DirectoryFilter(miapy_load.DirectoryFilter):
 
 
 def main(hdf_file: str, data_dir: str):
-    keys = [FileTypes.T1, FileTypes.T2, FileTypes.GT, FileTypes.MASK, FileTypes.AGE, FileTypes.SEX]
+    keys = [FileTypes.T1, FileTypes.T2, FileTypes.GT, FileTypes.MASK, FileTypes.AGE, FileTypes.GPA, FileTypes.SEX]
     crawler = miapy_load.FileSystemDataCrawler(data_dir,
                                                keys,
                                                DataSetFilePathGenerator(),

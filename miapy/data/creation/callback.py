@@ -51,15 +51,9 @@ class WriteDataCallback(Callback):
         max_digits = len(str(len(subject_files)))
         index_str = '{{:0{}}}'.format(max_digits).format(subject_index)
 
-        images = params['images']
-        self.writer.write('{}/{}'.format(df.DATA_IMAGE, index_str), images)
-        if params['has_labels']:
-            labels = params['labels']
-            self.writer.write('{}/{}'.format(df.DATA_LABEL, index_str), labels)
-        if params['has_supplementaries']:
-            supplementaries = params['supplementaries']
-            for key, value in supplementaries.items():
-                self.writer.write('{}/{}/{}'.format(df.DATA, key, index_str), value, value.dtype)
+        for category in params['categories']:
+            data = params[category]
+            self.writer.write('{}/{}'.format(df.DATA_PLACEHOLDER.format(category), index_str), data, dtype=data.dtype)
 
 
 class WriteSubjectCallback(Callback):
@@ -81,8 +75,9 @@ class WriteSubjectCallback(Callback):
 
 class WriteImageInformationCallback(Callback):
 
-    def __init__(self, writer: wr.Writer) -> None:
+    def __init__(self, writer: wr.Writer, category='images') -> None:
         self.writer = writer
+        self.category = category
         self.new_subject = False
 
     def on_start(self, params: dict):
@@ -94,12 +89,12 @@ class WriteImageInformationCallback(Callback):
 
     def on_subject(self, params: dict):
         subject_index = params['subject_index']
-        image_properties = params['image_properties']  # type: conv.ImageProperties
+        properties = params['{}_properties'.format(self.category)]  # type: conv.ImageProperties
 
-        self.writer.fill(df.INFO_SHAPE, image_properties.size, expr.IndexExpression(subject_index))
-        self.writer.fill(df.INFO_ORIGIN, image_properties.origin, expr.IndexExpression(subject_index))
-        self.writer.fill(df.INFO_DIRECTION, image_properties.direction, expr.IndexExpression(subject_index))
-        self.writer.fill(df.INFO_SPACING, image_properties.spacing, expr.IndexExpression(subject_index))
+        self.writer.fill(df.INFO_SHAPE, properties.size, expr.IndexExpression(subject_index))
+        self.writer.fill(df.INFO_ORIGIN, properties.origin, expr.IndexExpression(subject_index))
+        self.writer.fill(df.INFO_DIRECTION, properties.direction, expr.IndexExpression(subject_index))
+        self.writer.fill(df.INFO_SPACING, properties.spacing, expr.IndexExpression(subject_index))
 
 
 class WriteNamesCallback(Callback):
@@ -108,16 +103,8 @@ class WriteNamesCallback(Callback):
         self.writer = writer
 
     def on_start(self, params: dict):
-        image_names = params['image_names']
-        self.writer.write(df.NAMES_IMAGE, image_names, dtype='str')
-
-        if params['has_labels']:
-            label_names = params['label_names']
-            self.writer.write(df.NAMES_LABEL, label_names, dtype='str')
-
-        if params['has_supplementaries']:
-            supplementary_names = params['supplementary_names']
-            self.writer.write(df.NAMES_SUPPL, supplementary_names, dtype='str')
+        for category in params['categories']:
+            self.writer.write(df.NAMES_PLACEHOLDER.format(category), params['{}_names'.format(category)], dtype='str')
 
 
 class WriteFilesCallback(Callback):
@@ -135,18 +122,11 @@ class WriteFilesCallback(Callback):
     def on_start(self, params: dict):
         subject_files = params['subject_files']
         self.file_root = self._get_common_path(subject_files)
-
         self.writer.write(df.FILES_ROOT, self.file_root, dtype='str')
-        image_names = params['image_names']
-        self.writer.reserve(df.FILES_IMAGE, (len(subject_files), len(image_names)), dtype='str')
 
-        if params['has_labels']:
-            label_names = params['label_names']
-            self.writer.reserve(df.FILES_LABEL, (len(subject_files), len(label_names)), dtype='str')
-
-        if params['has_supplementaries']:
-            supplementary_names = params['supplementary_names']
-            self.writer.reserve(df.FILES_SUPPL, (len(subject_files), len(supplementary_names)), dtype='str')
+        for category in params['categories']:
+            self.writer.reserve(df.FILES_PLACEHOLDER.format(category),
+                                (len(subject_files), len(params['{}_names'.format(category)])), dtype='str')
 
     def on_subject(self, params: dict):
         subject_index = params['subject_index']
@@ -154,22 +134,11 @@ class WriteFilesCallback(Callback):
 
         subject_file = subject_files[subject_index]  # type: subj.SubjectFile
 
-        for image_index, key in enumerate(subject_file.images):
-            relative_path = os.path.relpath(subject_file.images[key], self.file_root)
-            index_expr = expr.IndexExpression(indexing=[subject_index, image_index], axis=(0, 1))
-            self.writer.fill(df.FILES_IMAGE, relative_path, index_expr)
-
-        if subject_file.label_images is not None:
-            for label_index, key in enumerate(subject_file.label_images):
-                relative_path = os.path.relpath(subject_file.label_images[key], self.file_root)
-                index_expr = expr.IndexExpression(indexing=[subject_index, label_index], axis=(0, 1))
-                self.writer.fill(df.FILES_LABEL, relative_path, index_expr)
-
-        if subject_file.supplementaries is not None:
-            for supplementary_index, key in enumerate(subject_file.supplementaries):
-                relative_path = os.path.relpath(subject_file.supplementaries[key], self.file_root)
-                index_expr = expr.IndexExpression(indexing=[subject_index, supplementary_index], axis=(0, 1))
-                self.writer.fill(df.FILES_SUPPL, relative_path, index_expr)
+        for category in params['categories']:
+            for index, file_name in enumerate(subject_file.categories[category].entries.values()):
+                relative_path = os.path.relpath(file_name, self.file_root)
+                index_expr = expr.IndexExpression(indexing=[subject_index, index], axis=(0, 1))
+                self.writer.fill(df.FILES_PLACEHOLDER.format(category), relative_path, index_expr)
 
 
 def get_default_callbacks(writer: wr.Writer):

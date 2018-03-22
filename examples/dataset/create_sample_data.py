@@ -32,7 +32,8 @@ def main(data_dir: str):
         create_and_save_image(os.path.join(subject_dir, '{}_GT.mha'.format(subject)), np_shape, 0, 4)
         create_and_save_image(os.path.join(subject_dir, '{}_MASK.nii.gz'.format(subject)), np_shape, 0, 1)
 
-        additional = 'Age: {}\nSex: {}'.format(np.random.randint(20, 90), 'M' if n % 2 == 0 else 'F')
+        additional = 'Age: {}\nGPA: {}\nSex: {}'.format(np.random.randint(20, 90), np.random.rand(1)[0] * 4,
+                                                        'M' if n % 2 == 0 else 'F')
 
         with open(os.path.join(subject_dir, 'demographic.txt'), 'w') as file:
             file.write(additional)

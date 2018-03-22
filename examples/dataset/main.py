@@ -42,18 +42,18 @@ def main(config_file: str):
     indexing_strategy = miapy_extr.SliceIndexing()  # slice-wise extraction
     extraction_transform = None  # we do not want to apply any transformation on the slices after extraction
     # define an extractor for training, i.e. what information we would like to extract per sample
-    train_extractor = miapy_extr.ComposeExtractor([miapy_extr.ImageExtractor(),
-                                                   miapy_extr.LabelExtractor()])
+    train_extractor = miapy_extr.ComposeExtractor([miapy_extr.DataExtractor(),
+                                                   miapy_extr.SelectiveDataExtractor()])
 
     # define an extractor for testing, i.e. what information we would like to extract per sample
     test_extractor = miapy_extr.ComposeExtractor([miapy_extr.IndexingExtractor(),
-                                                  miapy_extr.ImageExtractor(),
-                                                  miapy_extr.LabelExtractor(),
+                                                  miapy_extr.DataExtractor(),
+                                                  miapy_extr.SelectiveDataExtractor(),
                                                   miapy_extr.ImageShapeExtractor()])
 
     # define an extractor for evaluation, i.e. what information we would like to extract per sample
     eval_extractor = miapy_extr.ComposeExtractor([miapy_extr.SubjectExtractor(),
-                                                  miapy_extr.LabelExtractor(),
+                                                  miapy_extr.SelectiveDataExtractor(),
                                                   miapy_extr.ImagePropertiesExtractor()])
 
     # define the data set

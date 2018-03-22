@@ -99,17 +99,20 @@ class Reader(metaclass=abc.ABCMeta):
 class Hdf5Reader(Reader):
     """Represents the dataset reader for HDF5 files."""
 
-    def __init__(self, file_path: str) -> None:
+    def __init__(self, file_path: str, category='images') -> None:
         """Initializes a new instance.
 
         Args:
             file_path(str): The path to the dataset file.
+            category(str): The category of an entry that contains data of all subjects
         """
         super().__init__(file_path)
         self.h5 = None  # type: h5py.File
+        self.category = category
 
     def get_subject_entries(self) -> list:
-        return ['{}/{}'.format(df.DATA_IMAGE, k) for k in sorted(self.h5[df.DATA_IMAGE].keys())]
+        group = df.DATA_PLACEHOLDER.format(self.category)
+        return ['{}/{}'.format(group, k) for k in sorted(self.h5[group].keys())]
 
     def get_shape(self, entry: str) -> list:
         return self.h5[entry].shape

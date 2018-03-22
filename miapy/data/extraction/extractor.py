@@ -30,10 +30,11 @@ class ComposeExtractor(Extractor):
 
 class NamesExtractor(Extractor):
 
-    def __init__(self, cache=True) -> None:
+    def __init__(self, cache=True, categories=('images', 'labels')) -> None:
         super().__init__()
         self.cache = cache
         self.cached_result = None
+        self.categories = categories
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
         if not self.cache or self.cached_result is None:
@@ -45,14 +46,10 @@ class NamesExtractor(Extractor):
         for k, v in d.items():
             extracted[k] = v
 
-    @staticmethod
-    def _extract(reader: rd.Reader):
-        image_names = reader.read(df.NAMES_IMAGE)
-        d = {'image_names': image_names}
-        if reader.has(df.NAMES_LABEL):
-            d['label_names'] = reader.read(df.NAMES_LABEL)
-        if reader.has(df.NAMES_SUPPL):
-            d['supplementary_names'] = reader.read(df.NAMES_SUPPL)
+    def _extract(self, reader: rd.Reader):
+        d = {}
+        for category in self.categories:
+            d['{}_names'.format(category)] = reader.read(df.NAMES_PLACEHOLDER.format(category))
         return d
 
 
@@ -105,15 +102,16 @@ class ImagePropertiesExtractor(Extractor):
         if self.do_pickle:
             # pickle to prevent from problems since own class
             img_properties = pickle.dumps(img_properties)
-        extracted['image_properties'] = img_properties
+        extracted['properties'] = img_properties
 
 
 class FilesExtractor(Extractor):
 
-    def __init__(self, cache=True) -> None:
+    def __init__(self, cache=True, categories=('images', 'labels')) -> None:
         super().__init__()
         self.cache = cache
         self.cached_file_root = None
+        self.categories = categories
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
         subject_index_expr = expr.IndexExpression(params['subject_index'])
@@ -125,39 +123,15 @@ class FilesExtractor(Extractor):
             file_root = self.cached_file_root
 
         extracted['file_root'] = file_root
-        extracted['image_files'] = reader.read(df.FILES_IMAGE, subject_index_expr)
-        if reader.has(df.FILES_LABEL):
-            extracted['label_files'] = reader.read(df.FILES_LABEL, subject_index_expr)
-        if reader.has(df.FILES_SUPPL):
-            extracted['supplementary_files'] = reader.read(df.FILES_SUPPL, subject_index_expr)
+
+        for category in self.categories:
+            extracted['{}_files'.format(category)] = reader.read(df.FILES_PLACEHOLDER.format(category),
+                                                                 subject_index_expr)
 
 
-class ImageExtractor(Extractor):
+class SelectiveDataExtractor(Extractor):
 
-    def __init__(self, entire_subject=False) -> None:
-        super().__init__()
-        self.entry_base_names = None
-        self.entire_subject = entire_subject
-
-    def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
-        if self.entry_base_names is None:
-            entries = reader.get_subject_entries()
-            self.entry_base_names = [entry.rsplit('/', maxsplit=1)[1] for entry in entries]
-
-        subject_index = params['subject_index']
-        index_expr = params['index_expr']
-
-        base_name = self.entry_base_names[subject_index]
-        if self.entire_subject:
-            np_image = reader.read('{}/{}'.format(df.DATA_IMAGE, base_name))
-        else:
-            np_image = reader.read('{}/{}'.format(df.DATA_IMAGE, base_name), index_expr)
-        extracted['images'] = np_image
-
-
-class LabelExtractor(Extractor):
-
-    def __init__(self, gt_mode='all', gt_selection=None, entire_subject=False) -> None:
+    def __init__(self, gt_mode='all', gt_selection=None, entire_subject=False, category='labels') -> None:
         super().__init__()
         self.entry_base_names = None
         if gt_mode not in ('all', 'random', 'select'):
@@ -168,13 +142,14 @@ class LabelExtractor(Extractor):
             gt_selection = (gt_selection,)
         self.gt_selection = gt_selection
         self.entire_subject = entire_subject
+        self.category = category
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
         if self.entry_base_names is None:
             entries = reader.get_subject_entries()
             self.entry_base_names = [entry.rsplit('/', maxsplit=1)[1] for entry in entries]
 
-        if not reader.has(df.DATA_LABEL):
+        if not reader.has(df.DATA_PLACEHOLDER.format(self.category)):
             raise ValueError('FullSubjectExtractor requires GT to exist')
 
         subject_index = params['subject_index']
@@ -183,9 +158,9 @@ class LabelExtractor(Extractor):
         base_name = self.entry_base_names[subject_index]
 
         if self.entire_subject:
-            np_gts = reader.read('{}/{}'.format(df.DATA_LABEL, base_name))
+            np_gts = reader.read('{}/{}'.format(df.DATA_PLACEHOLDER.format(self.category), base_name))
         else:
-            np_gts = reader.read('{}/{}'.format(df.DATA_LABEL, base_name), index_expr)
+            np_gts = reader.read('{}/{}'.format(df.DATA_PLACEHOLDER.format(self.category), base_name), index_expr)
 
         if self.gt_mode != 'all':
             if 'label_names' not in extracted:
@@ -228,11 +203,11 @@ class ImageShapeExtractor(Extractor):
         extracted['shape'] = tuple(shape.tolist())
 
 
-class SupplementaryExtractor(Extractor):
+class DataExtractor(Extractor):
 
-    def __init__(self, entries: tuple, entire_subject=False) -> None:
+    def __init__(self, categories=('images',), entire_subject=False) -> None:
         super().__init__()
-        self.entries = entries
+        self.categories = categories
         self.entire_subject = entire_subject
         self.entry_base_names = None
 
@@ -245,8 +220,9 @@ class SupplementaryExtractor(Extractor):
         index_expr = params['index_expr']
 
         base_name = self.entry_base_names[subject_index]
-        for entry in self.entries:
+        for category in self.categories:
             if self.entire_subject:
-                extracted[entry] = reader.read('{}/{}/{}'.format(df.DATA, entry, base_name))
+                data = reader.read('{}/{}'.format(df.DATA_PLACEHOLDER.format(category), base_name))
             else:
-                extracted[entry] = reader.read('{}/{}/{}'.format(df.DATA, entry, base_name), index_expr)
+                data = reader.read('{}/{}'.format(df.DATA_PLACEHOLDER.format(category), base_name), index_expr)
+            extracted[category] = data
