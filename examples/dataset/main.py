@@ -106,10 +106,10 @@ def main(config_file: str):
             # convert prediction and labels back to SimpleITK images
             sample = dataset.direct_extract(eval_extractor, subject_idx)
             label_image = miapy_conv.NumpySimpleITKImageBridge.convert(sample['labels'],
-                                                                       sample['image_properties'])
+                                                                       sample['properties'])
 
             assembled = subject_assembler.get_assembled_subject(sample['subject_index'])
-            prediction_image = miapy_conv.NumpySimpleITKImageBridge.convert(assembled, sample['image_properties'])
+            prediction_image = miapy_conv.NumpySimpleITKImageBridge.convert(assembled, sample['properties'])
             evaluator.evaluate(prediction_image, label_image, sample['subject'])  # evaluate prediction
 
 
