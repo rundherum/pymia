@@ -3,6 +3,8 @@ import pickle
 
 import numpy as np
 
+from . import transformation as tfm
+
 
 class Assembler(metaclass=abc.ABCMeta):
 
@@ -23,7 +25,7 @@ class SubjectAssembler(Assembler):
         self.subjects_ready = set()
         self.zero_fn = zero_fn
 
-    def add_batch(self, to_assemble, batch: dict, last_batch=False):
+    def add_batch(self, to_assemble, batch: dict, last_batch=False, transform: tfm.Transform=None):
         if 'subject_index' not in batch:
             raise ValueError('SubjectAssembler requires "subject_index" to be extracted (use IndexingExtractor)')
         if 'index_expr' not in batch:
@@ -39,9 +41,12 @@ class SubjectAssembler(Assembler):
 
         if last_batch:
             # to prevent from last batch to be ignored
-            self.subjects_ready = set(self.predictions.keys())
+            self.end()
 
-    def add_sample(self, to_assemble, batch, idx):
+    def end(self):
+        self.subjects_ready = set(self.predictions.keys())
+
+    def add_sample(self, to_assemble, batch, idx, transform: tfm.Transform=None):
         # initialize subject
         subject_index = batch['subject_index'][idx]
 
@@ -57,7 +62,10 @@ class SubjectAssembler(Assembler):
             index_expr = pickle.loads(index_expr)
 
         for key in to_assemble:
-            self.predictions[subject_index][key][index_expr.expression] = to_assemble[key][idx]
+            data = to_assemble[key][idx]
+            if transform is not None:
+                data = transform({key: data})[key]
+            self.predictions[subject_index][key][index_expr.expression] = data
 
     def _init_new_subject(self, batch, to_assemble, idx):
         subject_prediction = {}
