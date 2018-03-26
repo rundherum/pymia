@@ -60,11 +60,12 @@ class IntensityRescale(Transform):
 
 class IntensityNormalization(Transform):
 
-    def __init__(self, loop_axis=None, entries=('images',), cast_to=np.float32) -> None:
+    def __init__(self, loop_axis=None, entries=('images',), cast_to=np.float32, norm_sergio=False) -> None:
         super().__init__()
         self.loop_axis = loop_axis
         self.entries = entries
         self.cast_to = cast_to
+        self.normalize_fn = self._normalize if not norm_sergio else self._normalize_sergio
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
@@ -74,18 +75,23 @@ class IntensityNormalization(Transform):
             np_entry = _check_and_return(sample[entry], np.ndarray).astype(self.cast_to)
 
             if self.loop_axis is None:
-                np_entry = self._normalize(np_entry)
+                np_entry = self.normalize_fn(np_entry)
             else:
                 slicing = [slice(None) for _ in range(np_entry.ndim)]
                 for i in range(np_entry.shape[self.loop_axis]):
                     slicing[self.loop_axis] = i
-                    np_entry[slicing] = self._normalize(np_entry[slicing])
+                    np_entry[slicing] = self.normalize_fn(np_entry[slicing])
             sample[entry] = np_entry
         return sample
 
     @staticmethod
     def _normalize(arr: np.ndarray):
         return (arr - arr.mean()) / arr.std()
+
+    @staticmethod
+    def _normalize_sergio(arr: np.ndarray):
+        arr[arr != 0] = IntensityNormalization._normalize(arr[arr != 0])
+        return arr
 
 
 class ClipPercentile(Transform):
