@@ -1,7 +1,6 @@
 import argparse
 
 import numpy as np
-import tensorflow as tf
 
 import miapy.data.conversion as miapy_conv
 import miapy.data.extraction as miapy_extr
@@ -79,26 +78,24 @@ def main(config_file: str):
     testing_loader = miapy_extr.DataLoader(dataset, config.batch_size_testing, sampler=testing_sampler,
                                            collate_fn=collate_batch, num_workers=1)
 
-    # define TensorFlow placeholders
-    sample = dataset.direct_extract(train_extractor, 0)  # extract a subject to obtain shape
-    x = tf.placeholder(tf.float32, (None, ) + sample['images'].shape[1:])
-    y = tf.placeholder(tf.int16, (None, ) + sample['labels'].shape[1:] + (1, ))
+    sample = dataset.direct_extract(train_extractor, 0)  # extract a subject
 
     evaluator = init_evaluator()  # initialize evaluator
 
     for epoch in range(config.epochs):  # epochs loop
         dataset.set_extractor(train_extractor)
         for batch in training_loader:  # batches for training
-            feed_dict = batch_to_feed_dict(x, y, batch, True)
+            # feed_dict = batch_to_feed_dict(x, y, batch, True)  # e.g. for TensorFlow
             # train model, e.g.:
             # sess.run([train_op, loss], feed_dict=feed_dict)
+            pass
 
         # subject assembler for testing
         subject_assembler = miapy_asmbl.SubjectAssembler()
 
         dataset.set_extractor(test_extractor)
         for batch in testing_loader:  # batches for testing
-            feed_dict = batch_to_feed_dict(x, y, batch, False)
+            # feed_dict = batch_to_feed_dict(x, y, batch, False)  # e.g. for TensorFlow
             # test model, e.g.:
             # prediction = sess.run(y_model, feed_dict=feed_dict)
             prediction = np.stack(batch['labels'], axis=0)  # we use the labels as predictions such that we can validate the assembler
@@ -109,10 +106,10 @@ def main(config_file: str):
             # convert prediction and labels back to SimpleITK images
             sample = dataset.direct_extract(eval_extractor, subject_idx)
             label_image = miapy_conv.NumpySimpleITKImageBridge.convert(sample['labels'],
-                                                                       sample['image_properties'])
+                                                                       sample['properties'])
 
             assembled = subject_assembler.get_assembled_subject(sample['subject_index'])
-            prediction_image = miapy_conv.NumpySimpleITKImageBridge.convert(assembled, sample['image_properties'])
+            prediction_image = miapy_conv.NumpySimpleITKImageBridge.convert(assembled, sample['properties'])
             evaluator.evaluate(prediction_image, label_image, sample['subject'])  # evaluate prediction
 
 
