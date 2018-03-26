@@ -60,17 +60,18 @@ class IntensityRescale(Transform):
 
 class IntensityNormalization(Transform):
 
-    def __init__(self, loop_axis=None, entries=('images',), norm_sergio=False) -> None:
+    def __init__(self, loop_axis=None, entries=('images',)) -> None:
         super().__init__()
         self.loop_axis = loop_axis
         self.entries = entries
-        self.normalize_fn = self._normalize if not norm_sergio else self._normalize_sergio
+        self.normalize_fn = self._normalize
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
             if entry not in sample:
                 continue
 
+            np_entry = _check_and_return(sample[entry], np.ndarray)
             if not np.issubdtype(np_entry.dtype, np.floating):
                 raise ValueError('Array must be floating type')
 
@@ -88,11 +89,6 @@ class IntensityNormalization(Transform):
     def _normalize(arr: np.ndarray):
         return (arr - arr.mean()) / arr.std()
 
-    @staticmethod
-    def _normalize_sergio(arr: np.ndarray):
-        arr[arr != 0] = IntensityNormalization._normalize(arr[arr != 0])
-        return arr
-
 
 class LambdaTransform(Transform):
 
@@ -106,6 +102,8 @@ class LambdaTransform(Transform):
         for entry in self.entries:
             if entry not in sample:
                 continue
+
+            np_entry = _check_and_return(sample[entry], np.ndarray)
 
             if self.loop_axis is None:
                 np_entry = self.lambda_fn(np_entry)
