@@ -10,22 +10,25 @@ from . import extractor as extr
 class ParameterizableDataset(data.Dataset):
 
     def __init__(self, dataset_path: str, indexing_strategy: idx.IndexingStrategy=None, extractor: extr.Extractor=None,
-                 transform: tfm.Transform = None, init_reader_once=True) -> None:
+                 transform: tfm.Transform = None, subject_subset: list=None, init_reader_once=True) -> None:
         self.dataset_path = dataset_path
         if indexing_strategy is None:
             indexing_strategy = idx.EmptyIndexing()
         self.indexing_strategy = indexing_strategy
         self.extractor = extractor
         self.transform = transform
+        self.subject_subset = subject_subset
         self.init_reader_once=init_reader_once
 
         self.indices = []
         self.reader = None
         with rd.get_reader(dataset_path) as reader:
+            all_subjects = reader.get_subjects()
             for i, subject in enumerate(reader.get_subject_entries()):
-                subject_indices = self.indexing_strategy(reader.get_shape(subject))
-                subject_and_indices = zip(len(subject_indices) * [i], subject_indices)
-                self.indices.extend(subject_and_indices)
+                if self.subject_subset is None or all_subjects[i] in self.subject_subset:
+                    subject_indices = self.indexing_strategy(reader.get_shape(subject))
+                    subject_and_indices = zip(len(subject_indices) * [i], subject_indices)
+                    self.indices.extend(subject_and_indices)
 
     def __del__(self):
         self.close_reader()

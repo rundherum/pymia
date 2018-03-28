@@ -13,6 +13,9 @@ class IndexingStrategy(metaclass=abc.ABCMeta):
         # return list of indexes by giving shape
         pass
 
+    def __repr__(self) -> str:
+        return self.__class__.__name__
+
 
 class EmptyIndexing(IndexingStrategy):
 
@@ -33,6 +36,9 @@ class SliceIndexing(IndexingStrategy):
             indexing.extend(expr.IndexExpression(i, axis) for i in range(shape[axis]))
         return indexing
 
+    def __repr__(self) -> str:
+        return '{}({})'.format(self.__class__.__name__, self.slice_axis)
+
 
 class VoxelWiseIndexing(IndexingStrategy):
 
@@ -51,3 +57,4 @@ class VoxelWiseIndexing(IndexingStrategy):
         indices = indices.transpose()
         self.indexing = [expr.IndexExpression(idx.tolist()) for idx in indices]
         return self.indexing
+
