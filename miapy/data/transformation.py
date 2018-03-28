@@ -121,6 +121,8 @@ class ClipPercentile(Transform):
     def __init__(self, upper_percentile: float, lower_percentile: float = None, entries=('images',)) -> None:
         super().__init__()
         self.upper_percentile = upper_percentile
+        if lower_percentile is None:
+            lower_percentile = 100 - upper_percentile
         self.lower_percentile = lower_percentile
         self.entries = entries
 
