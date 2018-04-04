@@ -26,6 +26,7 @@ class SubjectAssembler(Assembler):
         self.zero_fn = zero_fn
 
     def add_batch(self, to_assemble, batch: dict, last_batch=False, transform: tfm.Transform=None):
+        # todo(fabianbalsiger): replace tfm.Transform by callback
         if 'subject_index' not in batch:
             raise ValueError('SubjectAssembler requires "subject_index" to be extracted (use IndexingExtractor)')
         if 'index_expr' not in batch:
@@ -37,7 +38,7 @@ class SubjectAssembler(Assembler):
             to_assemble = {'__prediction': to_assemble}
 
         for idx in range(len(batch['subject_index'])):
-            self.add_sample(to_assemble, batch, idx)
+            self.add_sample(to_assemble, batch, idx, transform)
 
         if last_batch:
             # to prevent from last batch to be ignored
@@ -47,6 +48,7 @@ class SubjectAssembler(Assembler):
         self.subjects_ready = set(self.predictions.keys())
 
     def add_sample(self, to_assemble, batch, idx, transform: tfm.Transform=None):
+        # todo(fabianbalsiger): replace tfm.Transform by callback
         # initialize subject
         subject_index = batch['subject_index'][idx]
 
@@ -64,7 +66,7 @@ class SubjectAssembler(Assembler):
         for key in to_assemble:
             data = to_assemble[key][idx]
             if transform is not None:
-                data = transform({key: data})[key]
+                data = transform({key: data, 'batch': batch, 'batch_idx': idx})[key]
             self.predictions[subject_index][key][index_expr.expression] = data
 
     def _init_new_subject(self, batch, to_assemble, idx):
