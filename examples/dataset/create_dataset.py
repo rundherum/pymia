@@ -41,7 +41,7 @@ class LoadData(file_load.Load):
                 value = np.asarray([f.readlines()[2].split(':')[1].strip()])
                 return value, None
 
-        if id_ == FileTypes.T1.name or id_ == FileTypes.T2.name:
+        if category == 'images':
             img = sitk.ReadImage(file_name, sitk.sitkFloat32)
         else:
             img = sitk.ReadImage(file_name, sitk.sitkUInt8)
