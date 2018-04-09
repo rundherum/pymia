@@ -10,7 +10,7 @@ from . import extractor as extr
 class ParameterizableDataset(data.Dataset):
 
     def __init__(self, dataset_path: str, indexing_strategy: idx.IndexingStrategy=None, extractor: extr.Extractor=None,
-                 transform: tfm.Transform = None, subject_subset: list=None, init_reader_once=True) -> None:
+                 transform: tfm.Transform=None, subject_subset: list=None, init_reader_once=True) -> None:
         self.dataset_path = dataset_path
         if indexing_strategy is None:
             indexing_strategy = idx.EmptyIndexing()
@@ -41,8 +41,11 @@ class ParameterizableDataset(data.Dataset):
     def set_extractor(self, extractor: extr.Extractor):
         self.extractor = extractor
 
+    def set_transform(self, transform: tfm.Transform):
+        self.transform = transform
+
     def direct_extract(self, extractor: extr.Extractor, subject_index: int, index_expr: expr.IndexExpression=None,
-                       transform=None):
+                       transform: tfm.Transform=None):
         if index_expr is None:
             index_expr = expr.IndexExpression()
 
