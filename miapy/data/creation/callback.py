@@ -117,7 +117,7 @@ class WriteFilesCallback(Callback):
     def _get_common_path(subject_files):
         def get_subject_common(subject_file: subj.SubjectFile):
             return os.path.commonpath(list(subject_file.get_all_files().values()))
-        return os.path.commonpath(get_subject_common(sf) for sf in subject_files)
+        return os.path.commonpath([get_subject_common(sf) for sf in subject_files])
 
     def on_start(self, params: dict):
         subject_files = params['subject_files']
