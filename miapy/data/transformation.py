@@ -118,12 +118,14 @@ class LambdaTransform(Transform):
 
 class ClipPercentile(Transform):
 
-    def __init__(self, upper_percentile: float, lower_percentile: float = None, entries=('images',)) -> None:
+    def __init__(self, upper_percentile: float, lower_percentile: float=None,
+                 loop_axis=None, entries=('images',)) -> None:
         super().__init__()
         self.upper_percentile = upper_percentile
         if lower_percentile is None:
             lower_percentile = 100 - upper_percentile
         self.lower_percentile = lower_percentile
+        self.loop_axis = loop_axis
         self.entries = entries
 
     def __call__(self, sample: dict) -> dict:
@@ -133,13 +135,23 @@ class ClipPercentile(Transform):
 
             np_entry = _check_and_return(sample[entry], np.ndarray)
 
-            upper_max = np.percentile(np_entry, self.upper_percentile)
-            np_entry[np_entry > upper_max] = upper_max
-            lower_max = np.percentile(np_entry, self.lower_percentile)
-            np_entry[np_entry < lower_max] = lower_max
+            if self.loop_axis is None:
+                np_entry = self._clip(np_entry)
+            else:
+                slicing = [slice(None) for _ in range(np_entry.ndim)]
+                for i in range(np_entry.shape[self.loop_axis]):
+                    slicing[self.loop_axis] = i
+                    np_entry[slicing] = self._clip(np_entry[slicing])
 
             sample[entry] = np_entry
         return sample
+
+    def _clip(self, arr: np.ndarray):
+        upper_max = np.percentile(arr, self.upper_percentile)
+        arr[arr > upper_max] = upper_max
+        lower_max = np.percentile(arr, self.lower_percentile)
+        arr[arr < lower_max] = lower_max
+        return arr
 
 
 class Relabel(Transform):
