@@ -270,6 +270,37 @@ class SizeCorrection(Transform):
         return sample
 
 
+class Mask(Transform):
+
+    def __init__(self, mask_key: str, mask_value: int=0, masking_value: float=0,
+                 loop_axis=None, entries=('images', 'labels')) -> None:
+        super().__init__()
+        self.mask_key = mask_key
+        self.mask_value = mask_value
+        self.masking_value = masking_value
+        self.loop_axis = loop_axis
+        self.entries = entries
+
+    def __call__(self, sample: dict) -> dict:
+        np_mask = _check_and_return(sample[self.mask_key], np.ndarray)
+
+        for entry in self.entries:
+            if entry not in sample:
+                continue
+
+            np_entry = _check_and_return(sample[entry], np.ndarray)
+
+            if np_mask.shape == np_entry.shape:
+                np_entry[np_mask == self.mask_value] = self.masking_value
+            else:
+                mask_for_np_entry = np.repeat(np.expand_dims(np_mask, self.loop_axis),
+                                          np_entry.shape[self.loop_axis], axis=self.loop_axis)
+                np_entry[mask_for_np_entry == self.mask_value] = self.masking_value
+
+            sample[entry] = np_entry
+        return sample
+
+
 def _check_and_return(obj, type_):
     if not isinstance(obj, type_):
         raise ValueError("entry must be '{}'".format(type_.__name__))
