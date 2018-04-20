@@ -246,14 +246,14 @@ class SizeCorrection(Transform):
                 continue
 
             np_entry = _check_and_return(sample[entry], np.ndarray)
-            if not len(self.shape) <= len(np_entry.shape):
-                raise ValueError('Shape dimension needs to be less or equal to {}'.format(len(np_entry.shape)))
+            if not len(self.shape) <= np_entry.ndim:
+                raise ValueError('Shape dimension needs to be less or equal to {}'.format(np_entry.ndim))
 
             for idx, size in enumerate(self.shape):
                 if size is not None and size < np_entry.shape[idx]:
                     # crop current dimension
                     before = (np_entry.shape[idx] - size) // 2
-                    after = np_entry.shape[idx] - (np_entry.shape[idx] - size) // 2 + ((np_entry.shape[idx] - size) % 2)
+                    after = np_entry.shape[idx] - (np_entry.shape[idx] - size) // 2 - ((np_entry.shape[idx] - size) % 2)
                     slicing = [slice(None)] * np_entry.ndim
                     slicing[idx] = slice(before, after)
                     np_entry = np_entry[slicing]
