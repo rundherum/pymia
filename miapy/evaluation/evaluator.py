@@ -248,6 +248,8 @@ class Evaluator:
                     metric.segmentation = predictions
                 elif isinstance(metric, miapy_metric.ISimpleITKImageMetric):
                     if not converted_to_image:
+                        if not isinstance(image, sitk.Image):
+                            raise ValueError('SimpleITK image is required for SimpleITK-based metrics')
                         predictions_as_image = sitk.GetImageFromArray(predictions)
                         predictions_as_image.CopyInformation(image)
                         labels_as_image = sitk.GetImageFromArray(labels)
