@@ -46,11 +46,11 @@ class VoxelWiseIndexing(IndexingStrategy):
         self.shape = None
         self.indexing = None
 
-    def __call__(self, shape, offset=0) -> t.List[expr.IndexExpression]:
+    def __call__(self, shape) -> t.List[expr.IndexExpression]:
         if self.shape == shape:
             return self.indexing
 
-        self.shape = shape  # save for later comparison
+        self.shape = shape  # save for later comparison to avoid calculating indices if the shape is equal
         shape_without_voxel = shape[:-1]
         indices = np.indices(shape_without_voxel)
         indices = indices.reshape((indices.shape[0], np.prod(indices.shape[1:])))
