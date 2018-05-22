@@ -80,9 +80,10 @@ class WithForegroundSelection(SelectionStrategy):
 
 
 class SubjectSelection(SelectionStrategy):
+    """Select subjects by their name."""
 
-    def __init__(self, subjects: t.Union[int, tuple]) -> None:
-        if isinstance(subjects, int):
+    def __init__(self, subjects: t.Union[str, tuple]) -> None:
+        if isinstance(subjects, str):
             subjects = (subjects, )
         self.subjects = subjects
 
