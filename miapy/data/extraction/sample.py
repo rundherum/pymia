@@ -1,4 +1,5 @@
 import abc
+import typing as t
 
 import numpy as np
 import torch.utils.data as data
@@ -69,7 +70,7 @@ class PercentileSelection(SelectionStrategy):
         return (image_data >= percentile_value).all()
 
     def __repr__(self) -> str:
-        return '{}({})'.format(self.__class__.__name__, self.percentile)
+        return '{} ({})'.format(self.__class__.__name__, self.percentile)
 
 
 class WithForegroundSelection(SelectionStrategy):
@@ -80,14 +81,16 @@ class WithForegroundSelection(SelectionStrategy):
 
 class SubjectSelection(SelectionStrategy):
 
-    def __init__(self, subjects) -> None:
+    def __init__(self, subjects: t.Union[int, tuple]) -> None:
+        if isinstance(subjects, int):
+            subjects = (subjects, )
         self.subjects = subjects
 
     def __call__(self, sample) -> bool:
         return sample['subject'] in self.subjects
 
     def __repr__(self) -> str:
-        return '{}({})'.format(self.__class__.__name__, ','.join(self.subjects))
+        return '{} ({})'.format(self.__class__.__name__, ','.join(self.subjects))
 
 
 class ComposeSelection(SelectionStrategy):
