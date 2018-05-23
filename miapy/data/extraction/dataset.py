@@ -18,7 +18,7 @@ class ParameterizableDataset(data.Dataset):
         self.extractor = extractor
         self.transform = transform
         self.subject_subset = subject_subset
-        self.init_reader_once=init_reader_once
+        self.init_reader_once = init_reader_once
 
         self.indices = []
         self.reader = None
