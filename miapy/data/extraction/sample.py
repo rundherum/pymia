@@ -80,15 +80,17 @@ class WithForegroundSelection(SelectionStrategy):
 
 
 class SubjectSelection(SelectionStrategy):
-    """Select subjects by their name."""
+    """Select subjects by their name or index."""
 
-    def __init__(self, subjects: t.Union[str, tuple]) -> None:
+    def __init__(self, subjects) -> None:
+        if isinstance(subjects, int):
+            subjects = (subjects, )
         if isinstance(subjects, str):
             subjects = (subjects, )
         self.subjects = subjects
 
     def __call__(self, sample) -> bool:
-        return sample['subject'] in self.subjects
+        return sample['subject'] in self.subjects or sample['subject_index'] in self.subjects
 
     def __repr__(self) -> str:
         return '{} ({})'.format(self.__class__.__name__, ','.join(self.subjects))
