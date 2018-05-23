@@ -1,6 +1,31 @@
 """Enables the plotting of 3-dimensional visualizations.
 
 Use `conda install -c clinicalgraphics vtk` to install the required Visualization Toolkit (VTK) with anaconda.
+
+Examples:
+    
+    The first example computes the surface-to-surface distance of a unit sphere and unit cube.
+
+    >>> # create sphere and cube
+    >>> sphere = vtk.vtkSphereSource()
+    >>> sphere.SetPhiResolution(100)
+    >>> sphere.SetThetaResolution(100)
+    >>> cube = vtk.vtkCubeSource()
+    >>> 
+    >>> distance_filter = vtk.vtkDistancePolyDataFilter()
+    >>> distance_filter.SetInputConnection(0, sphere.GetOutputPort())
+    >>> distance_filter.SetInputConnection(1, cube.GetOutputPort())
+    >>> distance_filter.Update()
+    >>> distance = distance_filter.GetOutput()
+    
+    The second example computes the surface-to-surface distance of a prediction to a ground truth image.
+    >>> image1, transform1 = read_and_transform_image('PREDICTION.mha')
+    >>> image2, transform2 = read_and_transform_image('GROUND-TRUTH.mha')
+    >>> isocontour1 = compute_isocontour(image1)
+    >>> isocontour2 = compute_isocontour(image2)
+    >>> model = compute_surface_to_surface_distance(isocontour1, isocontour2)
+
+    
 """
 import pathlib
 
