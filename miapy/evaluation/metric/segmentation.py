@@ -1,173 +1,13 @@
-"""The metric module contains a set of evaluation metrics.
-
-The metrics are selected based on the paper of Taha 2016.
-Refer to the paper for guidelines how to select appropriate metrics, in-depth description,
-and the math.
-
-It is possible to implement your own metrics and use them with the :class:`evaluator.Evaluator`.
-Just inherit from :class:`metric.IMetric`, :class:`metric.IConfusionMatrixMetric` or :class:`ISimpleITKImageMetric`
-and implement the function :func:`calculate`.
-"""
 import abc
 import math
 
 import numpy as np
 import SimpleITK as sitk
 
-
-def get_all_metrics():
-    """Gets a list with all metrics.
-
-    Returns:
-        list[IMetric]: A list of metrics.
-    """
-    return get_overlap_metrics() + get_distance_metrics() + get_distance_metrics()
+import miapy.evaluation.metric as miapy_metric
 
 
-def get_overlap_metrics():
-    """Gets a list of overlap-based metrics.
-
-    Returns:
-        list[IMetric]: A list of metrics.
-    """
-    return [DiceCoefficient(),
-            JaccardCoefficient(),
-            AreaUnderCurve(),
-            CohenKappaMetric(),
-            RandIndex(),
-            AdjustedRandIndex(),
-            InterclassCorrelation(),
-            VolumeSimilarity(),
-            MutualInformation()]
-
-
-def get_distance_metrics():
-    """Gets a list of distance-based metrics.
-
-    Returns:
-        list[IMetric]: A list of metrics.
-    """
-
-    return [HausdorffDistance(),
-            AverageDistance(),
-            MahalanobisDistance(),
-            VariationOfInformation(),
-            GlobalConsistencyError(),
-            ProbabilisticDistance()]
-
-
-def get_classical_metrics():
-    """Gets a list of classical metrics.
-
-    Returns:
-        list[IMetric]: A list of metrics.
-    """
-
-    return[Sensitivity(),
-           Specificity(),
-           Precision(),
-           FMeasure(),
-           Accuracy(),
-           Fallout(),
-           TruePositive(),
-           FalsePositive(),
-           TrueNegative(),
-           FalseNegative(),
-           GroundTruthVolume(),
-           SegmentationVolume()]
-
-
-class ConfusionMatrix:
-    """Represents a confusion matrix (or error matrix)."""
-
-    def __init__(self, prediction, label):
-        """Initializes a new instance of the ConfusionMatrix class."""
-
-        # true positive (tp): we predict a label of 1 (positive), and the true label is 1
-        self.tp = np.sum(np.logical_and(prediction == 1, label == 1))
-        # true negative (tn): we predict a label of 0 (negative), and the true label is 0
-        self.tn = np.sum(np.logical_and(prediction == 0, label == 0))
-        # false positive (fp): we predict a label of 1 (positive), but the true label is 0
-        self.fp = np.sum(np.logical_and(prediction == 1, label == 0))
-        # false negative (fn): we predict a label of 0 (negative), but the true label is 1
-        self.fn = np.sum(np.logical_and(prediction == 0, label == 1))
-
-        self.n = prediction.size
-
-
-class IMetric(metaclass=abc.ABCMeta):
-    """Represents an evaluation metric."""
-
-    def __init__(self):
-        self.metric = 'IMetric'
-
-    @abc.abstractmethod
-    def calculate(self):
-        """Calculates the metric."""
-
-        raise NotImplementedError
-
-    def __str__(self):
-        """Gets a printable string representation.
-
-        Returns:
-            str: String representation.
-        """
-        return '{self.metric}' \
-            .format(self=self)
-
-
-class IConfusionMatrixMetric(IMetric):
-    """Represents an evaluation metric based on the confusion matrix."""
-
-    def __init__(self):
-        """Initializes a new instance of the IConfusionMatrixMetric class."""
-        super().__init__()
-        self.metric = 'IConfusionMatrixMetric'
-        self.confusion_matrix = None  # ConfusionMatrix
-
-    @abc.abstractmethod
-    def calculate(self):
-        """Calculates the metric."""
-
-        raise NotImplementedError
-
-
-class ISimpleITKImageMetric(IMetric):
-    """Represents an evaluation metric based on SimpleITK images."""
-
-    def __init__(self):
-        """Initializes a new instance of the ISimpleITKImageMetric class."""
-        super(ISimpleITKImageMetric, self).__init__()
-        self.metric = 'ISimpleITKImageMetric'
-        self.ground_truth = None  # SimpleITK.Image
-        self.segmentation = None  # SimpleITK.Image
-
-    @abc.abstractmethod
-    def calculate(self):
-        """Calculates the metric."""
-
-        raise NotImplementedError
-
-
-class INumpyArrayMetric(IMetric):
-    """Represents an evaluation metric based on numpy arrays."""
-
-    def __init__(self):
-        """Initializes a new instance of the INumpyArrayMetric class."""
-        super(INumpyArrayMetric, self).__init__()
-        self.metric = 'INumpyArrayMetric'
-        self.ground_truth = None  # np.ndarray
-        self.segmentation = None  # np.ndarray
-
-    @abc.abstractmethod
-    def calculate(self):
-        """Calculates the metric."""
-
-        raise NotImplementedError
-
-
-class AreaMetric(ISimpleITKImageMetric):
+class AreaMetric(miapy_metric.ISimpleITKImageMetric):
     """Represents an area metric."""
 
     def __init__(self):
@@ -198,7 +38,7 @@ class AreaMetric(ISimpleITKImageMetric):
         return img_arr[slice_number, ...].sum() * image.GetSpacing()[0] * image.GetSpacing()[1]
 
 
-class VolumeMetric(ISimpleITKImageMetric):
+class VolumeMetric(miapy_metric.ISimpleITKImageMetric):
     """Represents a volume metric."""
 
     def __init__(self):
@@ -225,7 +65,7 @@ class VolumeMetric(ISimpleITKImageMetric):
         return number_of_voxels * voxel_volume
 
 
-class Accuracy(IConfusionMatrixMetric):
+class Accuracy(miapy_metric.IConfusionMatrixMetric):
     """Represents an accuracy metric."""
 
     def __init__(self):
@@ -244,7 +84,7 @@ class Accuracy(IConfusionMatrixMetric):
             return 0
 
 
-class AdjustedRandIndex(IConfusionMatrixMetric):
+class AdjustedRandIndex(miapy_metric.IConfusionMatrixMetric):
     """Represents an adjusted rand index metric."""
 
     def __init__(self):
@@ -285,7 +125,7 @@ class AdjustedRandIndex(IConfusionMatrixMetric):
             return 0
 
 
-class AreaUnderCurve(IConfusionMatrixMetric):
+class AreaUnderCurve(miapy_metric.IConfusionMatrixMetric):
     """Represents an area under the curve metric."""
 
     def __init__(self):
@@ -305,7 +145,7 @@ class AreaUnderCurve(IConfusionMatrixMetric):
         return (true_positive_rate - false_positive_rate + 1) / 2
 
 
-class AverageDistance(ISimpleITKImageMetric):
+class AverageDistance(miapy_metric.ISimpleITKImageMetric):
     """Represents an average (Hausdorff) distance metric.
 
         Calculates the distance between the set of non-zero pixels of two images using the following equation:
@@ -332,7 +172,7 @@ class AverageDistance(ISimpleITKImageMetric):
         return distance_filter.GetAverageHausdorffDistance()
 
 
-class CohenKappaMetric(IConfusionMatrixMetric):
+class CohenKappaMetric(miapy_metric.IConfusionMatrixMetric):
     """Represents a Cohen's kappa coefficient metric."""
 
     def __init__(self):
@@ -357,7 +197,7 @@ class CohenKappaMetric(IConfusionMatrixMetric):
         return (agreement - chance) / (sum_ - chance)
 
 
-class DiceCoefficient(IConfusionMatrixMetric):
+class DiceCoefficient(miapy_metric.IConfusionMatrixMetric):
     """Represents a Dice coefficient metric."""
 
     def __init__(self):
@@ -372,7 +212,7 @@ class DiceCoefficient(IConfusionMatrixMetric):
                (2 * self.confusion_matrix.tp + self.confusion_matrix.fp + self.confusion_matrix.fn)
 
 
-class FalseNegative(IConfusionMatrixMetric):
+class FalseNegative(miapy_metric.IConfusionMatrixMetric):
     """Represents a false negative metric."""
 
     def __init__(self):
@@ -386,7 +226,7 @@ class FalseNegative(IConfusionMatrixMetric):
         return self.confusion_matrix.fn
 
 
-class FalsePositive(IConfusionMatrixMetric):
+class FalsePositive(miapy_metric.IConfusionMatrixMetric):
     """Represents a false positive metric."""
 
     def __init__(self):
@@ -400,7 +240,7 @@ class FalsePositive(IConfusionMatrixMetric):
         return self.confusion_matrix.fp
 
 
-class Fallout(IConfusionMatrixMetric):
+class Fallout(miapy_metric.IConfusionMatrixMetric):
     """Represents a fallout (false positive rate) metric."""
 
     def __init__(self):
@@ -415,7 +255,7 @@ class Fallout(IConfusionMatrixMetric):
         return 1 - specificity
 
 
-class FalseNegativeRate(IConfusionMatrixMetric):
+class FalseNegativeRate(miapy_metric.IConfusionMatrixMetric):
     """Represents a false negative rate metric."""
 
     def __init__(self):
@@ -429,7 +269,7 @@ class FalseNegativeRate(IConfusionMatrixMetric):
         return 1 - sensitivity
 
 
-class FMeasure(IConfusionMatrixMetric):
+class FMeasure(miapy_metric.IConfusionMatrixMetric):
     """Represents a F-measure metric."""
 
     def __init__(self):
@@ -458,7 +298,7 @@ class FMeasure(IConfusionMatrixMetric):
             return 0
 
 
-class GlobalConsistencyError(IConfusionMatrixMetric):
+class GlobalConsistencyError(miapy_metric.IConfusionMatrixMetric):
     """Represents a global consistency error metric.
 
     Implementation based on Martin 2001.
@@ -484,7 +324,7 @@ class GlobalConsistencyError(IConfusionMatrixMetric):
         return min(e1, e2)
 
 
-class HausdorffDistance(ISimpleITKImageMetric):
+class HausdorffDistance(miapy_metric.ISimpleITKImageMetric):
     """Represents a Hausdorff distance metric.
 
     Calculates the distance between the set of non-zero pixels of two images using the following equation:
@@ -511,7 +351,7 @@ class HausdorffDistance(ISimpleITKImageMetric):
         return distance_filter.GetHausdorffDistance()
 
 
-class InterclassCorrelation(INumpyArrayMetric):
+class InterclassCorrelation(miapy_metric.INumpyArrayMetric):
     """Represents a interclass correlation metric."""
 
     def __init__(self):
@@ -540,7 +380,7 @@ class InterclassCorrelation(INumpyArrayMetric):
         return (ssb - ssw) / (ssb + ssw)
 
 
-class JaccardCoefficient(IConfusionMatrixMetric):
+class JaccardCoefficient(miapy_metric.IConfusionMatrixMetric):
     """Represents a Jaccard coefficient metric."""
 
     def __init__(self):
@@ -592,7 +432,7 @@ class GroundTruthVolume(VolumeMetric):
         return self._calculate_volume(self.ground_truth)
 
 
-class MahalanobisDistance(INumpyArrayMetric):
+class MahalanobisDistance(miapy_metric.INumpyArrayMetric):
     """Represents a Mahalanobis distance metric."""
 
     def __init__(self):
@@ -622,7 +462,7 @@ class MahalanobisDistance(INumpyArrayMetric):
         return math.sqrt(mean * np.matrix(common_cov_inv) * mean.T)
 
 
-class MutualInformation(IConfusionMatrixMetric):
+class MutualInformation(miapy_metric.IConfusionMatrixMetric):
     """Represents a mutual information metric."""
 
     def __init__(self):
@@ -662,7 +502,7 @@ class MutualInformation(IConfusionMatrixMetric):
         return mi
 
 
-class Precision(IConfusionMatrixMetric):
+class Precision(miapy_metric.IConfusionMatrixMetric):
     """Represents a precision metric."""
 
     def __init__(self):
@@ -715,7 +555,7 @@ class SegmentationVolume(VolumeMetric):
         return self._calculate_volume(self.segmentation)
 
 
-class ProbabilisticDistance(INumpyArrayMetric):
+class ProbabilisticDistance(miapy_metric.INumpyArrayMetric):
     """Represents a probabilistic distance metric."""
 
     def __init__(self):
@@ -738,7 +578,7 @@ class ProbabilisticDistance(INumpyArrayMetric):
             return -1
 
 
-class RandIndex(IConfusionMatrixMetric):
+class RandIndex(miapy_metric.IConfusionMatrixMetric):
     """Represents a rand index metric."""
 
     def __init__(self):
@@ -771,7 +611,7 @@ class RandIndex(IConfusionMatrixMetric):
         return (a + d) / (a + b + c + d)
 
 
-class Recall(IConfusionMatrixMetric):
+class Recall(miapy_metric.IConfusionMatrixMetric):
     """Represents a recall metric."""
 
     def __init__(self):
@@ -790,7 +630,7 @@ class Recall(IConfusionMatrixMetric):
             return 0
 
 
-class Sensitivity(IConfusionMatrixMetric):
+class Sensitivity(miapy_metric.IConfusionMatrixMetric):
     """Represents a sensitivity (true positive rate or recall) metric."""
 
     def __init__(self):
@@ -804,7 +644,7 @@ class Sensitivity(IConfusionMatrixMetric):
         return self.confusion_matrix.tp / (self.confusion_matrix.tp + self.confusion_matrix.fn)
 
 
-class Specificity(IConfusionMatrixMetric):
+class Specificity(miapy_metric.IConfusionMatrixMetric):
     """Represents a specificity metric."""
 
     def __init__(self):
@@ -818,7 +658,7 @@ class Specificity(IConfusionMatrixMetric):
         return self.confusion_matrix.tn / (self.confusion_matrix.tn + self.confusion_matrix.fp)
 
 
-class TrueNegative(IConfusionMatrixMetric):
+class TrueNegative(miapy_metric.IConfusionMatrixMetric):
     """Represents a true negative metric."""
 
     def __init__(self):
@@ -832,7 +672,7 @@ class TrueNegative(IConfusionMatrixMetric):
         return self.confusion_matrix.tn
 
 
-class TruePositive(IConfusionMatrixMetric):
+class TruePositive(miapy_metric.IConfusionMatrixMetric):
     """Represents a true positive metric."""
 
     def __init__(self):
@@ -846,7 +686,7 @@ class TruePositive(IConfusionMatrixMetric):
         return self.confusion_matrix.tp
 
 
-class VariationOfInformation(IConfusionMatrixMetric):
+class VariationOfInformation(miapy_metric.IConfusionMatrixMetric):
     """Represents a variation of information metric."""
 
     def __init__(self):
@@ -888,7 +728,7 @@ class VariationOfInformation(IConfusionMatrixMetric):
         return vi
 
 
-class VolumeSimilarity(IConfusionMatrixMetric):
+class VolumeSimilarity(miapy_metric.IConfusionMatrixMetric):
     """Represents a volume similarity metric."""
 
     def __init__(self):
