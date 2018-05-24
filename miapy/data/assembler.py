@@ -18,7 +18,12 @@ def numpy_zeros(shape: tuple, id_: str):
 
 
 class SubjectAssembler(Assembler):
-    """Assembles predictions of one or multiple subjects."""
+    """Assembles predictions of one or multiple subjects.
+
+    Assumes that the network output, i.e. to_assemble, is of shape (B, ..., C)
+    where B is the batch size and C is the numbers of channels (must be at least 1). ... refers to the arbitrary image
+    dimension.
+    """
 
     def __init__(self, zero_fn=numpy_zeros):
         self.predictions = {}
@@ -73,7 +78,7 @@ class SubjectAssembler(Assembler):
         subject_prediction = {}
         for key in to_assemble:
             subject_shape = batch['shape'][idx]
-            if to_assemble[key].ndim > len(subject_shape) and to_assemble[key].shape[-1] > 1:
+            if to_assemble[key].shape[-1] > 1:
                 subject_shape += (to_assemble[key].shape[-1],)
             subject_prediction[key] = self.zero_fn(subject_shape, key)
         return subject_prediction
