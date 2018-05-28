@@ -12,7 +12,7 @@ import abc
 
 import numpy as np
 
-from .regression import (MeanAbsoluteError, MeanSquaredError, RootMeanSquaredError)
+from .regression import (CoefficientOfDetermination, MeanAbsoluteError, MeanSquaredError, RootMeanSquaredError)
 from .segmentation import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageDistance, CohenKappaMetric,
                            DiceCoefficient, FalseNegative, FalsePositive, Fallout, FMeasure,
                            GlobalConsistencyError, GroundTruthVolume, HausdorffDistance,
@@ -37,7 +37,7 @@ def get_all_regression_metrics():
     Returns:
         list[IMetric]: A list of metrics.
     """
-    return [MeanAbsoluteError(), MeanSquaredError(), RootMeanSquaredError()]
+    return [CoefficientOfDetermination(), MeanAbsoluteError(), MeanSquaredError(), RootMeanSquaredError()]
 
 
 def get_overlap_metrics():
