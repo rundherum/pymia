@@ -324,6 +324,40 @@ class GlobalConsistencyError(miapy_metric.IConfusionMatrixMetric):
         return min(e1, e2)
 
 
+class GroundTruthArea(AreaMetric):
+    """Represents a ground truth area metric."""
+
+    def __init__(self, slice_number: int=-1):
+        """Initializes a new instance of the GroundTruthArea class.
+
+        Args:
+            slice_number (int): The slice number to calculate the area.
+                Defaults to -1, which will calculate the area on the intermediate slice.
+        """
+        super().__init__()
+        self.metric = 'GTAREA'
+        self.slice_number = slice_number
+
+    def calculate(self):
+        """Calculates the ground truth area on a specified slice in mm2."""
+
+        return self._calculate_area(self.ground_truth, self.slice_number)
+
+
+class GroundTruthVolume(VolumeMetric):
+    """Represents a ground truth volume metric."""
+
+    def __init__(self):
+        """Initializes a new instance of the GroundTruthVolume class."""
+        super().__init__()
+        self.metric = 'GTVOL'
+
+    def calculate(self):
+        """Calculates the ground truth volume in mm3."""
+
+        return self._calculate_volume(self.ground_truth)
+
+
 class HausdorffDistance(miapy_metric.ISimpleITKImageMetric):
     """Represents a Hausdorff distance metric.
 
@@ -396,40 +430,6 @@ class JaccardCoefficient(miapy_metric.IConfusionMatrixMetric):
         fn = self.confusion_matrix.fn
 
         return tp / (tp + fp + fn)
-
-
-class GroundTruthArea(AreaMetric):
-    """Represents a ground truth area metric."""
-
-    def __init__(self, slice_number: int=-1):
-        """Initializes a new instance of the GroundTruthArea class.
-
-        Args:
-            slice_number (int): The slice number to calculate the area.
-                Defaults to -1, which will calculate the area on the intermediate slice.
-        """
-        super().__init__()
-        self.metric = 'GTAREA'
-        self.slice_number = slice_number
-
-    def calculate(self):
-        """Calculates the ground truth area on a specified slice in mm2."""
-
-        return self._calculate_area(self.ground_truth, self.slice_number)
-
-
-class GroundTruthVolume(VolumeMetric):
-    """Represents a ground truth volume metric."""
-
-    def __init__(self):
-        """Initializes a new instance of the GroundTruthVolume class."""
-        super().__init__()
-        self.metric = 'GTVOL'
-
-    def calculate(self):
-        """Calculates the ground truth volume in mm3."""
-
-        return self._calculate_volume(self.ground_truth)
 
 
 class MahalanobisDistance(miapy_metric.INumpyArrayMetric):
@@ -521,40 +521,6 @@ class Precision(miapy_metric.IConfusionMatrixMetric):
             return 0
 
 
-class SegmentationArea(AreaMetric):
-    """Represents a segmentation area metric."""
-
-    def __init__(self, slice_number: int = -1):
-        """Initializes a new instance of the SegmentationArea class.
-
-        Args:
-            slice_number (int): The slice number to calculate the area.
-                Defaults to -1, which will calculate the area on the intermediate slice.
-        """
-        super().__init__()
-        self.metric = 'SEGAREA'
-        self.slice_number = slice_number
-
-    def calculate(self):
-        """Calculates the segmentation area on a specified slice in mm2."""
-
-        return self._calculate_area(self.segmentation, self.slice_number)
-
-
-class SegmentationVolume(VolumeMetric):
-    """Represents a segmentation volume metric."""
-
-    def __init__(self):
-        """Initializes a new instance of the SegmentationVolume class."""
-        super().__init__()
-        self.metric = 'SEGVOL'
-
-    def calculate(self):
-        """Calculates the segmented volume in mm3."""
-
-        return self._calculate_volume(self.segmentation)
-
-
 class ProbabilisticDistance(miapy_metric.INumpyArrayMetric):
     """Represents a probabilistic distance metric."""
 
@@ -628,6 +594,40 @@ class Recall(miapy_metric.IConfusionMatrixMetric):
             return self.confusion_matrix.tp / sum_
         else:
             return 0
+
+
+class SegmentationArea(AreaMetric):
+    """Represents a segmentation area metric."""
+
+    def __init__(self, slice_number: int = -1):
+        """Initializes a new instance of the SegmentationArea class.
+
+        Args:
+            slice_number (int): The slice number to calculate the area.
+                Defaults to -1, which will calculate the area on the intermediate slice.
+        """
+        super().__init__()
+        self.metric = 'SEGAREA'
+        self.slice_number = slice_number
+
+    def calculate(self):
+        """Calculates the segmentation area on a specified slice in mm2."""
+
+        return self._calculate_area(self.segmentation, self.slice_number)
+
+
+class SegmentationVolume(VolumeMetric):
+    """Represents a segmentation volume metric."""
+
+    def __init__(self):
+        """Initializes a new instance of the SegmentationVolume class."""
+        super().__init__()
+        self.metric = 'SEGVOL'
+
+    def calculate(self):
+        """Calculates the segmented volume in mm3."""
+
+        return self._calculate_volume(self.segmentation)
 
 
 class Sensitivity(miapy_metric.IConfusionMatrixMetric):

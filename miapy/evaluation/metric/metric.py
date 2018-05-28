@@ -15,10 +15,11 @@ import numpy as np
 from .regression import (MeanAbsoluteError, MeanSquaredError, RootMeanSquaredError)
 from .segmentation import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageDistance, CohenKappaMetric,
                            DiceCoefficient, FalseNegative, FalsePositive, Fallout, FMeasure,
-                           GlobalConsistencyError, GroundTruthVolume, HausdorffDistance, InterclassCorrelation,
-                           JaccardCoefficient, MahalanobisDistance, MutualInformation, Precision,
-                           ProbabilisticDistance, RandIndex, SegmentationVolume, Sensitivity, Specificity,
-                           TrueNegative, TruePositive, VariationOfInformation, VolumeSimilarity)
+                           GlobalConsistencyError, GroundTruthVolume, HausdorffDistance,
+                           InterclassCorrelation, JaccardCoefficient, MahalanobisDistance, MutualInformation, Precision,
+                           ProbabilisticDistance, RandIndex, Recall, SegmentationVolume,
+                           Sensitivity, Specificity, TrueNegative, TruePositive,
+                           VariationOfInformation, VolumeSimilarity)
 
 
 def get_all_segmentation_metrics():
@@ -81,6 +82,7 @@ def get_classical_metrics():
     return[Sensitivity(),
            Specificity(),
            Precision(),
+           Recall(),
            FMeasure(),
            Accuracy(),
            Fallout(),
