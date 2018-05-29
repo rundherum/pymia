@@ -1,6 +1,6 @@
+from .base import (ConfusionMatrix, IMetric, IConfusionMatrixMetric, ISimpleITKImageMetric, INumpyArrayMetric)
 from .metric import (get_all_segmentation_metrics, get_all_regression_metrics, get_overlap_metrics, get_distance_metrics,
-                     get_classical_metrics,
-                     ConfusionMatrix, IMetric, IConfusionMatrixMetric, ISimpleITKImageMetric, INumpyArrayMetric)
+                     get_classical_metrics)
 
 from .regression import (CoefficientOfDetermination, MeanAbsoluteError, MeanSquaredError, RootMeanSquaredError)
 from .segmentation import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageDistance, CohenKappaMetric,

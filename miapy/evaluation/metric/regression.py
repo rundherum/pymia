@@ -1,9 +1,9 @@
 import numpy as np
 
-import miapy.evaluation.metric as miapy_metric
+from .base import INumpyArrayMetric
 
 
-class MeanAbsoluteError(miapy_metric.INumpyArrayMetric):
+class MeanAbsoluteError(INumpyArrayMetric):
     """Represents a mean absolute error metric."""
 
     def __init__(self):
@@ -17,7 +17,7 @@ class MeanAbsoluteError(miapy_metric.INumpyArrayMetric):
         return np.mean(np.abs(self.ground_truth - self.segmentation))
 
 
-class MeanSquaredError(miapy_metric.INumpyArrayMetric):
+class MeanSquaredError(INumpyArrayMetric):
     """Represents a mean squared error metric."""
 
     def __init__(self):
@@ -31,7 +31,7 @@ class MeanSquaredError(miapy_metric.INumpyArrayMetric):
         return np.mean(np.square(self.ground_truth - self.segmentation))
 
 
-class RootMeanSquaredError(miapy_metric.INumpyArrayMetric):
+class RootMeanSquaredError(INumpyArrayMetric):
     """Represents a root mean squared error metric."""
 
     def __init__(self):
@@ -45,7 +45,7 @@ class RootMeanSquaredError(miapy_metric.INumpyArrayMetric):
         return np.sqrt(np.mean(np.square(self.ground_truth - self.segmentation)))
 
 
-class CoefficientOfDetermination(miapy_metric.INumpyArrayMetric):
+class CoefficientOfDetermination(INumpyArrayMetric):
     """Represents a coefficient of determination (R^2) error metric."""
 
     def __init__(self):
