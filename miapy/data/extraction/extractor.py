@@ -150,7 +150,7 @@ class SelectiveDataExtractor(Extractor):
             self.entry_base_names = [entry.rsplit('/', maxsplit=1)[1] for entry in entries]
 
         if not reader.has(df.DATA_PLACEHOLDER.format(self.category)):
-            raise ValueError('FullSubjectExtractor requires {} to exist'.format(self.category))
+            raise ValueError('SelectiveDataExtractor requires {} to exist'.format(self.category))
 
         subject_index = params['subject_index']
         index_expr = params['index_expr']
