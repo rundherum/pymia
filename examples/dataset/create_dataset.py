@@ -26,7 +26,7 @@ class FileTypes(enum.Enum):
 
 class LoadData(file_load.Load):
 
-    def __call__(self, file_name: str, id_: str, category: str) -> \
+    def __call__(self, file_name: str, id_: str, category: str, subject_id: str) -> \
             typing.Tuple[np.ndarray, typing.Union[conv.ImageProperties, None]]:
         if id_ == FileTypes.AGE.name:
             with open(file_name, 'r') as f:
