@@ -172,6 +172,28 @@ class Relabel(Transform):
         return sample
 
 
+class Reshape(Transform):
+
+    def __init__(self, shapes: dict) -> None:
+        """Initializes a new instance of the Reshape class.
+
+        Args:
+            shapes (dict): A dict with keys being the entries and the values the new shapes of the entries.
+                E.g. shapes = {'images': (-1, 4), 'labels' : (-1, 1)}
+        """
+        super().__init__()
+        self.shapes = shapes
+
+    def __call__(self, sample: dict) -> dict:
+        for entry in self.shapes:
+            if entry not in sample:
+                continue
+
+            np_entry = _check_and_return(sample[entry], np.ndarray)
+            sample[entry] = np.reshape(np_entry, self.shapes[entry])
+        return sample
+
+
 class ToTorchTensor(Transform):
 
     def __init__(self, entries=('images', 'labels')) -> None:
@@ -217,6 +239,22 @@ class Squeeze(Transform):
 
             np_entry = _check_and_return(sample[entry], np.ndarray)
             sample[entry] = np_entry.squeeze()
+        return sample
+
+
+class UnSqueeze(Transform):
+
+    def __init__(self, entries=('images', 'labels')) -> None:
+        super().__init__()
+        self.entries = entries
+
+    def __call__(self, sample: dict) -> dict:
+        for entry in self.entries:
+            if entry not in sample:
+                continue
+
+            np_entry = _check_and_return(sample[entry], np.ndarray)
+            sample[entry] = np.expand_dims(np_entry, -1)
         return sample
 
 
