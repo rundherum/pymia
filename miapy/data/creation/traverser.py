@@ -48,7 +48,7 @@ class SubjectFileTraverser(Traverser):
                 category_list = []
                 category_property = None  # type: conv.ImageProperties
                 for id_, file_path in subject_file.categories[category].entries.items():
-                    np_data, data_property = load(file_path, id_, category)
+                    np_data, data_property = load(file_path, id_, category, subject_file.subject)
                     category_list.append(np_data)
                     if category_property is None:  # only required once
                         category_property = data_property
