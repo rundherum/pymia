@@ -1,5 +1,6 @@
 import abc
 import pickle
+import typing as t
 
 import numpy as np
 import SimpleITK as sitk
@@ -129,6 +130,7 @@ class FilesExtractor(Extractor):
                                                                  subject_index_expr)
 
 
+# todo: make simpler and put this special case to alain's code base
 class SelectiveDataExtractor(Extractor):
 
     def __init__(self, gt_mode='all', gt_selection=None, entire_subject=False, category='labels') -> None:
@@ -226,3 +228,47 @@ class DataExtractor(Extractor):
             else:
                 data = reader.read('{}/{}'.format(df.DATA_PLACEHOLDER.format(category), base_name), index_expr)
             extracted[category] = data
+
+
+class PadPatchDataExtractor(Extractor):
+
+    def __init__(self, padding: t.Union[tuple, t.List[tuple]], categories=('images',)) -> None:
+        super().__init__()
+        self.categories = categories
+        self.entry_base_names = None
+
+        if isinstance(padding, tuple):
+            padding = [(pad, pad) for pad in padding]
+        index_diffs = np.asarray(padding)
+        index_diffs[:, 0] = -index_diffs[:, 0]
+        self.index_diffs = index_diffs
+
+    def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
+        if self.entry_base_names is None:
+            entries = reader.get_subject_entries()
+            self.entry_base_names = [entry.rsplit('/', maxsplit=1)[1] for entry in entries]
+
+        subject_index = params['subject_index']
+        index_expr = params['index_expr']  # type: expr.IndexExpression
+        padded_indexing = np.asarray(index_expr.get_indexing()) + self.index_diffs
+
+        padded_shape = tuple((padded_indexing[:, 1] - padded_indexing[:, 0]).tolist())
+
+        sub_indexing = padded_indexing.copy()
+        sub_indexing[padded_indexing > 0] = 0
+        sub_indexing = -sub_indexing
+
+        padded_indexing[padded_indexing < 0] = 0  # cannot slice outside the boundary
+        padded_index_expr = expr.IndexExpression(padded_indexing.tolist())
+
+        base_name = self.entry_base_names[subject_index]
+        for category in self.categories:
+            data = reader.read('{}/{}'.format(df.DATA_PLACEHOLDER.format(category), base_name), padded_index_expr)
+
+            full_pad_shape = padded_shape + data.shape[len(padded_shape):]
+            pad_data = np.zeros(full_pad_shape, dtype=data.dtype)
+            sub_indexing[:, 1] = sub_indexing[:, 0] + data.shape[:sub_indexing.shape[0]]
+            sub_index_expr = expr.IndexExpression(sub_indexing.tolist())
+
+            pad_data[sub_index_expr.expression] = data
+            extracted[category] = pad_data

@@ -63,3 +63,32 @@ class VoxelWiseIndexing(IndexingStrategy):
         indices = indices.transpose()
         self.indexing = [expr.IndexExpression(idx.tolist()) for idx in indices]
         return self.indexing
+
+
+class PatchWiseIndexing(IndexingStrategy):
+
+    def __init__(self, patch_shape: tuple, image_dimension: int, ignore_incomplete=True) -> None:
+        super().__init__()
+        self.patch_shape = patch_shape
+        self.image_dimension = image_dimension
+        self.ignore_incomplete = ignore_incomplete
+        self.prev_shape = None
+        self.prev_indexing = None
+
+    def __call__(self, shape) -> t.List[expr.IndexExpression]:
+        if shape == self.prev_shape:
+            return self.prev_indexing
+
+        shape_without_voxel = shape[:self.image_dimension]
+        index_count = np.divide(shape_without_voxel, self.patch_shape)
+        index_count = np.floor(index_count) if self.ignore_incomplete else np.ceil(index_count)
+        index_count = index_count.astype('int')
+
+        indices = np.indices(index_count).reshape(index_count.size, -1).T
+        index_ranges = np.stack([indices, indices + 1], axis=-1)
+        index_ranges *= np.asarray(self.patch_shape)[np.newaxis, :, np.newaxis]
+        indexing = [expr.IndexExpression(idx.tolist()) for idx in index_ranges]
+
+        self.prev_indexing = indexing
+        self.prev_shape = shape
+        return indexing
