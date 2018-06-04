@@ -67,10 +67,17 @@ class VoxelWiseIndexing(IndexingStrategy):
 
 class PatchWiseIndexing(IndexingStrategy):
 
-    def __init__(self, patch_shape: tuple, image_dimension: int, ignore_incomplete=True) -> None:
+    def __init__(self, patch_shape: tuple, ignore_incomplete=True) -> None:
+        """
+
+        Args:
+            patch_shape (tuple):
+            ignore_incomplete (bool): If even division of image by patch shape ignore incomplete patch on True.
+                Boundary condition.
+        """
         super().__init__()
         self.patch_shape = patch_shape
-        self.image_dimension = image_dimension
+        self.image_dimension = len(patch_shape)
         self.ignore_incomplete = ignore_incomplete
         self.prev_shape = None
         self.prev_indexing = None
@@ -92,3 +99,8 @@ class PatchWiseIndexing(IndexingStrategy):
         self.prev_indexing = indexing
         self.prev_shape = shape
         return indexing
+
+    def __repr__(self) -> str:
+        return '{} (patch shape={}, ignore incomplete={})'.format(self.__class__.__name__,
+                                                                  self.patch_shape,
+                                                                  self.ignore_incomplete)
