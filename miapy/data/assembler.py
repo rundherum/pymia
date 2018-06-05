@@ -78,8 +78,7 @@ class SubjectAssembler(Assembler):
         subject_prediction = {}
         for key in to_assemble:
             subject_shape = batch['shape'][idx]
-            if to_assemble[key].shape[-1] > 1:
-                subject_shape += (to_assemble[key].shape[-1],)
+            subject_shape += (to_assemble[key].shape[-1],)
             subject_prediction[key] = self.zero_fn(subject_shape, key)
         return subject_prediction
 
