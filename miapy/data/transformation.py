@@ -51,11 +51,12 @@ class IntensityRescale(Transform):
 
     @staticmethod
     def _normalize(arr: np.ndarray, lower, upper):
+        dtype = arr.dtype
         min_, max_ = arr.min(), arr.max()
         if min_ == max_:
             raise ValueError('cannot normalize when min == max')
         arr = (arr - min_) / (max_ - min_) * (upper - lower) + lower
-        return arr
+        return arr.astype(dtype)
 
 
 class IntensityNormalization(Transform):
