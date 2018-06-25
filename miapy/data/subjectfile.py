@@ -1,12 +1,3 @@
-import enum
-
-
-# class FileType(enum.Enum):
-#     IMAGE = 1
-#     LABEL = 2
-#     SUPPLEMENTARY = 3
-
-
 class FileCategory:
     def __init__(self, entries=None) -> None:
         if entries is None:
