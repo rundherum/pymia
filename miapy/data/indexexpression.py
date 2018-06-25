@@ -38,6 +38,7 @@ class IndexExpression:
 
     def get_indexing(self):
         indexing = []
+        # todo(alainjungo): handle case when self.expression is of type slice
         for index in self.expression:
             if index is None:
                 indexing.append(None)
