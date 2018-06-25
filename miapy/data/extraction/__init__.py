@@ -2,8 +2,8 @@ from .reader import (Reader, Hdf5Reader, get_reader)
 from .indexing import (IndexingStrategy, SliceIndexing, VoxelWiseIndexing, EmptyIndexing, PatchWiseIndexing)
 from .dataset import ParameterizableDataset
 from .extractor import (Extractor, DataExtractor, FilesExtractor, NamesExtractor, SubjectExtractor, IndexingExtractor,
-                        SelectiveDataExtractor, ComposeExtractor, ImagePropertiesExtractor, PadPatchDataExtractor,
-                        ImageShapeExtractor)
+                        SelectiveDataExtractor, RandomDataExtractor, ComposeExtractor,
+                        ImagePropertiesExtractor, PadPatchDataExtractor, ImageShapeExtractor)
 from .sample import (select_indices, SubsetSequentialSampler, NonBlackSelection, SelectionStrategy, ComposeSelection,
                      SubjectSelection, WithForegroundSelection, PercentileSelection, NonConstantSelection)
 

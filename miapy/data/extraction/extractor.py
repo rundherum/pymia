@@ -12,6 +12,7 @@ from . import reader as rd
 
 
 class Extractor(metaclass=abc.ABCMeta):
+    """Represents an extractor that extracts data from a dataset."""
 
     @abc.abstractmethod
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
@@ -19,6 +20,7 @@ class Extractor(metaclass=abc.ABCMeta):
 
 
 class ComposeExtractor(Extractor):
+    """Composes multiple Extractor objects."""
 
     def __init__(self, extractors) -> None:
         super().__init__()
@@ -30,8 +32,12 @@ class ComposeExtractor(Extractor):
 
 
 class NamesExtractor(Extractor):
+    """Extracts the names of the entries within a category (i.e. the name of the enum identifying the data).
 
-    def __init__(self, cache=True, categories=('images', 'labels')) -> None:
+    The names are of type str.
+    """
+
+    def __init__(self, cache: bool=True, categories=('images', 'labels')) -> None:
         super().__init__()
         self.cache = cache
         self.cached_result = None
@@ -55,6 +61,10 @@ class NamesExtractor(Extractor):
 
 
 class SubjectExtractor(Extractor):
+    """Extracts the subject's identification.
+
+    The subject's identification is of type str.
+    """
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
         extracted['subject_index'] = params['subject_index']
@@ -63,6 +73,10 @@ class SubjectExtractor(Extractor):
 
 
 class IndexingExtractor(Extractor):
+    """Extracts the index expression.
+
+    The index expression is of type IndexExpression.
+    """
 
     def __init__(self, do_pickle=False) -> None:
         super().__init__()
@@ -78,7 +92,10 @@ class IndexingExtractor(Extractor):
 
 
 class ImagePropertiesExtractor(Extractor):
-    """Extracts the image properties."""
+    """Extracts the image properties.
+
+    The image properties are of type ImageProperties.
+    """
 
     def __init__(self, do_pickle=False) -> None:
         super().__init__()
@@ -107,8 +124,12 @@ class ImagePropertiesExtractor(Extractor):
 
 
 class FilesExtractor(Extractor):
+    """Extracts the file paths.
 
-    def __init__(self, cache=True, categories=('images', 'labels')) -> None:
+    The file paths are of type str.
+    """
+
+    def __init__(self, cache: bool=True, categories=('images', 'labels')) -> None:
         super().__init__()
         self.cache = cache
         self.cached_file_root = None
@@ -130,23 +151,29 @@ class FilesExtractor(Extractor):
                                                                  subject_index_expr)
 
 
-# todo: make simpler and put this special case to alain's code base
 class SelectiveDataExtractor(Extractor):
+    """Extracts data of a given category selectively."""
 
-    def __init__(self, gt_mode='all', gt_selection=None, entire_subject=False, category='labels') -> None:
+    def __init__(self, selection=None, category: str='labels') -> None:
+        """Initializes a new instance of the SelectiveDataExtractor class.
+
+        Args:
+            selection (str or tuple): Entries within the category to select.
+                If selection is None, the class has the same behaviour as the DataExtractor and selects all entries.
+            category (str): The category to extract data from.
+        """
         super().__init__()
         self.entry_base_names = None
-        if gt_mode not in ('all', 'random', 'select'):
-            raise ValueError('gt_mode must be "all", "random", or "select"')
 
-        self.gt_mode = gt_mode
-        if isinstance(gt_selection, str):
-            gt_selection = (gt_selection,)
-        self.gt_selection = gt_selection
-        self.entire_subject = entire_subject
+        if isinstance(selection, str):
+            selection = (selection,)
+        self.selection = selection
         self.category = category
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
+        if '{}_names'.format(self.category) not in extracted:
+            raise ValueError('selection of labels requires label_names to be extracted (use NamesExtractor)')
+
         if self.entry_base_names is None:
             entries = reader.get_subject_entries()
             self.entry_base_names = [entry.rsplit('/', maxsplit=1)[1] for entry in entries]
@@ -158,33 +185,61 @@ class SelectiveDataExtractor(Extractor):
         index_expr = params['index_expr']
 
         base_name = self.entry_base_names[subject_index]
+        data = reader.read('{}/{}'.format(df.DATA_PLACEHOLDER.format(self.category), base_name), index_expr)
+        label_names = extracted['{}_names'.format(self.category)]  # type: list
 
-        if self.entire_subject:
-            np_gts = reader.read('{}/{}'.format(df.DATA_PLACEHOLDER.format(self.category), base_name))
+        if self.selection is None:
+            extracted[self.category] = data
         else:
-            np_gts = reader.read('{}/{}'.format(df.DATA_PLACEHOLDER.format(self.category), base_name), index_expr)
+            selection_indices = np.array([label_names.index(s) for s in self.selection])
+            extracted[self.category] = np.take(data, selection_indices, axis=-1)
 
-        if self.gt_mode != 'all':
-            if '{}_names'.format(self.category) not in extracted:
-                raise ValueError('selection of labels requires label_names to be extracted (use NamesExtractor)')
-            label_names = extracted['{}_names'.format(self.category)]  # type: list
-            if self.gt_mode == 'random':
-                selection_indices = [label_names.index(s) for s in self.gt_selection]
-                index = np.random.choice(selection_indices)
-            elif self.gt_mode == 'select' and isinstance(self.gt_selection, (tuple, list)):
-                selection_indices = np.array([label_names.index(s) for s in self.gt_selection])
-                extracted[self.category] = np.take(np_gts, selection_indices, axis=-1)
-                return
-            else:
-                # mode == 'select'
-                index = label_names.index(self.gt_selection[0])
 
-            # todo: inverse index_expr in order to add index to it
-            np_gts = np_gts[..., index]
-            # maintaining gt dims
-            np_gts = np.expand_dims(np_gts, -1)
+class RandomDataExtractor(Extractor):
+    """Extracts data of a given category randomly."""
 
-        extracted[self.category] = np_gts
+    def __init__(self, selection=None, category: str='labels') -> None:
+        """Initializes a new instance of the RandomDataExtractor class.
+
+        Args:
+            selection (str or tuple): Entries within the category to select an entry randomly from.
+                If selection is None, an entry from all entries is randomly selected.
+            selection (str or tuple): Note that if selection is None, all keys are considered.
+            category (str): The category to extract data from.
+        """
+        super().__init__()
+        self.entry_base_names = None
+
+        if isinstance(selection, str):
+            selection = (selection,)
+        self.selection = selection
+        self.category = category
+
+    def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
+        if '{}_names'.format(self.category) not in extracted:
+            raise ValueError('selection of labels requires label_names to be extracted (use NamesExtractor)')
+
+        if self.entry_base_names is None:
+            entries = reader.get_subject_entries()
+            self.entry_base_names = [entry.rsplit('/', maxsplit=1)[1] for entry in entries]
+
+        if not reader.has(df.DATA_PLACEHOLDER.format(self.category)):
+            raise ValueError('SelectiveDataExtractor requires {} to exist'.format(self.category))
+
+        subject_index = params['subject_index']
+        index_expr = params['index_expr']
+
+        base_name = self.entry_base_names[subject_index]
+        data = reader.read('{}/{}'.format(df.DATA_PLACEHOLDER.format(self.category), base_name), index_expr)
+        label_names = extracted['{}_names'.format(self.category)]  # type: list
+
+        if self.selection is None:
+            selection_indices = np.array(range(len(label_names)))
+        else:
+            selection_indices = np.array([label_names.index(s) for s in self.selection])
+
+        random_index = np.random.choice(selection_indices)
+        extracted[self.category] = np.take(data, random_index, axis=-1)
 
 
 class ImageShapeExtractor(Extractor):
@@ -207,7 +262,7 @@ class ImageShapeExtractor(Extractor):
 
 class DataExtractor(Extractor):
 
-    def __init__(self, categories=('images',), entire_subject=False) -> None:
+    def __init__(self, categories=('images',), entire_subject: bool=False) -> None:
         super().__init__()
         self.categories = categories
         self.entire_subject = entire_subject
