@@ -238,7 +238,7 @@ class RandomDataExtractor(Extractor):
         else:
             selection_indices = np.array([label_names.index(s) for s in self.selection])
 
-        random_index = np.random.choice(selection_indices)
+        random_index = list(np.random.choice(selection_indices))  # as list to keep the last dimension with np.take
         extracted[self.category] = np.take(data, random_index, axis=-1)
 
 
