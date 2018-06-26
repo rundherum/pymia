@@ -78,7 +78,7 @@ class IndexingExtractor(Extractor):
     The index expression is of type IndexExpression.
     """
 
-    def __init__(self, do_pickle=False) -> None:
+    def __init__(self, do_pickle: bool=False) -> None:
         super().__init__()
         self.do_pickle = do_pickle
 
@@ -97,7 +97,7 @@ class ImagePropertiesExtractor(Extractor):
     The image properties are of type ImageProperties.
     """
 
-    def __init__(self, do_pickle=False) -> None:
+    def __init__(self, do_pickle: bool=False) -> None:
         super().__init__()
         self.do_pickle = do_pickle
 
@@ -244,7 +244,7 @@ class RandomDataExtractor(Extractor):
 
 class ImageShapeExtractor(Extractor):
 
-    def __init__(self, numpy_format=True) -> None:
+    def __init__(self, numpy_format: bool=True) -> None:
         super().__init__()
         self.numpy_format = numpy_format
 
@@ -262,10 +262,10 @@ class ImageShapeExtractor(Extractor):
 
 class DataExtractor(Extractor):
 
-    def __init__(self, categories=('images',), entire_subject: bool=False) -> None:
+    def __init__(self, categories=('images',), ignore_indexing: bool=False) -> None:
         super().__init__()
         self.categories = categories
-        self.entire_subject = entire_subject
+        self.ignore_indexing = ignore_indexing
         self.entry_base_names = None
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
@@ -278,7 +278,7 @@ class DataExtractor(Extractor):
 
         base_name = self.entry_base_names[subject_index]
         for category in self.categories:
-            if self.entire_subject:
+            if self.ignore_indexing:
                 data = reader.read('{}/{}'.format(df.DATA_PLACEHOLDER.format(category), base_name))
             else:
                 data = reader.read('{}/{}'.format(df.DATA_PLACEHOLDER.format(category), base_name), index_expr)
