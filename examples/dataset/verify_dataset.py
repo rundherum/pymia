@@ -13,9 +13,9 @@ def main(hdf_file: str):
     extractor = extr.ComposeExtractor([extr.NamesExtractor(),
                                        extr.DataExtractor(),
                                        extr.SelectiveDataExtractor(),
-                                       extr.DataExtractor(('numerical',), entire_subject=True),
-                                       extr.DataExtractor(('sex',), entire_subject=True),
-                                       extr.DataExtractor(('mask',), entire_subject=False),
+                                       extr.DataExtractor(('numerical',), ignore_indexing=True),
+                                       extr.DataExtractor(('sex',), ignore_indexing=True),
+                                       extr.DataExtractor(('mask',), ignore_indexing=False),
                                        extr.SubjectExtractor(),
                                        extr.FilesExtractor(categories=('images', 'labels', 'mask', 'numerical', 'sex')),
                                        extr.IndexingExtractor(),
@@ -46,6 +46,7 @@ def main(hdf_file: str):
         for file in item['labels_files']:
             image = sitk.ReadImage(os.path.join(root, file))
             np_img = sitk.GetArrayFromImage(image)
+            np_img = np.expand_dims(np_img, axis=-1)  # due to the convention of having the last dim as number of channels
             np_slice = np_img[index_expr.expression]
             if (np_slice != item['labels']).any():
                 raise ValueError('slice not equal')
@@ -53,6 +54,7 @@ def main(hdf_file: str):
         for file in item['mask_files']:
             image = sitk.ReadImage(os.path.join(root, file))
             np_img = sitk.GetArrayFromImage(image)
+            np_img = np.expand_dims(np_img, axis=-1)  # due to the convention of having the last dim as number of channels
             np_slice = np_img[index_expr.expression]
             if (np_slice != item['mask']).any():
                 raise ValueError('slice not equal')
