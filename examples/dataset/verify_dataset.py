@@ -80,7 +80,7 @@ if __name__ == '__main__':
     Parse the arguments and run the program.
     """
 
-    parser = argparse.ArgumentParser(description='Dataset creation')
+    parser = argparse.ArgumentParser(description='Data set verification')
 
     parser.add_argument(
         '--hdf_file',
