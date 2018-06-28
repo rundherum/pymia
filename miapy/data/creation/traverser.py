@@ -25,6 +25,18 @@ def default_concat(data: t.List[np.ndarray]) -> np.ndarray:
 
 
 class SubjectFileTraverser(Traverser):
+
+    def __init__(self, categories: t.Union[str, t.Tuple[str, ...]]=None):
+        """Initializes a new instance of the SubjectFileTraverser class.
+
+        Args:
+            categories (str or tuple of str): The categories to traverse. If None, then all categories of a SubjectFile
+                will be traversed.
+        """
+        if isinstance(categories, str):
+            categories = (categories, )
+        self.categories = categories
+
     def traverse(self, subject_files: t.List[subj.SubjectFile], load=load.LoadDefault(), callback: cb.Callback=None,
                  transform: tfm.Transform=None, concat_fn=default_concat):
         if len(subject_files) == 0:
@@ -34,8 +46,11 @@ class SubjectFileTraverser(Traverser):
         if callback is None:
             raise ValueError('callback can not be None')
 
+        if self.categories is None:
+            self.categories = subject_files[0].categories
+
         callback_params = {'subject_files': subject_files}
-        for category in subject_files[0].categories:
+        for category in self.categories:
             callback_params.setdefault('categories', []).append(category)
             callback_params['{}_names'.format(category)] = self._get_names(subject_files, category)
         callback.on_start(callback_params)
@@ -43,7 +58,7 @@ class SubjectFileTraverser(Traverser):
         # looping over the subject files and calling callbacks
         for subject_index, subject_file in enumerate(subject_files):
             transform_params = {'subject_index': subject_index}
-            for category in subject_file.categories:
+            for category in self.categories:
 
                 category_list = []
                 category_property = None  # type: conv.ImageProperties
