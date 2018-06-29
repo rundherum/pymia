@@ -37,7 +37,7 @@ class IntensityRescale(Transform):
             if entry not in sample:
                 continue
 
-            np_entry = _check_and_return(sample[entry], np.ndarray)
+            np_entry = check_and_return(sample[entry], np.ndarray)
             if self.loop_axis is None:
                 np_entry = self._normalize(np_entry, self.lower, self.upper)
             else:
@@ -72,7 +72,7 @@ class IntensityNormalization(Transform):
             if entry not in sample:
                 continue
 
-            np_entry = _check_and_return(sample[entry], np.ndarray)
+            np_entry = check_and_return(sample[entry], np.ndarray)
             if not np.issubdtype(np_entry.dtype, np.floating):
                 raise ValueError('Array must be floating type')
 
@@ -104,7 +104,7 @@ class LambdaTransform(Transform):
             if entry not in sample:
                 continue
 
-            np_entry = _check_and_return(sample[entry], np.ndarray)
+            np_entry = check_and_return(sample[entry], np.ndarray)
 
             if self.loop_axis is None:
                 np_entry = self.lambda_fn(np_entry)
@@ -134,7 +134,7 @@ class ClipPercentile(Transform):
             if entry not in sample:
                 continue
 
-            np_entry = _check_and_return(sample[entry], np.ndarray)
+            np_entry = check_and_return(sample[entry], np.ndarray)
 
             if self.loop_axis is None:
                 np_entry = self._clip(np_entry)
@@ -166,7 +166,7 @@ class Relabel(Transform):
         for entry in self.entries:
             if entry not in sample:
                 continue
-            np_entry = _check_and_return(sample[entry], np.ndarray)
+            np_entry = check_and_return(sample[entry], np.ndarray)
             for new_label, old_label in self.label_changes.items():
                 np_entry[np_entry == old_label] = new_label
             sample[entry] = np_entry
@@ -190,7 +190,7 @@ class Reshape(Transform):
             if entry not in sample:
                 continue
 
-            np_entry = _check_and_return(sample[entry], np.ndarray)
+            np_entry = check_and_return(sample[entry], np.ndarray)
             sample[entry] = np.reshape(np_entry, self.shapes[entry])
         return sample
 
@@ -206,7 +206,7 @@ class ToTorchTensor(Transform):
             if entry not in sample:
                 continue
 
-            np_entry = _check_and_return(sample[entry], np.ndarray)
+            np_entry = check_and_return(sample[entry], np.ndarray)
             sample[entry] = torch.from_numpy(np_entry)
         return sample
 
@@ -222,7 +222,7 @@ class Permute(Transform):
         for entry in self.entries:
             if entry not in sample:
                 continue
-            np_entry = _check_and_return(sample[entry], np.ndarray)
+            np_entry = check_and_return(sample[entry], np.ndarray)
             sample[entry] = np.transpose(np_entry, self.permutation)
         return sample
 
@@ -238,7 +238,7 @@ class Squeeze(Transform):
             if entry not in sample:
                 continue
 
-            np_entry = _check_and_return(sample[entry], np.ndarray)
+            np_entry = check_and_return(sample[entry], np.ndarray)
             sample[entry] = np_entry.squeeze()
         return sample
 
@@ -254,7 +254,7 @@ class UnSqueeze(Transform):
             if entry not in sample:
                 continue
 
-            np_entry = _check_and_return(sample[entry], np.ndarray)
+            np_entry = check_and_return(sample[entry], np.ndarray)
             sample[entry] = np.expand_dims(np_entry, -1)
         return sample
 
@@ -284,7 +284,7 @@ class SizeCorrection(Transform):
             if entry not in sample:
                 continue
 
-            np_entry = _check_and_return(sample[entry], np.ndarray)
+            np_entry = check_and_return(sample[entry], np.ndarray)
             if not len(self.shape) <= np_entry.ndim:
                 raise ValueError('Shape dimension needs to be less or equal to {}'.format(np_entry.ndim))
 
@@ -321,13 +321,13 @@ class Mask(Transform):
         self.entries = entries
 
     def __call__(self, sample: dict) -> dict:
-        np_mask = _check_and_return(sample[self.mask_key], np.ndarray)
+        np_mask = check_and_return(sample[self.mask_key], np.ndarray)
 
         for entry in self.entries:
             if entry not in sample:
                 continue
 
-            np_entry = _check_and_return(sample[entry], np.ndarray)
+            np_entry = check_and_return(sample[entry], np.ndarray)
 
             if np_mask.shape == np_entry.shape:
                 np_entry[np_mask == self.mask_value] = self.masking_value
@@ -340,7 +340,7 @@ class Mask(Transform):
         return sample
 
 
-def _check_and_return(obj, type_):
+def check_and_return(obj, type_):
     if not isinstance(obj, type_):
         raise ValueError("entry must be '{}'".format(type_.__name__))
     return obj
