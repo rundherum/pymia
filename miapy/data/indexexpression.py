@@ -30,6 +30,8 @@ class IndexExpression:
             elif isinstance(index, (tuple, list)):
                 start, stop = index
                 expr[a] = slice(start, stop)
+            elif isinstance(index, slice):
+                expr[a] = index
             else:
                 raise ValueError('Unknown type "{}" of index'.format(type(index)))
 
