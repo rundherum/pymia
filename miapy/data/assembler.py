@@ -63,15 +63,16 @@ class SubjectAssembler(Assembler):
             self.subjects_ready = set(self.predictions.keys())
             self.predictions[subject_index] = self._init_new_subject(batch, to_assemble, idx)
 
-        index_expr = batch['index_expr'][idx]
-        if isinstance(index_expr, bytes):
-            # is pickled
-            index_expr = pickle.loads(index_expr)
-
         for key in to_assemble:
             data = to_assemble[key][idx]
             if transform is not None:
                 data = transform({key: data, 'batch': batch, 'batch_idx': idx})[key]
+
+            index_expr = batch['index_expr'][idx]
+            if isinstance(index_expr, bytes):
+                # is pickled
+                index_expr = pickle.loads(index_expr)
+
             self.predictions[subject_index][key][index_expr.expression] = data
 
     def _init_new_subject(self, batch, to_assemble, idx):
