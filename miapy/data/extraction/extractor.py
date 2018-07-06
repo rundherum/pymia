@@ -305,8 +305,13 @@ class PadPatchDataExtractor(Extractor):
 
         subject_index = params['subject_index']
         index_expr = params['index_expr']  # type: expr.IndexExpression
-        padded_indexing = np.asarray(index_expr.get_indexing()) + self.index_diffs
 
+        # Make sure all indexing is done with slices (Example: (16,) will be changed to (slice(16, 17, None),) which
+        # is equivalent), otherwise the following steps will be wrong; .
+        if any(isinstance(s, int) for s in index_expr.expression):
+            index_expr.set_indexing([slice(s, s + 1) if isinstance(s, int) else s for s in index_expr.expression])
+
+        padded_indexing = np.asarray(index_expr.get_indexing()) + self.index_diffs
         padded_shape = tuple((padded_indexing[:, 1] - padded_indexing[:, 0]).tolist())
 
         sub_indexing = padded_indexing.copy()
