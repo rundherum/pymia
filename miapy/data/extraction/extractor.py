@@ -285,12 +285,12 @@ class DataExtractor(Extractor):
             extracted[category] = data
 
 
-class PadPatchDataExtractor(Extractor):
+class PadDataExtractor(Extractor):
 
-    def __init__(self, padding: t.Union[tuple, t.List[tuple]], categories=('images',)) -> None:
+    def __init__(self, padding: t.Union[tuple, t.List[tuple]], extractor: Extractor, categories=('images',)) -> None:
         super().__init__()
         self.categories = categories
-        self.entry_base_names = None
+        self.extractor = extractor
 
         if isinstance(padding, tuple):
             padding = [(pad, pad) for pad in padding]
@@ -299,11 +299,6 @@ class PadPatchDataExtractor(Extractor):
         self.index_diffs = index_diffs
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
-        if self.entry_base_names is None:
-            entries = reader.get_subject_entries()
-            self.entry_base_names = [entry.rsplit('/', maxsplit=1)[1] for entry in entries]
-
-        subject_index = params['subject_index']
         index_expr = params['index_expr']  # type: expr.IndexExpression
 
         # Make sure all indexing is done with slices (Example: (16,) will be changed to (slice(16, 17, None),) which
@@ -321,9 +316,12 @@ class PadPatchDataExtractor(Extractor):
         padded_indexing[padded_indexing < 0] = 0  # cannot slice outside the boundary
         padded_index_expr = expr.IndexExpression(padded_indexing.tolist())
 
-        base_name = self.entry_base_names[subject_index]
+        params['index_expr'] = padded_index_expr
+        self.extractor.extract(reader, params, extracted)
+        params['index_expr'] = index_expr
+
         for category in self.categories:
-            data = reader.read('{}/{}'.format(df.DATA_PLACEHOLDER.format(category), base_name), padded_index_expr)
+            data = extracted[category]
 
             full_pad_shape = padded_shape + data.shape[len(padded_shape):]
             pad_data = np.zeros(full_pad_shape, dtype=data.dtype)
