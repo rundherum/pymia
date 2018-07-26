@@ -28,7 +28,7 @@ class Relabel(miapy_fltr.IFilter):
 
         Args:
             image (sitk.Image): The image.
-            params (miapy_fltr.IFilterParams): The parameters (unused).
+            params (IFilterParams): The parameters (unused).
 
         Returns:
             sitk.Image: The filtered image.
@@ -167,7 +167,7 @@ class CmdlineExecutor(miapy_fltr.IFilter):
         """Executes a command line program.
 
         Args:
-            image (sitk.Image): The image.
+            image (SimpleITK.Image): The image.
             params (CmdlineExecutorParams): The execution specific command line parameters.
 
         Returns:

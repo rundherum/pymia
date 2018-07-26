@@ -1,3 +1,6 @@
+"""This module contains global definitions for the :mod:`miapy.data` package.
+"""
+
 NAMES_PLACEHOLDER = 'meta/names/{}_names'
 # NAMES_IMAGE = 'meta/names/image_names'
 # NAMES_LABEL = 'meta/names/label_names'

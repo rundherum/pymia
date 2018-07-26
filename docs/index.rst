@@ -10,6 +10,7 @@
     :caption: Getting started
 
     installation
+    examples
     pycharm
     contribution
     history

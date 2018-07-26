@@ -15,7 +15,8 @@ class BiasFieldCorrectorParams(miapy_fltr.IFilterParams):
 
         Examples:
         To generate a default mask use Otsu's thresholding:
-        >>> sitk.OtsuThreshold( image, 0, 1, 200 )
+
+        >>> sitk.OtsuThreshold(image, 0, 1, 200)
         """
         self.mask = mask
 
@@ -24,7 +25,7 @@ class BiasFieldCorrector(miapy_fltr.IFilter):
     """Represents a bias field correction filter."""
 
     def __init__(self, shrink_factor=1, convergence_threshold=0.001, max_iterations=(50, 50, 50, 50),
-                 fullwidth_at_halfmax = 0.15, fiter_noise=0.01, histogram_bins=200, control_points=(4,4,4),
+                 fullwidth_at_halfmax=0.15, fiter_noise=0.01, histogram_bins=200, control_points=(4, 4, 4),
                  spline_order=3):
         """Initializes a new instance of the BiasFieldCorrector class.
 
@@ -111,7 +112,7 @@ class GradientAnisotropicDiffusion(miapy_fltr.IFilter):
 
         Args:
             image (sitk.Image): The image.
-            params (miapy_fltr.IFilterParams): The parameters (unused).
+            params (IFilterParams): The parameters (unused).
 
         Returns:
             sitk.Image: The smoothed image.
@@ -148,7 +149,7 @@ class NormalizeZScore(miapy_fltr.IFilter):
 
         Args:
             image (sitk.Image): The image.
-            params (miapy_fltr.IFilterParams): The parameters (unused).
+            params (IFilterParams): The parameters (unused).
 
         Returns:
             sitk.Image: The normalized image.
@@ -194,7 +195,7 @@ class RescaleIntensity(miapy_fltr.IFilter):
 
         Args:
             image (sitk.Image): The image.
-            params (miapy_fltr.IFilterParams): The parameters (unused).
+            params (IFilterParams): The parameters (unused).
 
         Returns:
             sitk.Image: The intensity rescaled image.

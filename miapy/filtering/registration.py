@@ -235,7 +235,8 @@ class MultiModalRegistration(miapy_fltr.IFilter):
             else:
                 raise ValueError('not supported registration_type')
 
-            initial_transform = sitk.CenteredTransformInitializer(sitk.Cast(params.fixed_image, image.GetPixelIDValue()),
+            initial_transform = sitk.CenteredTransformInitializer(sitk.Cast(params.fixed_image,
+                                                                            image.GetPixelIDValue()),
                                                                   image,
                                                                   transform_type,
                                                                   sitk.CenteredTransformInitializerFilter.GEOMETRY)
