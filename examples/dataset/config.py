@@ -14,7 +14,7 @@ class Configuration(miapy_cfg.ConfigurationBase):
         return cls.TYPE
 
     def __init__(self):
-        self.database_file = '/home/fbalsiger/Documents/config.json'
+        self.database_file = 'out/test/test.h5'
 
         self.batch_size_training = 10
         self.batch_size_testing = 10
