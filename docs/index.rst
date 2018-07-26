@@ -15,16 +15,19 @@
     history
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 3
     :caption: Packages
 
-    evaluation
-    filtering
-    image
-    plotting
+    miapy.config
+    miapy.data
+    miapy.evaluation
+    miapy.filtering
+    miapy.plotting
 
-Indices
-=======
+
+Indices and tables
+==================
 
 * :ref:`genindex`
 * :ref:`modindex`
+* :ref:`search`

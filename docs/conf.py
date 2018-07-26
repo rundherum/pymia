@@ -19,18 +19,17 @@
 #
 import os
 import sys
-import mock
+# import mock
 
 import sphinx_rtd_theme
 
-sys.path.insert(0, os.path.abspath('.'))  # docs directory
-sys.path.insert(0, os.path.abspath('..'))  # root directory of project
-#sys.path.insert(0, os.path.abspath('../miapy'))  # root directory of miapy package
+basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, basedir)
 
-MOCK_MODULES = ['h5py', 'matplotlib', 'matplotlib.colors', 'matplotlib.pyplot', 'numpy', 'SimpleITK',
-                'torch', 'torch.utils.data', 'torch.utils.data.dataset', 'torch.utils.data.sampler']
-for mod_name in MOCK_MODULES:
-    sys.modules[mod_name] = mock.Mock()
+# MOCK_MODULES = ['h5py', 'matplotlib', 'matplotlib.colors', 'matplotlib.pyplot', 'numpy', 'SimpleITK',
+#                 'torch', 'torch.utils.data', 'torch.utils.data.dataset', 'torch.utils.data.sampler']
+# for mod_name in MOCK_MODULES:
+#     sys.modules[mod_name] = mock.Mock()
 
 # -- General configuration ------------------------------------------------
 
@@ -64,7 +63,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'miapy'
-copyright = '2017, MIA group, ISTB, University of Bern'
+copyright = '2017-2018, MIA group, ISTB, University of Bern'
 author = 'Fabian Balsiger'
 
 # The version info for the project you're documenting, acts as replacement for
