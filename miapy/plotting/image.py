@@ -12,12 +12,13 @@ import numpy as np
 import SimpleITK as sitk
 
 
-def plot_2d_image(path: str, image: np.ndarray) -> None:
+def plot_2d_image(path: str, image: np.ndarray, cmap='gray') -> None:
     """Plots a 2-D image.
 
     Args:
         path (str): The output file path.
         image (np.ndarray): The 2-D image.
+        cmap (str): The colormap.
     """
 
     fig = plt.figure(figsize=image.shape[::-1], dpi=2)  # figure is twice as large as array (in pixels)
@@ -29,7 +30,7 @@ def plot_2d_image(path: str, image: np.ndarray) -> None:
     ax.tick_params(which='both', direction='in')
 
     # plot image
-    ax.imshow(image, 'gray', interpolation='none')
+    ax.imshow(image, cmap, interpolation='none')
 
     fig.add_axes(ax)
 
@@ -53,8 +54,8 @@ def plot_slice(path: str, image: sitk.Image, slice_no: int) -> None:
 
 def plot_2d_segmentation(path: str,
                          image: np.ndarray,
-                         ground_truth : np.ndarray,
-                         segmentation : np.ndarray,
+                         ground_truth: np.ndarray,
+                         segmentation: np.ndarray,
                          alpha: float=0.5,
                          label: int=1) -> None:
     """Plots a 2-dimensional image with an overlaid mask, which indicates under-, correct-, and over-segmentation.
@@ -163,8 +164,8 @@ def plot_2d_segmentation_contour(path: str,
 def plot_2d_segmentation_series(path: str,
                                 file_name_suffix: str,
                                 image: sitk.Image,
-                                ground_truth : sitk.Image,
-                                segmentation : sitk.Image,
+                                ground_truth: sitk.Image,
+                                segmentation: sitk.Image,
                                 alpha: float=0.5,
                                 label: int=1,
                                 file_extension: str='.png') -> None:
@@ -201,11 +202,11 @@ def plot_2d_segmentation_series(path: str,
     os.makedirs(path, exist_ok=True)
     file_extension = file_extension if file_extension.startswith('.') else '.' + file_extension
 
-    for slice in range(img_arr.shape[0]):
-        full_file_path = os.path.join(path, file_name_suffix + str(slice) + file_extension)
+    for slice_no in range(img_arr.shape[0]):
+        full_file_path = os.path.join(path, file_name_suffix + str(slice_no) + file_extension)
         plot_2d_segmentation(full_file_path,
-                             img_arr[slice, ...],
-                             gt_arr[slice, ...],
-                             seg_arr[slice, ...],
+                             img_arr[slice_no, ...],
+                             gt_arr[slice_no, ...],
+                             seg_arr[slice_no, ...],
                              alpha=alpha,
                              label=label)
