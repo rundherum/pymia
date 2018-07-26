@@ -91,3 +91,20 @@ class INumpyArrayMetric(IMetric):
         """Calculates the metric."""
 
         raise NotImplementedError
+
+
+class Information(IMetric):
+    """Represents an information.
+
+    Can be used to add an additional column of information to an evaluator.
+    """
+
+    def __init__(self, column_name: str, value: str):
+        """Initializes a new instance of the Information class."""
+        super().__init__()
+        self.metric = column_name
+        self.value = value
+
+    def calculate(self):
+        """Outputs the value of the information."""
+        return self.value
