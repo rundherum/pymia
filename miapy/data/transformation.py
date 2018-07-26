@@ -107,11 +107,10 @@ class LambdaTransform(Transform):
             if entry not in sample:
                 raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
 
-            np_entry = check_and_return(sample[entry], np.ndarray)
-
             if self.loop_axis is None:
-                np_entry = self.lambda_fn(np_entry)
+                np_entry = self.lambda_fn(sample[entry])
             else:
+                np_entry = check_and_return(sample[entry], np.ndarray)
                 slicing = [slice(None) for _ in range(np_entry.ndim)]
                 for i in range(np_entry.shape[self.loop_axis]):
                     slicing[self.loop_axis] = i
