@@ -44,7 +44,7 @@ It contains a succinct description of the change. Allowed ``<type>`` s are:
  * test (when adding missing tests)
  * chore (maintain)
 
-An example would be: ``feat(DiceCoefficient): add Dice coefficient``
+An example would be: ``feat(DiceCoefficient): add Dice coefficient metric``
 
 TODOs
 -----
