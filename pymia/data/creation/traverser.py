@@ -3,9 +3,9 @@ import typing as t
 
 import numpy as np
 
-from miapy.data import subjectfile as subj
-import miapy.data.transformation as tfm
-import miapy.data.conversion as conv
+from pymia.data import subjectfile as subj
+import pymia.data.transformation as tfm
+import pymia.data.conversion as conv
 from . import callback as cb
 from . import fileloader as load
 

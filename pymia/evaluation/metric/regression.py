@@ -1,4 +1,4 @@
-"""The miapy.evaluation.metric.regression module provides several metrics to measure regression performance."""
+"""The pymia.evaluation.metric.regression module provides several metrics to measure regression performance."""
 
 import numpy as np
 

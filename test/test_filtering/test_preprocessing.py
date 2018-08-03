@@ -3,8 +3,8 @@ import unittest
 import numpy as np
 import SimpleITK as sitk
 
-import miapy.filtering.filter as miapy_fltr
-import miapy.filtering.preprocessing as miapy_fltr_prep
+import pymia.filtering.filter as pymia_fltr
+import pymia.filtering.preprocessing as pymia_fltr_prep
 
 
 class TestNormalizeZScore(unittest.TestCase):
@@ -25,21 +25,21 @@ class TestNormalizeZScore(unittest.TestCase):
         self.desired = np.array([[-1.3416407864999, -0.44721359549996, 0.44721359549996, 1.3416407864999]], np.float64)
 
     def test_normalization(self):
-        dut = miapy_fltr_prep.NormalizeZScore()
+        dut = pymia_fltr_prep.NormalizeZScore()
         out = dut.execute(self.image)
         out_arr = sitk.GetArrayFromImage(out)
 
         np.testing.assert_array_almost_equal(self.desired, out_arr, decimal=12)
 
     def test_normalization_with_param(self):
-        dut = miapy_fltr_prep.NormalizeZScore()
-        out = dut.execute(self.image, miapy_fltr.IFilterParams())
+        dut = pymia_fltr_prep.NormalizeZScore()
+        out = dut.execute(self.image, pymia_fltr.IFilterParams())
         out_arr = sitk.GetArrayFromImage(out)
 
         np.testing.assert_array_almost_equal(self.desired, out_arr, decimal=12)
 
     def test_image_properties(self):
-        dut = miapy_fltr_prep.NormalizeZScore()
+        dut = pymia_fltr_prep.NormalizeZScore()
         out = dut.execute(self.image)
         self.assertEqual(self.image.GetSize(), out.GetSize())
         self.assertEqual(self.image.GetOrigin(), out.GetOrigin())

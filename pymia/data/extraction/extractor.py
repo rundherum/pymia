@@ -5,9 +5,9 @@ import typing as t
 import numpy as np
 import SimpleITK as sitk
 
-import miapy.data.conversion as conv
-import miapy.data.definition as df
-import miapy.data.indexexpression as expr
+import pymia.data.conversion as conv
+import pymia.data.definition as df
+import pymia.data.indexexpression as expr
 from . import reader as rd
 
 

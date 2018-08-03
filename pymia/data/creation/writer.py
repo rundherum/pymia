@@ -4,7 +4,7 @@ import os
 import numpy as np
 import h5py
 
-import miapy.data.indexexpression as expr
+import pymia.data.indexexpression as expr
 
 
 class Writer(metaclass=abc.ABCMeta):

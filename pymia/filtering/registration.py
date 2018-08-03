@@ -1,7 +1,7 @@
 """The registration module contains classes for image registration.
 
 Image registration aims to align two images using a particular transformation.
-miapy currently supports multi-modal rigid registration, i.e. align two images of different modalities
+pymia currently supports multi-modal rigid registration, i.e. align two images of different modalities
 using a rigid transformation (rotation, translation, reflection, or their combination).
 
 See Also:
@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import SimpleITK as sitk
 
-import miapy.filtering.filter as miapy_fltr
+import pymia.filtering.filter as pymia_fltr
 
 
 class RegistrationType(enum.Enum):
@@ -80,7 +80,7 @@ class RegistrationCallback(metaclass=abc.ABCMeta):
         pass
 
 
-class MultiModalRegistrationParams(miapy_fltr.IFilterParams):
+class MultiModalRegistrationParams(pymia_fltr.IFilterParams):
     """Represents parameters for the multi-modal rigid registration."""
 
     def __init__(self, fixed_image: sitk.Image, fixed_image_mask: sitk.Image=None,
@@ -99,7 +99,7 @@ class MultiModalRegistrationParams(miapy_fltr.IFilterParams):
         self.callbacks = callbacks
 
 
-class MultiModalRegistration(miapy_fltr.IFilter):
+class MultiModalRegistration(pymia_fltr.IFilter):
     """Represents a multi-modal image registration filter.
 
     The filter estimates a 3-dimensional rigid or affine transformation between images of different modalities using

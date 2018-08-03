@@ -1,4 +1,4 @@
-Data (:mod:`miapy.data` package)
+Data (:mod:`pymia.data` package)
 ================================
 
 Provides data loading and handling functionality for machine learning (especially deep learning) projects.
@@ -8,61 +8,61 @@ Subpackages
 
 .. toctree::
 
-    miapy.data.creation
-    miapy.data.extraction
+    pymia.data.creation
+    pymia.data.extraction
 
-Assembler (:mod:`miapy.data.assembler` module)
+Assembler (:mod:`pymia.data.assembler` module)
 ----------------------------------------------
 
-.. automodule:: miapy.data.assembler
+.. automodule:: pymia.data.assembler
     :members:
     :undoc-members:
     :show-inheritance:
 
-Conversion (:mod:`miapy.data.conversion` module)
+Conversion (:mod:`pymia.data.conversion` module)
 ------------------------------------------------
 
-.. automodule:: miapy.data.conversion
+.. automodule:: pymia.data.conversion
     :members:
     :undoc-members:
     :show-inheritance:
 
-Definition (:mod:`miapy.data.definition` module)
+Definition (:mod:`pymia.data.definition` module)
 ------------------------------------------------
 
-.. automodule:: miapy.data.definition
+.. automodule:: pymia.data.definition
     :members:
     :undoc-members:
     :show-inheritance:
 
-Index expression (:mod:`miapy.data.indexexpression` module)
+Index expression (:mod:`pymia.data.indexexpression` module)
 -----------------------------------------------------------
 
-.. automodule:: miapy.data.indexexpression
+.. automodule:: pymia.data.indexexpression
     :members:
     :undoc-members:
     :show-inheritance:
 
-Loading (:mod:`miapy.data.loading` module)
+Loading (:mod:`pymia.data.loading` module)
 ------------------------------------------
 
-.. automodule:: miapy.data.loading
+.. automodule:: pymia.data.loading
     :members:
     :undoc-members:
     :show-inheritance:
 
-Subject file (:mod:`miapy.data.subjectfile` module)
+Subject file (:mod:`pymia.data.subjectfile` module)
 ---------------------------------------------------
 
-.. automodule:: miapy.data.subjectfile
+.. automodule:: pymia.data.subjectfile
     :members:
     :undoc-members:
     :show-inheritance:
 
-Transformation (:mod:`miapy.data.transformation` module)
+Transformation (:mod:`pymia.data.transformation` module)
 --------------------------------------------------------
 
-.. automodule:: miapy.data.transformation
+.. automodule:: pymia.data.transformation
     :members:
     :undoc-members:
     :show-inheritance:

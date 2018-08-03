@@ -3,7 +3,7 @@ Installation
 
 Dependencies
 ------------
-miapy depends on the following packages:
+pymia depends on the following packages:
 
  - `Matplotlib <https://matplotlib.org/>`_
  - `NumPy <http://www.numpy.org/>`_

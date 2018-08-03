@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 import SimpleITK as sitk
 
-import miapy.filtering.postprocessing as fltr
+import pymia.filtering.postprocessing as fltr
 
 
 class TestLargestNConnectedComponents(unittest.TestCase):

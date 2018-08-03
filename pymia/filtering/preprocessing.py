@@ -1,10 +1,10 @@
 """Enables the enhancement of images before their use with other algorithms."""
 import SimpleITK as sitk
 
-import miapy.filtering.filter as miapy_fltr
+import pymia.filtering.filter as pymia_fltr
 
 
-class BiasFieldCorrectorParams(miapy_fltr.IFilterParams):
+class BiasFieldCorrectorParams(pymia_fltr.IFilterParams):
     """Bias field correction filter parameters."""
 
     def __init__(self, mask: sitk.Image):
@@ -21,7 +21,7 @@ class BiasFieldCorrectorParams(miapy_fltr.IFilterParams):
         self.mask = mask
 
 
-class BiasFieldCorrector(miapy_fltr.IFilter):
+class BiasFieldCorrector(pymia_fltr.IFilter):
     """Represents a bias field correction filter."""
 
     def __init__(self, shrink_factor=1, convergence_threshold=0.001, max_iterations=(50, 50, 50, 50),
@@ -85,7 +85,7 @@ class BiasFieldCorrector(miapy_fltr.IFilter):
             .format(self=self)
 
 
-class GradientAnisotropicDiffusion(miapy_fltr.IFilter):
+class GradientAnisotropicDiffusion(pymia_fltr.IFilter):
     """Represents a gradient anisotropic diffusion filter."""
 
     def __init__(self,
@@ -107,7 +107,7 @@ class GradientAnisotropicDiffusion(miapy_fltr.IFilter):
         self.conductance_scaling_update_interval = conductance_scaling_update_interval
         self.no_iterations = no_iterations
 
-    def execute(self, image: sitk.Image, params: miapy_fltr.IFilterParams=None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: pymia_fltr.IFilterParams=None) -> sitk.Image:
         """Executes a gradient anisotropic diffusion on an image.
 
         Args:
@@ -137,14 +137,14 @@ class GradientAnisotropicDiffusion(miapy_fltr.IFilter):
             .format(self=self)
 
 
-class NormalizeZScore(miapy_fltr.IFilter):
+class NormalizeZScore(pymia_fltr.IFilter):
     """Represents a z-score normalization filter."""
 
     def __init__(self):
         """Initializes a new instance of the NormalizeZScore class."""
         super().__init__()
 
-    def execute(self, image: sitk.Image, params: miapy_fltr.IFilterParams=None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: pymia_fltr.IFilterParams=None) -> sitk.Image:
         """Executes a z-score normalization on an image.
 
         Args:
@@ -176,7 +176,7 @@ class NormalizeZScore(miapy_fltr.IFilter):
             .format(self=self)
 
 
-class RescaleIntensity(miapy_fltr.IFilter):
+class RescaleIntensity(pymia_fltr.IFilter):
     """Represents a rescale intensity filter."""
 
     def __init__(self, min_intensity, max_intensity):
@@ -190,7 +190,7 @@ class RescaleIntensity(miapy_fltr.IFilter):
         self.min_intensity = min_intensity
         self.max_intensity = max_intensity
 
-    def execute(self, image: sitk.Image, params: miapy_fltr.IFilterParams=None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: pymia_fltr.IFilterParams=None) -> sitk.Image:
         """Executes an intensity rescaling on an image.
 
         Args:
@@ -215,7 +215,7 @@ class RescaleIntensity(miapy_fltr.IFilter):
             .format(self=self)
 
 
-class HistogramMatcherParams(miapy_fltr.IFilterParams):
+class HistogramMatcherParams(pymia_fltr.IFilterParams):
     """Histogram matching filter parameters."""
 
     def __init__(self, reference_image: sitk.Image):
@@ -227,7 +227,7 @@ class HistogramMatcherParams(miapy_fltr.IFilterParams):
         self.reference_image = reference_image
 
 
-class HistogramMatcher(miapy_fltr.IFilter):
+class HistogramMatcher(pymia_fltr.IFilter):
     """A method to align the intensity ranges of images."""
 
     def __init__(self, histogram_levels=256, match_points=1, threshold_mean_intensity=True):

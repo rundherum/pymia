@@ -7,10 +7,10 @@ import typing as t
 import numpy as np
 import SimpleITK as sitk
 
-import miapy.filtering.filter as miapy_fltr
+import pymia.filtering.filter as pymia_fltr
 
 
-class Relabel(miapy_fltr.IFilter):
+class Relabel(pymia_fltr.IFilter):
     """Relabels the labels in the file by the provided rule"""
 
     def __init__(self, label_changes: t.Dict[int, t.Union[int, tuple]]) -> None:
@@ -23,7 +23,7 @@ class Relabel(miapy_fltr.IFilter):
         super().__init__()
         self.label_changes = label_changes
 
-    def execute(self, image: sitk.Image, params: miapy_fltr.IFilterParams = None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: pymia_fltr.IFilterParams = None) -> sitk.Image:
         """Executes the relabeling of the label image.
 
         Args:
@@ -56,7 +56,7 @@ class Relabel(miapy_fltr.IFilter):
             .format(self=self, label_changes='; '.join(str_list))
 
 
-class SizeCorrectionParams(miapy_fltr.IFilterParams):
+class SizeCorrectionParams(pymia_fltr.IFilterParams):
     """Size (shape) correction filter parameters."""
 
     def __init__(self, reference_shape: tuple) -> None:
@@ -69,7 +69,7 @@ class SizeCorrectionParams(miapy_fltr.IFilterParams):
         self.reference_shape = reference_shape
 
 
-class SizeCorrectionFilter(miapy_fltr.IFilter):
+class SizeCorrectionFilter(pymia_fltr.IFilter):
     """A method to correct shape/size difference."""
 
     def __init__(self, two_sided=True, pad_constant=0.0) -> None:
@@ -139,7 +139,7 @@ class SizeCorrectionFilter(miapy_fltr.IFilter):
             .format(self=self)
 
 
-class CmdlineExecutorParams(miapy_fltr.IFilterParams):
+class CmdlineExecutorParams(pymia_fltr.IFilterParams):
     """Command line executor filter parameters."""
 
     def __init__(self, arguments: t.List[str]) -> None:
@@ -151,7 +151,7 @@ class CmdlineExecutorParams(miapy_fltr.IFilterParams):
         self.arguments = arguments
 
 
-class CmdlineExecutor(miapy_fltr.IFilter):
+class CmdlineExecutor(pymia_fltr.IFilter):
     """Represents a command line executable."""
 
     def __init__(self, executable_path: str):

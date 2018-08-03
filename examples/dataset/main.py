@@ -2,11 +2,11 @@ import argparse
 
 import numpy as np
 
-import miapy.data.conversion as miapy_conv
-import miapy.data.extraction as miapy_extr
-import miapy.data.assembler as miapy_asmbl
-import miapy.evaluation.evaluator as miapy_eval
-import miapy.evaluation.metric as miapy_metric
+import pymia.data.conversion as pymia_conv
+import pymia.data.extraction as pymia_extr
+import pymia.data.assembler as pymia_asmbl
+import pymia.evaluation.evaluator as pymia_eval
+import pymia.evaluation.metric as pymia_metric
 
 import examples.dataset.config as cfg
 
@@ -24,13 +24,13 @@ def collate_batch(batch) -> dict:
     return dict(zip(batch[0], zip(*[d.values() for d in batch])))
 
 
-def init_evaluator() -> miapy_eval.Evaluator:
-    evaluator = miapy_eval.Evaluator(miapy_eval.ConsoleEvaluatorWriter(5))
+def init_evaluator() -> pymia_eval.Evaluator:
+    evaluator = pymia_eval.Evaluator(pymia_eval.ConsoleEvaluatorWriter(5))
     evaluator.add_label(1, 'Structure 1')
     evaluator.add_label(2, 'Structure 2')
     evaluator.add_label(3, 'Structure 3')
     evaluator.add_label(4, 'Structure 4')
-    evaluator.metrics = [miapy_metric.DiceCoefficient()]
+    evaluator.metrics = [pymia_metric.DiceCoefficient()]
     return evaluator
 
 
@@ -38,48 +38,48 @@ def main(config_file: str):
     config = cfg.load(config_file, cfg.Configuration)
     print(config)
 
-    indexing_strategy = miapy_extr.SliceIndexing()  # slice-wise extraction
+    indexing_strategy = pymia_extr.SliceIndexing()  # slice-wise extraction
     extraction_transform = None  # we do not want to apply any transformation on the slices after extraction
     # define an extractor for training, i.e. what information we would like to extract per sample
-    train_extractor = miapy_extr.ComposeExtractor([miapy_extr.NamesExtractor(),
-                                                   miapy_extr.DataExtractor(),
-                                                   miapy_extr.SelectiveDataExtractor()])
+    train_extractor = pymia_extr.ComposeExtractor([pymia_extr.NamesExtractor(),
+                                                   pymia_extr.DataExtractor(),
+                                                   pymia_extr.SelectiveDataExtractor()])
 
     # define an extractor for testing, i.e. what information we would like to extract per sample
     # not that usually we don't use labels for testing, i.e. the SelectiveDataExtractor is only used for this example
-    test_extractor = miapy_extr.ComposeExtractor([miapy_extr.NamesExtractor(),
-                                                  miapy_extr.IndexingExtractor(),
-                                                  miapy_extr.DataExtractor(),
-                                                  miapy_extr.SelectiveDataExtractor(),
-                                                  miapy_extr.ImageShapeExtractor()])
+    test_extractor = pymia_extr.ComposeExtractor([pymia_extr.NamesExtractor(),
+                                                  pymia_extr.IndexingExtractor(),
+                                                  pymia_extr.DataExtractor(),
+                                                  pymia_extr.SelectiveDataExtractor(),
+                                                  pymia_extr.ImageShapeExtractor()])
 
     # define an extractor for evaluation, i.e. what information we would like to extract per sample
-    eval_extractor = miapy_extr.ComposeExtractor([miapy_extr.NamesExtractor(),
-                                                  miapy_extr.SubjectExtractor(),
-                                                  miapy_extr.SelectiveDataExtractor(),
-                                                  miapy_extr.ImagePropertiesExtractor()])
+    eval_extractor = pymia_extr.ComposeExtractor([pymia_extr.NamesExtractor(),
+                                                  pymia_extr.SubjectExtractor(),
+                                                  pymia_extr.SelectiveDataExtractor(),
+                                                  pymia_extr.ImagePropertiesExtractor()])
 
     # define the data set
-    dataset = miapy_extr.ParameterizableDataset(config.database_file,
+    dataset = pymia_extr.ParameterizableDataset(config.database_file,
                                                 indexing_strategy,
-                                                miapy_extr.SubjectExtractor(),  # for select_indices() below
+                                                pymia_extr.SubjectExtractor(),  # for select_indices() below
                                                 extraction_transform)
 
     # generate train / test split for data set
     # we use Subject_0, Subject_1 and Subject_2 for training and Subject_3 for testing
-    sampler_ids_train = miapy_extr.select_indices(dataset,
-                                                  miapy_extr.SubjectSelection(('Subject_0', 'Subject_1', 'Subject_2')))
-    sampler_ids_test = miapy_extr.select_indices(dataset,
-                                                 miapy_extr.SubjectSelection(('Subject_3')))
+    sampler_ids_train = pymia_extr.select_indices(dataset,
+                                                  pymia_extr.SubjectSelection(('Subject_0', 'Subject_1', 'Subject_2')))
+    sampler_ids_test = pymia_extr.select_indices(dataset,
+                                                 pymia_extr.SubjectSelection(('Subject_3')))
 
     # set up training data loader
-    training_sampler = miapy_extr.SubsetRandomSampler(sampler_ids_train)
-    training_loader = miapy_extr.DataLoader(dataset, config.batch_size_training, sampler=training_sampler,
+    training_sampler = pymia_extr.SubsetRandomSampler(sampler_ids_train)
+    training_loader = pymia_extr.DataLoader(dataset, config.batch_size_training, sampler=training_sampler,
                                             collate_fn=collate_batch, num_workers=1)
 
     # set up testing data loader
-    testing_sampler = miapy_extr.SubsetSequentialSampler(sampler_ids_test)
-    testing_loader = miapy_extr.DataLoader(dataset, config.batch_size_testing, sampler=testing_sampler,
+    testing_sampler = pymia_extr.SubsetSequentialSampler(sampler_ids_test)
+    testing_loader = pymia_extr.DataLoader(dataset, config.batch_size_testing, sampler=testing_sampler,
                                            collate_fn=collate_batch, num_workers=1)
 
     sample = dataset.direct_extract(train_extractor, 0)  # extract a subject
@@ -95,7 +95,7 @@ def main(config_file: str):
             pass
 
         # subject assembler for testing
-        subject_assembler = miapy_asmbl.SubjectAssembler()
+        subject_assembler = pymia_asmbl.SubjectAssembler()
 
         dataset.set_extractor(test_extractor)
         for batch in testing_loader:  # batches for testing
@@ -109,11 +109,11 @@ def main(config_file: str):
         for subject_idx in list(subject_assembler.predictions.keys()):
             # convert prediction and labels back to SimpleITK images
             sample = dataset.direct_extract(eval_extractor, subject_idx)
-            label_image = miapy_conv.NumpySimpleITKImageBridge.convert(sample['labels'],
+            label_image = pymia_conv.NumpySimpleITKImageBridge.convert(sample['labels'],
                                                                        sample['properties'])
 
             assembled = subject_assembler.get_assembled_subject(sample['subject_index'])
-            prediction_image = miapy_conv.NumpySimpleITKImageBridge.convert(assembled, sample['properties'])
+            prediction_image = pymia_conv.NumpySimpleITKImageBridge.convert(assembled, sample['properties'])
             evaluator.evaluate(prediction_image, label_image, sample['subject'])  # evaluate prediction
 
 

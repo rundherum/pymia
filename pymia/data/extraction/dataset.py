@@ -1,7 +1,7 @@
 import torch.utils.data.dataset as data
 
-import miapy.data.transformation as tfm
-import miapy.data.indexexpression as expr
+import pymia.data.transformation as tfm
+import pymia.data.indexexpression as expr
 from . import reader as rd
 from . import indexing as idx
 from . import extractor as extr

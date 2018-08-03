@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 import SimpleITK as sitk
-import miapy.filtering.misc as m
+import pymia.filtering.misc as m
 
 
 class TestSizeCorrection(unittest.TestCase):

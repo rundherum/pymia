@@ -2,10 +2,10 @@ import os
 
 import numpy as np
 
-import miapy.data.indexexpression as expr
-import miapy.data.conversion as conv
-import miapy.data.subjectfile as subj
-import miapy.data.definition as df
+import pymia.data.indexexpression as expr
+import pymia.data.conversion as conv
+import pymia.data.subjectfile as subj
+import pymia.data.definition as df
 from . import writer as wr
 
 

@@ -4,9 +4,9 @@ import os
 import SimpleITK as sitk
 import numpy as np
 
-import miapy.data as miapy_data
-import miapy.data.conversion as conv
-import miapy.data.extraction as extr
+import pymia.data as pymia_data
+import pymia.data.conversion as conv
+import pymia.data.extraction as extr
 
 
 def main(hdf_file: str):
@@ -25,7 +25,7 @@ def main(hdf_file: str):
     for i in range(len(dataset)):
         item = dataset[i]
 
-        index_expr = item['index_expr']  # type: miapy_data.IndexExpression
+        index_expr = item['index_expr']  # type: pymia_data.IndexExpression
         root = item['file_root']
 
         image = None  # type: sitk.Image

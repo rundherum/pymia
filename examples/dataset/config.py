@@ -1,7 +1,7 @@
-import miapy.config.configuration as miapy_cfg
+import pymia.config.configuration as pymia_cfg
 
 
-class Configuration(miapy_cfg.ConfigurationBase):
+class Configuration(pymia_cfg.ConfigurationBase):
     VERSION = 1
     TYPE = ''
 
@@ -32,4 +32,4 @@ def load(path: str, config_cls):
         (config_cls): The configuration.
     """
 
-    return miapy_cfg.JSONConfigurationParser.load(path, config_cls)
+    return pymia_cfg.JSONConfigurationParser.load(path, config_cls)

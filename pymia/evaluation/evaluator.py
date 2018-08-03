@@ -10,7 +10,7 @@ from typing import Union
 import numpy as np
 import SimpleITK as sitk
 
-import miapy.evaluation.metric as miapy_metric
+import pymia.evaluation.metric as pymia_metric
 
 
 class IEvaluatorWriter(metaclass=ABCMeta):
@@ -174,11 +174,11 @@ class Evaluator:
 
         self.labels[label] = description
 
-    def add_metric(self, metric: miapy_metric.IMetric):
+    def add_metric(self, metric: pymia_metric.IMetric):
         """Adds a metric to the evaluation.
 
         Args:
-            metric (miapy_metric.IMetric): The metric.
+            metric (pymia_metric.IMetric): The metric.
         """
 
         self.metrics.append(metric)
@@ -232,7 +232,7 @@ class Evaluator:
             labels = np.in1d(ground_truth_array.ravel(), label, True).reshape(ground_truth_array.shape).astype(np.uint8)
 
             # calculate the confusion matrix for IConfusionMatrixMetric
-            confusion_matrix = miapy_metric.ConfusionMatrix(predictions, labels)
+            confusion_matrix = pymia_metric.ConfusionMatrix(predictions, labels)
 
             # flag indicating whether the images have been converted for ISimpleITKImageMetric
             converted_to_image = False
@@ -241,12 +241,12 @@ class Evaluator:
 
             # calculate the metrics
             for param_index, metric in enumerate(self.metrics):
-                if isinstance(metric, miapy_metric.IConfusionMatrixMetric):
+                if isinstance(metric, pymia_metric.IConfusionMatrixMetric):
                     metric.confusion_matrix = confusion_matrix
-                elif isinstance(metric, miapy_metric.INumpyArrayMetric):
+                elif isinstance(metric, pymia_metric.INumpyArrayMetric):
                     metric.ground_truth = labels
                     metric.segmentation = predictions
-                elif isinstance(metric, miapy_metric.ISimpleITKImageMetric):
+                elif isinstance(metric, pymia_metric.ISimpleITKImageMetric):
                     if not converted_to_image:
                         if not isinstance(image, sitk.Image):
                             raise ValueError('SimpleITK image is required for SimpleITK-based metrics')

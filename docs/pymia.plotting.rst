@@ -1,28 +1,28 @@
-Plotting (:mod:`miapy.plotting` package)
+Plotting (:mod:`pymia.plotting` package)
 ==============================================
 
 This package facilitates the plotting of images for presentation and documentation purposes.
 
-Histogram (:mod:`miapy.plotting.histogram` module)
+Histogram (:mod:`pymia.plotting.histogram` module)
 --------------------------------------------------
 
-.. automodule:: miapy.plotting.histogram
+.. automodule:: pymia.plotting.histogram
     :members:
     :undoc-members:
     :show-inheritance:
 
-Image (:mod:`miapy.plotting.image` module)
+Image (:mod:`pymia.plotting.image` module)
 ------------------------------------------
 
-.. automodule:: miapy.plotting.image
+.. automodule:: pymia.plotting.image
     :members:
     :undoc-members:
     :show-inheritance:
 
-Surface distance (:mod:`miapy.plotting.surfacedistance` module)
+Surface distance (:mod:`pymia.plotting.surfacedistance` module)
 ---------------------------------------------------------------
 
-.. automodule:: miapy.plotting.surfacedistance
+.. automodule:: pymia.plotting.surfacedistance
     :members:
     :undoc-members:
     :show-inheritance:

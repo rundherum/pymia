@@ -1,38 +1,38 @@
-Metric (:mod:`miapy.evaluation.metric` package)
+Metric (:mod:`pymia.evaluation.metric` package)
 ===============================================
 
 This package provides a number of metric measures that e.g. can be used for testing
 and/or evaluation purposes on two binary masks (i.e. measuring their similarity) or
 distance between histograms.
 
-Base (:mod:`miapy.evaluation.metric.base`) module
+Base (:mod:`pymia.evaluation.metric.base`) module
 -------------------------------------------------
 
-.. automodule:: miapy.evaluation.metric.base
+.. automodule:: pymia.evaluation.metric.base
     :members:
     :undoc-members:
     :show-inheritance:
 
-Metric (:mod:`miapy.evaluation.metric.metric`) module
+Metric (:mod:`pymia.evaluation.metric.metric`) module
 -----------------------------------------------------
 
-.. automodule:: miapy.evaluation.metric.metric
+.. automodule:: pymia.evaluation.metric.metric
     :members:
     :undoc-members:
     :show-inheritance:
 
-Regression metrics (:mod:`miapy.evaluation.metric.regression`) module
+Regression metrics (:mod:`pymia.evaluation.metric.regression`) module
 ---------------------------------------------------------------------
 
-.. automodule:: miapy.evaluation.metric.regression
+.. automodule:: pymia.evaluation.metric.regression
     :members:
     :undoc-members:
     :show-inheritance:
 
-Segmentation metrics (:mod:`miapy.evaluation.metric.segmentation`) module
+Segmentation metrics (:mod:`pymia.evaluation.metric.segmentation`) module
 -------------------------------------------------------------------------
 
-.. automodule:: miapy.evaluation.metric.segmentation
+.. automodule:: pymia.evaluation.metric.segmentation
     :members:
     :undoc-members:
     :show-inheritance:

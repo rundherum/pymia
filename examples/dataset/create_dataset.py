@@ -6,12 +6,12 @@ import typing
 import SimpleITK as sitk
 import numpy as np
 
-import miapy.data as miapy_data
-import miapy.data.conversion as conv
-import miapy.data.creation as miapy_crt
-import miapy.data.loading as miapy_load
-import miapy.data.transformation as miapy_tfm
-import miapy.data.creation.fileloader as file_load
+import pymia.data as pymia_data
+import pymia.data.conversion as conv
+import pymia.data.creation as pymia_crt
+import pymia.data.loading as pymia_load
+import pymia.data.transformation as pymia_tfm
+import pymia.data.creation.fileloader as file_load
 
 
 class FileTypes(enum.Enum):
@@ -49,7 +49,7 @@ class LoadData(file_load.Load):
         return sitk.GetArrayFromImage(img), conv.ImageProperties(img)
 
 
-class Subject(miapy_data.SubjectFile):
+class Subject(pymia_data.SubjectFile):
 
     def __init__(self, subject: str, files: dict):
         super().__init__(subject,
@@ -61,7 +61,7 @@ class Subject(miapy_data.SubjectFile):
         self.subject_path = files.get(subject, '')
 
 
-class DataSetFilePathGenerator(miapy_load.FilePathGenerator):
+class DataSetFilePathGenerator(pymia_load.FilePathGenerator):
     """Represents a brain image file path generator.
 
     The generator is used to convert a human readable image identifier to an image file path,
@@ -104,7 +104,7 @@ class DataSetFilePathGenerator(miapy_load.FilePathGenerator):
         return os.path.join(root_dir, file_name)
 
 
-class DirectoryFilter(miapy_load.DirectoryFilter):
+class DirectoryFilter(pymia_load.DirectoryFilter):
     """Represents a data directory filter."""
 
     def __init__(self):
@@ -127,7 +127,7 @@ class DirectoryFilter(miapy_load.DirectoryFilter):
 
 def main(hdf_file: str, data_dir: str):
     keys = [FileTypes.T1, FileTypes.T2, FileTypes.GT, FileTypes.MASK, FileTypes.AGE, FileTypes.GPA, FileTypes.SEX]
-    crawler = miapy_load.FileSystemDataCrawler(data_dir,
+    crawler = pymia_load.FileSystemDataCrawler(data_dir,
                                                keys,
                                                DataSetFilePathGenerator(),
                                                DirectoryFilter(),
@@ -138,17 +138,17 @@ def main(hdf_file: str, data_dir: str):
     if os.path.exists(hdf_file):
         os.remove(hdf_file)
 
-    with miapy_crt.get_writer(hdf_file) as writer:
-        callbacks = miapy_crt.get_default_callbacks(writer)
+    with pymia_crt.get_writer(hdf_file) as writer:
+        callbacks = pymia_crt.get_default_callbacks(writer)
 
         # normalize the images and unsqueeze the labels and mask.
         # Unsqueeze is needed due to the convention to have the number of channels as last dimension.
         # I.e., here we have the shape 10 x 256 x 256 before the unsqueeze operation and after 10 x 256 x 256 x 1
-        transform = miapy_tfm.ComposeTransform([miapy_tfm.IntensityNormalization(loop_axis=3, entries=('images',)),
-                                                miapy_tfm.UnSqueeze(entries=('labels', 'mask'))
+        transform = pymia_tfm.ComposeTransform([pymia_tfm.IntensityNormalization(loop_axis=3, entries=('images',)),
+                                                pymia_tfm.UnSqueeze(entries=('labels', 'mask'))
                                                 ])
 
-        traverser = miapy_crt.SubjectFileTraverser()
+        traverser = pymia_crt.SubjectFileTraverser()
         traverser.traverse(subjects, callback=callbacks, load=LoadData(), transform=transform)
 
 

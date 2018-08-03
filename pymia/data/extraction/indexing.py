@@ -3,7 +3,7 @@ import typing as t
 
 import numpy as np
 
-import miapy.data.indexexpression as expr
+import pymia.data.indexexpression as expr
 
 
 class IndexingStrategy(metaclass=abc.ABCMeta):

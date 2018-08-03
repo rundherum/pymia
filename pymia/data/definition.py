@@ -1,4 +1,4 @@
-"""This module contains global definitions for the :mod:`miapy.data` package.
+"""This module contains global definitions for the :mod:`pymia.data` package.
 """
 
 NAMES_PLACEHOLDER = 'meta/names/{}_names'

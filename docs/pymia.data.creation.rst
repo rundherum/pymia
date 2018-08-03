@@ -1,34 +1,34 @@
-Creation (:mod:`miapy.data.creation` package)
+Creation (:mod:`pymia.data.creation` package)
 =============================================
 
-Callback (:mod:`miapy.data.creation.callback` module)
+Callback (:mod:`pymia.data.creation.callback` module)
 -----------------------------------------------------
 
-.. automodule:: miapy.data.creation.callback
+.. automodule:: pymia.data.creation.callback
     :members:
     :undoc-members:
     :show-inheritance:
 
-File loader (:mod:`miapy.data.creation.fileloader` module)
+File loader (:mod:`pymia.data.creation.fileloader` module)
 ----------------------------------------------------------
 
-.. automodule:: miapy.data.creation.fileloader
+.. automodule:: pymia.data.creation.fileloader
     :members:
     :undoc-members:
     :show-inheritance:
 
-Traverser (:mod:`miapy.data.creation.traverser` module)
+Traverser (:mod:`pymia.data.creation.traverser` module)
 -------------------------------------------------------
 
-.. automodule:: miapy.data.creation.traverser
+.. automodule:: pymia.data.creation.traverser
     :members:
     :undoc-members:
     :show-inheritance:
 
-Writer (:mod:`miapy.data.creation.writer` module)
+Writer (:mod:`pymia.data.creation.writer` module)
 -------------------------------------------------
 
-.. automodule:: miapy.data.creation.writer
+.. automodule:: pymia.data.creation.writer
     :members:
     :undoc-members:
     :show-inheritance:

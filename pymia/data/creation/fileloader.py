@@ -4,8 +4,8 @@ import typing as t
 import numpy as np
 import SimpleITK as sitk
 
-import miapy.data.conversion as conv
-import miapy.data.subjectfile as subj
+import pymia.data.conversion as conv
+import pymia.data.subjectfile as subj
 
 
 class Load(metaclass=abc.ABCMeta):

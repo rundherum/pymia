@@ -1,42 +1,42 @@
-Extraction (:mod:`miapy.data.extraction` package)
+Extraction (:mod:`pymia.data.extraction` package)
 =================================================
 
-Data set (:mod:`miapy.data.extraction.dataset` module)
+Data set (:mod:`pymia.data.extraction.dataset` module)
 ------------------------------------------------------
 
-.. automodule:: miapy.data.extraction.dataset
+.. automodule:: pymia.data.extraction.dataset
     :members:
     :undoc-members:
     :show-inheritance:
 
-Extractor (:mod:`miapy.data.extraction.extractor` module)
+Extractor (:mod:`pymia.data.extraction.extractor` module)
 ---------------------------------------------------------
 
-.. automodule:: miapy.data.extraction.extractor
+.. automodule:: pymia.data.extraction.extractor
     :members:
     :undoc-members:
     :show-inheritance:
 
-Indexing (:mod:`miapy.data.extraction.indexing` module)
+Indexing (:mod:`pymia.data.extraction.indexing` module)
 -------------------------------------------------------
 
-.. automodule:: miapy.data.extraction.indexing
+.. automodule:: pymia.data.extraction.indexing
     :members:
     :undoc-members:
     :show-inheritance:
 
-Reader (:mod:`miapy.data.extraction.reader` module)
+Reader (:mod:`pymia.data.extraction.reader` module)
 ---------------------------------------------------
 
-.. automodule:: miapy.data.extraction.reader
+.. automodule:: pymia.data.extraction.reader
     :members:
     :undoc-members:
     :show-inheritance:
 
-Sample (:mod:`miapy.data.extraction.sample` module)
+Sample (:mod:`pymia.data.extraction.sample` module)
 ---------------------------------------------------
 
-.. automodule:: miapy.data.extraction.sample
+.. automodule:: pymia.data.extraction.sample
     :members:
     :undoc-members:
     :show-inheritance:

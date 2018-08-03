@@ -4,8 +4,8 @@ import os
 import h5py
 import numpy as np
 
-import miapy.data.indexexpression as expr
-import miapy.data.definition as df
+import pymia.data.indexexpression as expr
+import pymia.data.definition as df
 
 
 class Reader(metaclass=abc.ABCMeta):
