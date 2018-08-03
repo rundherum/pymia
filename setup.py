@@ -33,6 +33,7 @@ setup(
     author_email='fabian.balsiger@istb.unibe.ch',
     url='https://github.com/rundherum/pymia',
     license=license_,
+    python_requires='>=3.6',
     packages=find_packages(exclude=['docs', 'examples', 'test']),
     install_requires=REQUIRED_PACKAGES,
     tests_require=REQUIRED_PACKAGES + TEST_PACKAGES,
