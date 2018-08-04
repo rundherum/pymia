@@ -1,7 +1,9 @@
+.. _examples:
+
 Example scripts
 ===============
 
-Here are a few example scripts to get you started as fast as possible.
+Here are a few example scripts to get you started as fast as possible with pymia.
 
 .. toctree::
     :maxdepth: 1

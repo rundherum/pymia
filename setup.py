@@ -11,11 +11,11 @@ with open('LICENSE') as f:
     license_ = f.read()
 
 REQUIRED_PACKAGES = [
+    'h5py',
     'matplotlib >= 2.0.2',
     'numpy >= 1.12.1',
     'SimpleITK >= 1.0.0',
     'vtk >= 7.1.0',
-    'h5py',
     'torch'
 ]
 
@@ -25,7 +25,7 @@ TEST_PACKAGES = [
 
 setup(
     name='pymia',
-    version='0.1.0',
+    version='0.1.1',
     description='pymia facilitates medical image analysis',
     long_description=readme,
     long_description_content_type='text/x-rst',

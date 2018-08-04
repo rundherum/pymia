@@ -1,19 +1,27 @@
-.. pymia documentation master file, created by
-   sphinx-quickstart on Tue May 30 21:31:00 2017.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 .. include:: ../README.rst
+
+Getting Started
+===============
+
+If you are new to pymia, here are a few resources to get you up to speed right away.
 
 .. toctree::
     :maxdepth: 1
+    :hidden:
     :caption: Getting started
 
     installation
     examples
-    pycharm
     contribution
     history
+
+* :doc:`installation` helps you installing pymia.
+
+* :doc:`examples` give you an overview of pymia's intended use.
+
+* Do you want to contribute? See :doc:`contribution`.
+
+* :doc:`history`.
 
 .. toctree::
     :maxdepth: 3

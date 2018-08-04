@@ -1,7 +1,9 @@
+.. _contribution:
+
 Contribution
 ============
 
-You can contribute to this repository your own code and improve the existing one.
+Contributors are highly welcome on all levels such as new features, improvements, bug fixes, and documentation.
 Please read this chapter carefully to hold a certain standard in code quality.
 
 Code Style

@@ -1,5 +1,5 @@
-How to use the `pymia` for deep learning projects
-=================================================
+How to use the pymia for deep learning projects
+===============================================
 
 This example explains step by step how to use `pymia` for deep learning projects. `pymia` itself is not a deep learning library
 but provides packages to facilitate your projects. We are working with medical images, so first let's create some (realistic) sample data for a medical image segmentation task.
