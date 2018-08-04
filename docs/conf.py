@@ -19,28 +19,16 @@
 #
 import os
 import sys
-import unittest.mock
 
 import sphinx_rtd_theme
 
 basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, basedir)
 
-
-class Mock(unittest.mock.MagicMock):
-    @classmethod
-    def __getattr__(cls, name):
-        return unittest.mock.MagicMock()
-
-# 'h5py', 'matplotlib', 'matplotlib.colors', 'matplotlib.pyplot', 'numpy', 'SimpleITK',
-MOCK_MODULES = ['torch', 'torch.utils.data', 'torch.utils.data.dataset', 'torch.utils.data.sampler']
-sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
-
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-#
-# needs_sphinx = '1.0'
+needs_sphinx = '1.3'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -55,6 +43,7 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.napoleon']
 
 napoleon_use_ivar = True
+autodoc_mock_imports = ['torch']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
