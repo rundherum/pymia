@@ -19,17 +19,22 @@
 #
 import os
 import sys
-# import mock
+import unittest.mock
 
 import sphinx_rtd_theme
 
 basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, basedir)
 
-# MOCK_MODULES = ['h5py', 'matplotlib', 'matplotlib.colors', 'matplotlib.pyplot', 'numpy', 'SimpleITK',
-#                 'torch', 'torch.utils.data', 'torch.utils.data.dataset', 'torch.utils.data.sampler']
-# for mod_name in MOCK_MODULES:
-#     sys.modules[mod_name] = mock.Mock()
+
+class Mock(unittest.mock.MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+        return unittest.mock.MagicMock()
+
+# 'h5py', 'matplotlib', 'matplotlib.colors', 'matplotlib.pyplot', 'numpy', 'SimpleITK',
+MOCK_MODULES = ['torch', 'torch.utils.data', 'torch.utils.data.dataset', 'torch.utils.data.sampler']
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 # -- General configuration ------------------------------------------------
 
