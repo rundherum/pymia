@@ -316,9 +316,9 @@ class PadDataExtractor(Extractor):
         padded_indexing[padded_indexing < 0] = 0  # cannot slice outside the boundary
         padded_index_expr = expr.IndexExpression(padded_indexing.tolist())
 
-        params['index_expr'] = padded_index_expr
-        self.extractor.extract(reader, params, extracted)
-        params['index_expr'] = index_expr
+        padded_params = params.copy()
+        padded_params['index_expr'] = padded_index_expr
+        self.extractor.extract(reader, padded_params, extracted)
 
         for category in self.categories:
             data = extracted[category]
