@@ -482,11 +482,17 @@ class MutualInformation(IConfusionMatrixMetric):
         fn_tp = fn + tp
         fp_tp = fp + tp
 
-        h1 = -((fn_tp / n) * math.log2(fn_tp / n) +
-               (1 - fn_tp / n) * math.log2(1 - fn_tp / n))
-
-        h2 = -((fp_tp / n) * math.log2(fp_tp / n) +
-               (1 - fp_tp / n) * math.log2(1 - fp_tp / n))
+        if fn_tp != 0 and fn_tp/n != 1:
+            h1 = -((fn_tp / n) * math.log2(fn_tp / n) +
+                   (1 - fn_tp / n) * math.log2(1 - fn_tp / n))
+        else:
+            return 0
+ 
+        if fp_tp != 0 and fp_tp/n != 1:
+            h2 = -((fp_tp / n) * math.log2(fp_tp / n) +
+                   (1 - fp_tp / n) * math.log2(1 - fp_tp / n))
+        else:
+            return 0
 
         p00 = 1 if tn == 0 else (tn / n)
         p01 = 1 if fn == 0 else (fn / n)
@@ -706,11 +712,17 @@ class VariationOfInformation(IConfusionMatrixMetric):
         fn_tp = fn + tp
         fp_tp = fp + tp
 
-        h1 = -((fn_tp / n) * math.log2(fn_tp / n) +
-               (1 - fn_tp / n) * math.log2(1 - fn_tp / n))
-
-        h2 = -((fp_tp / n) * math.log2(fp_tp / n) +
-               (1 - fp_tp / n) * math.log2(1 - fp_tp / n))
+        if fn_tp != 0 and fn_tp / n != 1:
+            h1 = -((fn_tp / n) * math.log2(fn_tp / n) +
+                   (1 - fn_tp / n) * math.log2(1 - fn_tp / n))
+        else:
+            return 0
+ 
+        if fp_tp != 0 and fp_tp / n != 1:
+            h2 = -((fp_tp / n) * math.log2(fp_tp / n) +
+                   (1 - fp_tp / n) * math.log2(1 - fp_tp / n))
+        else:
+            return 0
 
         p00 = 1 if tn == 0 else (tn / n)
         p01 = 1 if fn == 0 else (fn / n)
