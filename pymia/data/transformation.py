@@ -233,9 +233,10 @@ class Permute(Transform):
 
 class Squeeze(Transform):
 
-    def __init__(self, entries=('images', 'labels')) -> None:
+    def __init__(self, entries=('images', 'labels'), squeeze_axis=None) -> None:
         super().__init__()
         self.entries = entries
+        self.squeeze_axis = squeeze_axis
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
@@ -243,7 +244,7 @@ class Squeeze(Transform):
                 raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
 
             np_entry = check_and_return(sample[entry], np.ndarray)
-            sample[entry] = np_entry.squeeze()
+            sample[entry] = np_entry.squeeze(self.squeeze_axis)
         return sample
 
 
