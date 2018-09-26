@@ -47,7 +47,7 @@ class IntensityRescale(Transform):
                 slicing = [slice(None) for _ in range(np_entry.ndim)]
                 for i in range(np_entry.shape[self.loop_axis]):
                     slicing[self.loop_axis] = i
-                    np_entry[slicing] = self._normalize(np_entry[slicing], self.lower, self.upper)
+                    np_entry[tuple(slicing)] = self._normalize(np_entry[tuple(slicing)], self.lower, self.upper)
 
             sample[entry] = np_entry
         return sample
@@ -85,7 +85,7 @@ class IntensityNormalization(Transform):
                 slicing = [slice(None) for _ in range(np_entry.ndim)]
                 for i in range(np_entry.shape[self.loop_axis]):
                     slicing[self.loop_axis] = i
-                    np_entry[slicing] = self.normalize_fn(np_entry[slicing])
+                    np_entry[tuple(slicing)] = self.normalize_fn(np_entry[tuple(slicing)])
             sample[entry] = np_entry
         return sample
 
@@ -114,7 +114,7 @@ class LambdaTransform(Transform):
                 slicing = [slice(None) for _ in range(np_entry.ndim)]
                 for i in range(np_entry.shape[self.loop_axis]):
                     slicing[self.loop_axis] = i
-                    np_entry[slicing] = self.lambda_fn(np_entry[slicing])
+                    np_entry[tuple(slicing)] = self.lambda_fn(np_entry[tuple(slicing)])
             sample[entry] = np_entry
         return sample
 
@@ -144,7 +144,7 @@ class ClipPercentile(Transform):
                 slicing = [slice(None) for _ in range(np_entry.ndim)]
                 for i in range(np_entry.shape[self.loop_axis]):
                     slicing[self.loop_axis] = i
-                    np_entry[slicing] = self._clip(np_entry[slicing])
+                    np_entry[tuple(slicing)] = self._clip(np_entry[tuple(slicing)])
 
             sample[entry] = np_entry
         return sample
@@ -300,7 +300,7 @@ class SizeCorrection(Transform):
                     after = np_entry.shape[idx] - (np_entry.shape[idx] - size) // 2 - ((np_entry.shape[idx] - size) % 2)
                     slicing = [slice(None)] * np_entry.ndim
                     slicing[idx] = slice(before, after)
-                    np_entry = np_entry[slicing]
+                    np_entry = np_entry[tuple(slicing)]
                 elif size is not None and size > np_entry.shape[idx]:
                     # pad current dimension
                     before = (size - np_entry.shape[idx]) // 2
