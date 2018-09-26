@@ -1,5 +1,5 @@
 import abc
-import typing as t
+import typing
 
 import numpy as np
 import torch
@@ -17,7 +17,7 @@ class Transform(metaclass=abc.ABCMeta):
 
 class ComposeTransform(Transform):
 
-    def __init__(self, transforms: t.Iterable[Transform]) -> None:
+    def __init__(self, transforms: typing.Iterable[Transform]) -> None:
         self.transforms = transforms
 
     def __call__(self, sample: dict) -> dict:
@@ -159,7 +159,7 @@ class ClipPercentile(Transform):
 
 class Relabel(Transform):
 
-    def __init__(self, label_changes: t.Dict[int, int], entries=('labels',)) -> None:
+    def __init__(self, label_changes: typing.Dict[int, int], entries=('labels',)) -> None:
         super().__init__()
         self.label_changes = label_changes
         self.entries = entries
@@ -269,7 +269,8 @@ class SizeCorrection(Transform):
     Corrects the size, i.e. shape, of an array to a given reference shape.
     """
 
-    def __init__(self, shape: t.Tuple[t.Union[None, int], ...], pad_value: int=0, entries=('images', 'labels')) -> None:
+    def __init__(self, shape: typing.Tuple[typing.Union[None, int], ...], pad_value: int=0,
+                 entries=('images', 'labels')) -> None:
         """Initializes a new instance of the SizeCorrection class.
 
         Args:
