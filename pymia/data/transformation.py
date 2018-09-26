@@ -337,7 +337,7 @@ class Mask(Transform):
                 np_entry[np_mask == self.mask_value] = self.masking_value
             else:
                 mask_for_np_entry = np.repeat(np.expand_dims(np_mask, self.loop_axis),
-                                          np_entry.shape[self.loop_axis], axis=self.loop_axis)
+                                              np_entry.shape[self.loop_axis], axis=self.loop_axis)
                 np_entry[mask_for_np_entry == self.mask_value] = self.masking_value
 
             sample[entry] = np_entry
