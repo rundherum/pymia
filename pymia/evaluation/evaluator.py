@@ -107,18 +107,20 @@ class ConsoleEvaluatorWriter(IEvaluatorWriter):
         """
 
         # format all floats with given precision to str
-        out = []
+        out_as_string = [self.header]
         for line in data:
-            out += [val if isinstance(val, str) else "{0:.{1}f}".format(val, self.precision) for val in line]
-            out += ["\n"]
+            out_as_string.append([val if isinstance(val, str) else "{0:.{1}f}".format(val, self.precision)
+                                  for val in line])
 
-        # get length for output alignment
-        length = max(len(max(out, key=len)), len(max(self.header, key=len))) + 2
+        # determine length of each column for output alignment
+        lengths = np.array([list(map(len, row)) for row in out_as_string])
+        lengths = lengths.max(0)
+        lengths += (len(lengths) - 1) * [2] + [0, ]  # append two spaces except for last column
 
-        print("".join("{0:>{1}}".format(val, length) for val in self.header),
-              "\n",
-              "".join("{0:>{1}}".format(val, length) for val in out),
-              sep='', end='')
+        # format for output alignment
+        out = [['{0:<{1}}'.format(val, lengths[idx]) for idx, val in enumerate(line)] for line in out_as_string]
+
+        print('\n'.join(''.join(line) for line in out), sep='', end='\n')
 
     def write_header(self, header: list):
         """Writes the evaluation header.
