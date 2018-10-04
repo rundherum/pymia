@@ -8,7 +8,8 @@ It is possible to implement your own metrics and use them with the :class:`evalu
 Just inherit from :class:`metric.IMetric`, :class:`metric.IConfusionMatrixMetric` or :class:`ISimpleITKImageMetric`
 and implement the function :func:`calculate`.
 """
-from .regression import (CoefficientOfDetermination, MeanAbsoluteError, MeanSquaredError, RootMeanSquaredError)
+from .regression import (CoefficientOfDetermination, MeanAbsoluteError, MeanSquaredError, RootMeanSquaredError,
+                         NormalizedRootMeanSquaredError)
 from .segmentation import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageDistance, CohenKappaMetric,
                            DiceCoefficient, FalseNegative, FalsePositive, Fallout, FMeasure,
                            GlobalConsistencyError, GroundTruthVolume, HausdorffDistance,
@@ -33,7 +34,8 @@ def get_all_regression_metrics():
     Returns:
         list[IMetric]: A list of metrics.
     """
-    return [CoefficientOfDetermination(), MeanAbsoluteError(), MeanSquaredError(), RootMeanSquaredError()]
+    return [CoefficientOfDetermination(), MeanAbsoluteError(), MeanSquaredError(), RootMeanSquaredError(),
+            NormalizedRootMeanSquaredError()]
 
 
 def get_overlap_metrics():

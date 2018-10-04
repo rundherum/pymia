@@ -47,6 +47,21 @@ class RootMeanSquaredError(INumpyArrayMetric):
         return np.sqrt(np.mean(np.square(self.ground_truth - self.segmentation)))
 
 
+class NormalizedRootMeanSquaredError(INumpyArrayMetric):
+    """Represents a normalized root mean squared error metric."""
+
+    def __init__(self):
+        """Initializes a new instance of the NormalizedRootMeanSquaredError class."""
+        super().__init__()
+        self.metric = 'NRMSE'
+
+    def calculate(self):
+        """Calculates the normalized root mean squared error."""
+
+        rmse = np.sqrt(np.mean(np.square(self.ground_truth - self.segmentation)))
+        return rmse / (self.ground_truth.max() - self.ground_truth.min())
+
+
 class CoefficientOfDetermination(INumpyArrayMetric):
     """Represents a coefficient of determination (R^2) error metric."""
 
