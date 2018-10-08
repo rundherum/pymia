@@ -13,6 +13,7 @@ def plot_histogram(path: str, image: t.Union[sitk.Image, np.ndarray], no_bins: i
     """Plots a histogram of an image.
 
     Plots either the histogram of a slice of the image or of the whole image.
+
     Args:
         path (str): The file path.
         image (SimpleITK.Image or numpy array): The image.

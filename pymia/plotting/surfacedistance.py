@@ -19,6 +19,7 @@ Examples:
     >>> distance = distance_filter.GetOutput()
     
     The second example computes the surface-to-surface distance of a prediction to a ground truth image.
+
     >>> image1, transform1 = read_and_transform_image('PREDICTION.mha')
     >>> image2, transform2 = read_and_transform_image('GROUND-TRUTH.mha')
     >>> isocontour1 = compute_isocontour(image1)
