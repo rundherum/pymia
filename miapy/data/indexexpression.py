@@ -9,7 +9,7 @@ class IndexExpression:
         self.expression = None
         self.set_indexing(indexing, axis)
 
-    def set_indexing(self, indexing: t.Union[int, tuple, t.List[int], t.List[tuple], t.List[list]],
+    def set_indexing(self, indexing: t.Union[int, tuple, slice, t.List[int], t.List[tuple], t.List[list]],
                      axis: t.Union[int, tuple]=None):
         if indexing is None:
             self.expression = slice(None)
