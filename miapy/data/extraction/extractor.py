@@ -287,9 +287,11 @@ class DataExtractor(Extractor):
 
 class PadDataExtractor(Extractor):
 
-    def __init__(self, padding: t.Union[tuple, t.List[tuple]], extractor: Extractor, categories=('images',)) -> None:
+    def __init__(self, padding: t.Union[tuple, t.List[tuple]], extractor: Extractor) -> None:
         super().__init__()
-        self.categories = categories
+        if not hasattr(extractor, 'categories'):
+            raise ValueError('argument extractor needs to have the property "categories"')
+
         self.extractor = extractor
 
         if isinstance(padding, tuple):
@@ -320,7 +322,7 @@ class PadDataExtractor(Extractor):
         padded_params['index_expr'] = padded_index_expr
         self.extractor.extract(reader, padded_params, extracted)
 
-        for category in self.categories:
+        for category in self.extractor.categories:
             data = extracted[category]
 
             full_pad_shape = padded_shape + data.shape[len(padded_shape):]
