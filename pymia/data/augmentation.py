@@ -1,3 +1,11 @@
+"""This module holds classes for data augmentation.
+
+The data augmentation bases on the transformation concept (see :class:`pymia.data.transformation.Transform`)
+and can easily be incorporated into the data loading process.
+
+See Also:
+    https://github.com/MIC-DKFZ/batchgenerators
+"""
 import typing as t
 
 import numpy as np
