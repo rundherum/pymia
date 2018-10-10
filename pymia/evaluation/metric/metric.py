@@ -4,9 +4,12 @@ The metrics are selected based on the paper of Taha 2016.
 Refer to the paper for guidelines how to select appropriate metrics, in-depth description,
 and the math.
 
-It is possible to implement your own metrics and use them with the :class:`evaluator.Evaluator`.
-Just inherit from :class:`metric.IMetric`, :class:`metric.IConfusionMatrixMetric` or :class:`ISimpleITKImageMetric`
-and implement the function :func:`calculate`.
+It is possible to implement your own metrics and use them with the :class:`pymia.evaluation.evaluator.Evaluator`.
+Just inherit from :class:`pymia.evaluation.metric.base.IMetric`,
+:class:`pymia.evaluation.metric.base.IConfusionMatrixMetric`,
+:class:`pymia.evaluation.metric.base.ISimpleITKImageMetric` or
+:class:`pymia.evaluation.metric.base.INumpyArrayMetric`
+and implement the function :func:`pymia.evaluation.metric.base.IMetric.calculate`.
 """
 from .regression import (CoefficientOfDetermination, MeanAbsoluteError, MeanSquaredError, RootMeanSquaredError,
                          NormalizedRootMeanSquaredError)

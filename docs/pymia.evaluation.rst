@@ -3,9 +3,9 @@ Evaluation (:mod:`pymia.evaluation` package)
 
 This package provides an easy way to evaluate the performance of your algorithms.
 
-We provide an :class:`pymia.evaluation.evaluator.Evaluator` and two writers (:class:`pymia.evaluation.evaluator.CSVEvaluatorWriter`)
-and (:class:`pymia.evaluation.evaluator.ConsoleEvaluatorWriter`), which can be used with a large amount of metrics
-(see :mod:`pymia.evaluation.evaluation.metric`).
+We provide an :class:`pymia.evaluation.evaluator.Evaluator` and two writers
+(:class:`pymia.evaluation.evaluator.CSVEvaluatorWriter` and :class:`pymia.evaluation.evaluator.ConsoleEvaluatorWriter`),
+which can be used with a large amount of metrics (see :mod:`pymia.evaluation.metric` package).
 
 Subpackages
 -----------
