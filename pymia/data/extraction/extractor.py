@@ -289,8 +289,8 @@ class PadDataExtractor(Extractor):
 
     def __init__(self, padding: t.Union[tuple, t.List[tuple]], extractor: Extractor) -> None:
         super().__init__()
-        if not hasattr(extractor, 'categories'):
-            raise ValueError('argument extractor needs to have the property "categories"')
+        if not (hasattr(extractor, 'categories') or hasattr(extractor, 'category')):
+            raise ValueError('argument extractor needs to have the property "categories" or "category"')
 
         self.extractor = extractor
 
@@ -322,7 +322,9 @@ class PadDataExtractor(Extractor):
         padded_params['index_expr'] = padded_index_expr
         self.extractor.extract(reader, padded_params, extracted)
 
-        for category in self.extractor.categories:
+        categories = self.extractor.categories if hasattr(self.extractor, 'categories') else [self.extractor.category]
+
+        for category in categories:
             data = extracted[category]
 
             full_pad_shape = padded_shape + data.shape[len(padded_shape):]
