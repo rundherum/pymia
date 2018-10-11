@@ -8,7 +8,7 @@ import pymia.data.assembler as pymia_asmbl
 import pymia.evaluation.evaluator as pymia_eval
 import pymia.evaluation.metric as pymia_metric
 
-import examples.dataset.config as cfg
+import config as cfg
 
 
 def batch_to_feed_dict(x_placeholder, y_placeholder, batch, is_train: bool=True) -> dict:
