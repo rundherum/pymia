@@ -38,8 +38,8 @@ class Tester(abc.ABC):
         self.model.load(self.model_dir)
         
         subject_assembler = self.init_subject_assembler()  # todo: not optimal solution since it keeps everything in memory
-        self.data_handler.dataset.set_extractor(self.data_handler.extractor_test)
-        self.data_handler.dataset.set_transform(self.data_handler.extraction_transform_test)
+        self.data_handler.dataset.set_extractor(self.data_handler.extractor_valid)
+        self.data_handler.dataset.set_transform(self.data_handler.extraction_transform_valid)
         for batch_idx, batch in enumerate(self.data_handler.loader_test):
             prediction = self.predict_batch(batch_idx, batch)
             subject_assembler.add_batch(prediction, batch)
