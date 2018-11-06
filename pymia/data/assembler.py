@@ -3,10 +3,8 @@ import pickle
 
 import numpy as np
 
-from . import transformation as tfm
 
-
-class Assembler(metaclass=abc.ABCMeta):
+class Assembler(abc.ABC):
 
     @abc.abstractmethod
     def add_batch(self, prediction, batch: dict):
@@ -21,17 +19,27 @@ class SubjectAssembler(Assembler):
     """Assembles predictions of one or multiple subjects.
 
     Assumes that the network output, i.e. to_assemble, is of shape (B, ..., C)
-    where B is the batch size and C is the numbers of channels (must be at least 1). ... refers to the arbitrary image
+    where B is the batch size and C is the numbers of channels (must be at least 1) and ... refers to an arbitrary image
     dimension.
     """
 
-    def __init__(self, zero_fn=numpy_zeros):
+    def __init__(self, zero_fn=numpy_zeros, on_sample_fn=None):
+        """Initializes a new instance of the SubjectAssembler class.
+
+        Args:
+            zero_fn: A function that initializes the numpy array to hold the predictions.
+                Args: shape: tuple with the shape of the subject's labels, id_: str identifying the subject.
+                Returns: A np.ndarray
+            on_sample_fn: A function that processes a sample.
+                Args: params: dict with the parameters.
+                Returns tuple of data and batch, i.e. the processed data and batch.
+        """
         self.predictions = {}
         self.subjects_ready = set()
         self.zero_fn = zero_fn
+        self.on_sample_fn = on_sample_fn
 
-    def add_batch(self, to_assemble, batch: dict, last_batch=False, transform: tfm.Transform=None):
-        # todo(fabianbalsiger): replace tfm.Transform by callback
+    def add_batch(self, to_assemble, batch: dict, last_batch=False):
         if 'subject_index' not in batch:
             raise ValueError('SubjectAssembler requires "subject_index" to be extracted (use IndexingExtractor)')
         if 'index_expr' not in batch:
@@ -43,7 +51,7 @@ class SubjectAssembler(Assembler):
             to_assemble = {'__prediction': to_assemble}
 
         for idx in range(len(batch['subject_index'])):
-            self.add_sample(to_assemble, batch, idx, transform)
+            self.add_sample(to_assemble, batch, idx)
 
         if last_batch:
             # to prevent from last batch to be ignored
@@ -52,11 +60,11 @@ class SubjectAssembler(Assembler):
     def end(self):
         self.subjects_ready = set(self.predictions.keys())
 
-    def add_sample(self, to_assemble, batch, idx, transform: tfm.Transform=None):
-        # todo(fabianbalsiger): replace tfm.Transform by callback
-        # initialize subject
+    def add_sample(self, to_assemble, batch, idx):
+
         subject_index = batch['subject_index'][idx]
 
+        # initialize subject
         if subject_index not in self.predictions and not self.predictions:
             self.predictions[subject_index] = self._init_new_subject(batch, to_assemble, idx)
         elif subject_index not in self.predictions:
@@ -65,8 +73,10 @@ class SubjectAssembler(Assembler):
 
         for key in to_assemble:
             data = to_assemble[key][idx]
-            if transform is not None:
-                data = transform({key: data, 'batch': batch, 'batch_idx': idx})[key]
+
+            if self.on_sample_fn is not None:
+                params = {key: data, 'batch': batch, 'batch_idx': idx, 'predictions': self.predictions}
+                data, batch = self.on_sample_fn(params)
 
             index_expr = batch['index_expr'][idx]
             if isinstance(index_expr, bytes):
@@ -103,4 +113,3 @@ class SubjectAssembler(Assembler):
         if '__prediction' in assembled:
             return assembled['__prediction']
         return assembled
-
