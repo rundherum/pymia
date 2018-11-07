@@ -88,7 +88,9 @@ class TensorFlowModel(Model, abc.ABC):
             score = kwargs['best_model_score']
             best_model_score_op = self.best_model_score.assign(score)
             self.session.run(best_model_score_op)
-            saved_checkpoint = self.saver.save(self.session, path)
+            # we save with a different checkpoint file, such that max_to_keep applies only to the epoch savings
+            # and the best model does not get overridden
+            saved_checkpoint = self.saver.save(self.session, path, latest_filename='checkpoint_best')
             logging.info('Epoch {:d}: Saved best model with score of {:.6f} at {}'.format(epoch, score, saved_checkpoint))
         else:
             saved_checkpoint = self.saver.save(self.session, path, global_step=epoch)
