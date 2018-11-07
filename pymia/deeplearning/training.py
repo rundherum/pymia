@@ -107,7 +107,7 @@ class Trainer(abc.ABC):
 
                 self.logger.log_scalar('valid/loss', loss_validation, self.current_epoch)
                 logging.info('Epoch {:d}: Validation loss of {:.5f}'.format(self.current_epoch, loss_validation))
-                logging.info('Epoch {:d}: Model score of {:.5f}'.format(self.current_epoch, loss_value_of_epoch))
+                logging.info('Epoch {:d}: Model score of {:.5f}'.format(self.current_epoch, model_score))
 
                 if model_score > self.best_model_score:
                     self.best_model_score = model_score
