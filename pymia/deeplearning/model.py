@@ -1,10 +1,13 @@
 # https://github.com/aicodes/tf-bestpractice
 # https://github.com/MrGemy95/Tensorflow-Project-Template
 import abc
+import glob
 import logging
 import os
+import re
 
 import tensorflow as tf
+import torch
 
 
 class Model(abc.ABC):
@@ -126,25 +129,62 @@ class TorchModel(Model, abc.ABC):
         self.max_to_keep = max_to_keep
 
         # initialize global step, i.e. the number of batches seen by the graph (starts at 0)
+        # this is TensorFlow notation but required since we use TensorBoard. It can be seen as the logging step.
+        self.global_step = 0
         # initialize epoch, i.e. the number of epochs trained (starts at 1)
         self.epoch = 1
+        # initialize best model score
+        self.best_model_score = 0
 
         self.device = None
 
     def save(self, path: str, epoch: int, **kwargs):
-        pass  #todo use max to keep and restore values
-        #path = os.path.join(path, ''.format(epoch))
-        #torch.save(self.network.state_dict(), path)
-        # if 'best_model_score' in kwargs:
-        #     score = kwargs['best_model_score']
-        #     saved_checkpoint = self.saver.save(self.session, path + '-best')
-        #     logging.info('Saved best model at epoch {} with score {:.6f} at {}'.format(epoch, score, saved_checkpoint))
-        # else:
-        #     saved_checkpoint = self.saver.save(self.session, path, global_step=epoch)
-        #     logging.info('Saved model for epoch {} at {}'.format(epoch, saved_checkpoint))
+        if 'best_model_score' in kwargs:
+            self.best_model_score = kwargs['best_model_score']
+            save_path = path + '.pt'
+            logging_str = 'Epoch {:d}: Saved best model with score of {:.6f} at {}'.format(epoch, self.best_model_score,
+                                                                                           save_path)
+        else:
+            save_path = path + '-{}.pt'.format(epoch)
+            logging_str = 'Epoch {:d}: Saved model at {}'.format(epoch, save_path)
+
+        state_dict = {
+            'best_model_score': self.best_model_score,
+            'epoch': epoch,
+            'global_step': self.global_step,
+            'network_state_dict': self.network.state_dict(),
+            'optimizer_state_dict': self.optimizer.state_dict(),
+        }
+
+        torch.save(state_dict, save_path)
+        logging.info(logging_str)
+
+        # keep only max_to_keep models
+        saved_models = glob.glob(path + '-[0-9]*.pt')
+        saved_models = sorted(saved_models,
+                              key=lambda model_path: int(re.search(path + '-(.+?).pt', model_path).group(1)))
+
+        for saved_model in saved_models[:-self.max_to_keep]:
+            os.remove(saved_model)
 
     def load(self, path: str) -> bool:
-        #self.network.load_state_dict(torch.load(path))
+        if os.path.isfile(path):
+            state_dict = torch.load(path)
+        else:
+            # check if a saved model is available
+            saved_models = glob.glob(os.path.join(path, '*-[0-9]*.pt'))
+            if len(saved_models) == 0:
+                return False
+            saved_models = sorted(saved_models,
+                                  key=lambda model_path: int(re.search('-(.+?).pt', model_path).group(1)))
+            state_dict = torch.load(saved_models[-1])
+
+        self.best_model_score = state_dict['best_model_score']
+        self.epoch = state_dict['epoch']
+        self.global_step = state_dict['global_step']
+        self.network.load_state_dict(state_dict['network_state_dict'])
+        self.optimizer.load_state_dict(state_dict['optimizer_state_dict'])
+
         return True
 
     def set_epoch(self, epoch: int):
