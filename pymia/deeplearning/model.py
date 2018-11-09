@@ -72,7 +72,7 @@ class TensorFlowModel(Model, abc.ABC):
         # initialize epoch, i.e. the number of epochs trained (starts at 1)
         self.epoch = tf.Variable(1, name='epoch', trainable=False)
         # initialize best model score
-        self.best_model_score = tf.Variable(0, name='best_model_score', trainable=False)
+        self.best_model_score = tf.Variable(0.0, name='best_model_score', trainable=False)
 
         self.network = self.inference(self.x_placeholder)
         self.loss = self.loss_function(self.x_placeholder, self.y_placeholder)
