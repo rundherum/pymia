@@ -15,6 +15,20 @@ def numpy_zeros(shape: tuple, id_: str):
     return np.zeros(shape)
 
 
+def default_sample_fn(params: dict):
+    key = '__prediction'
+    batch = params['batch']
+    idx = params['batch_idx']
+
+    data = params[key]
+    index_expr = batch['index_expr'][idx]
+    if isinstance(index_expr, bytes):
+        # is pickled
+        index_expr = pickle.loads(index_expr)
+
+    return data, index_expr
+
+
 class SubjectAssembler(Assembler):
     """Assembles predictions of one or multiple subjects.
 
@@ -23,7 +37,7 @@ class SubjectAssembler(Assembler):
     dimension.
     """
 
-    def __init__(self, zero_fn=numpy_zeros, on_sample_fn=None):
+    def __init__(self, zero_fn=numpy_zeros, on_sample_fn=default_sample_fn):
         """Initializes a new instance of the SubjectAssembler class.
 
         Args:
@@ -32,7 +46,7 @@ class SubjectAssembler(Assembler):
                 Returns: A np.ndarray
             on_sample_fn: A function that processes a sample.
                 Args: params: dict with the parameters.
-                Returns tuple of data and batch, i.e. the processed data and batch.
+                Returns tuple of data and index expression, i.e. the processed data and index expression.
         """
         self.predictions = {}
         self.subjects_ready = set()
@@ -73,17 +87,12 @@ class SubjectAssembler(Assembler):
 
         for key in to_assemble:
             data = to_assemble[key][idx]
+            sample_data, index_expr = self.on_sample_fn({key: data,
+                                                         'batch': batch,
+                                                         'batch_idx': idx,
+                                                         'predictions': self.predictions})
 
-            if self.on_sample_fn is not None:
-                params = {key: data, 'batch': batch, 'batch_idx': idx, 'predictions': self.predictions}
-                data, batch = self.on_sample_fn(params)
-
-            index_expr = batch['index_expr'][idx]
-            if isinstance(index_expr, bytes):
-                # is pickled
-                index_expr = pickle.loads(index_expr)
-
-            self.predictions[subject_index][key][index_expr.expression] = data
+            self.predictions[subject_index][key][index_expr.expression] = sample_data
 
     def _init_new_subject(self, batch, to_assemble, idx):
         subject_prediction = {}

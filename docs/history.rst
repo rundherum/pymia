@@ -41,20 +41,21 @@ To have the same behaviour, replace it by:
 
 The transformation in :py:mod:`SubjectAssembler`'s `add_batch` has been removed and replaced by the `on_sample_fn`
 parameter in the constructor. Replacing the transformation by this function should be straight forward by rewriting your
-transformation as function. A basic function could look like this:
+transformation as function (see also the default sample function :py:function:`default_sample_fn`):
 
 .. code-block:: python
 
   def on_sample_fn(params: dict):
     key = '__prediction'
-    data = params[key]
-    idx = params['batch_idx']
     batch = params['batch']
-    predictions = params['predictions']
+    idx = params['batch_idx']
 
-    # do something
+    data = params[key]
+    index_expr = batch['index_expr'][idx]
 
-    return data, batch
+    # manipulate data and index_expr according to your needs
+
+    return data, index_expr
 
 0.1.1 (2018-08-04)
 ------------------
