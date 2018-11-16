@@ -162,7 +162,7 @@ class TorchModel(Model, abc.ABC):
         # keep only max_to_keep models
         saved_models = glob.glob(path + '-[0-9]*.pt')
         saved_models = sorted(saved_models,
-                              key=lambda model_path: int(re.search(path + '-(.+?).pt', model_path).group(1)))
+                              key=lambda model_path: int(re.search(path + '-(\d+).pt', model_path).group(1)))
 
         for saved_model in saved_models[:-self.max_to_keep]:
             os.remove(saved_model)
@@ -176,7 +176,7 @@ class TorchModel(Model, abc.ABC):
             if len(saved_models) == 0:
                 return False
             saved_models = sorted(saved_models,
-                                  key=lambda model_path: int(re.search('-(.+?).pt', model_path).group(1)))
+                                  key=lambda model_path: int(re.search('-(\d+).pt', model_path).group(1)))
             state_dict = torch.load(saved_models[-1])
 
         self.best_model_score = state_dict['best_model_score']
