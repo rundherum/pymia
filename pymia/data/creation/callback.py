@@ -39,6 +39,20 @@ class ComposeCallback(Callback):
             c.on_subject(params)
 
 
+class MonitoringCallback(Callback):
+
+    def on_start(self, params: dict):
+        print('start dataset creation')
+
+    def on_subject(self, params: dict):
+        index = params['subject_index']
+        subject_files = params['subject_files']
+        print('[{}/{}] {}'.format(index + 1, len(subject_files), subject_files[index].subject))
+
+    def on_end(self, params: dict):
+        print('dataset creation finished')
+
+
 class WriteDataCallback(Callback):
 
     def __init__(self, writer: wr.Writer) -> None:
@@ -142,7 +156,8 @@ class WriteFilesCallback(Callback):
 
 
 def get_default_callbacks(writer: wr.Writer):
-    return ComposeCallback([WriteDataCallback(writer),
+    return ComposeCallback([MonitoringCallback(),
+                            WriteDataCallback(writer),
                             WriteFilesCallback(writer),
                             WriteNamesCallback(writer),
                             WriteImageInformationCallback(writer),
