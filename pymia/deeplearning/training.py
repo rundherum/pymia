@@ -370,7 +370,7 @@ class TorchTrainer(Trainer, abc.ABC):
 
         return prediction.cpu().detach().numpy(), loss_val.item() * batch['images'].size()[0]
 
-    def validate_batch(self, idx: int, batch: dict) -> np.ndarray:
+    def validate_batch(self, idx: int, batch: dict) -> (np.ndarray, float):
         """Evaluates a batch.
 
         Args:
