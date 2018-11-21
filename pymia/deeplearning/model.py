@@ -79,6 +79,7 @@ class TensorFlowModel(Model, abc.ABC):
         self.optimizer = self.optimize()
 
         self.saver = tf.train.Saver(max_to_keep=max_to_keep)
+        self.saver_best = tf.train.Saver(max_to_keep=1)
 
     @abc.abstractmethod
     def placeholders(self, x_shape: tuple, y_shape: tuple):
@@ -93,7 +94,7 @@ class TensorFlowModel(Model, abc.ABC):
             self.session.run(best_model_score_op)
             # we save with a different checkpoint file, such that max_to_keep applies only to the epoch savings
             # and the best model does not get overridden
-            saved_checkpoint = self.saver.save(self.session, path, latest_filename='checkpoint_best')
+            saved_checkpoint = self.saver_best.save(self.session, path, latest_filename='checkpoint_best')
             logging.info('Epoch {:d}: Saved best model with score of {:.6f} at {}'.format(epoch, score, saved_checkpoint))
         else:
             saved_checkpoint = self.saver.save(self.session, path, global_step=epoch)
