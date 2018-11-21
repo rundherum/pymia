@@ -16,7 +16,9 @@ REQUIRED_PACKAGES = [
     'numpy >= 1.12.1',
     'SimpleITK >= 1.0.0',
     'vtk >= 7.1.0',
-    'torch'
+    'tensorboardX',
+    'tensorflow',
+    'torch',
 ]
 
 TEST_PACKAGES = [
