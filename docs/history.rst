@@ -6,6 +6,7 @@ Change history
 0.1.2 (to be released)
 ----------------------
 
+ * New `deeplearning` package
  * New extractor :py:class:`PadDataExtractor`, which replaces the `PadPatchDataExtractor` (see migration guide below)
  * New metric :py:class:`NormalizedRootMeanSquaredError`
  * New data augmentation module :py:mod:`augmentation`
@@ -24,7 +25,8 @@ Migration guide
 The extractor `PadPatchDataExtractor` has been replaced by the :py:class:`PadDataExtractor` to facilitate the
 extraction flexibility. The :py:class:`PadDataExtractor` works now with any kind of the three data extractors
 (:py:class:`DataExtractor`, :py:class:`RandomDataExtractor`, and :py:class:`SelectiveDataExtractor`),
-which are passed as argument. Suppose you used the `PadPatchDataExtractor` like this:
+which are passed as argument. Further, it is now possible to pass a function for the padding as argument to replace the
+default zero padding. Suppose you used the `PadPatchDataExtractor` like this:
 
 .. code-block:: python
 
