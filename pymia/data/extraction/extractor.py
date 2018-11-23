@@ -287,12 +287,16 @@ class DataExtractor(Extractor):
 
 class PadDataExtractor(Extractor):
 
-    def __init__(self, padding: t.Union[tuple, t.List[tuple]], extractor: Extractor) -> None:
+    def __init__(self, padding: t.Union[tuple, t.List[tuple]], extractor: Extractor, pad_fn=None):
         super().__init__()
         if not (hasattr(extractor, 'categories') or hasattr(extractor, 'category')):
             raise ValueError('argument extractor needs to have the property "categories" or "category"')
 
         self.extractor = extractor
+        self.pad_fn = pad_fn
+
+        if self.pad_fn is None:
+            self.pad_fn = PadDataExtractor.zero_pad
 
         if isinstance(padding, tuple):
             padding = [(pad, pad) for pad in padding]
@@ -315,7 +319,7 @@ class PadDataExtractor(Extractor):
         sub_indexing[padded_indexing > 0] = 0
         sub_indexing = -sub_indexing
 
-        padded_indexing[padded_indexing < 0] = 0  # cannot slice outside the boundary
+        padded_indexing[padded_indexing < 0] = 0  # cannot slice outside the boundary in negative (but positive works!)
         padded_index_expr = expr.IndexExpression(padded_indexing.tolist())
 
         padded_params = params.copy()
@@ -328,9 +332,16 @@ class PadDataExtractor(Extractor):
             data = extracted[category]
 
             full_pad_shape = padded_shape + data.shape[len(padded_shape):]
-            pad_data = np.zeros(full_pad_shape, dtype=data.dtype)
-            sub_indexing[:, 1] = sub_indexing[:, 0] + data.shape[:sub_indexing.shape[0]]
-            sub_index_expr = expr.IndexExpression(sub_indexing.tolist())
+            if full_pad_shape != data.shape:
+                # we could not fully extract the padded shape, use pad_fn to pad data
+                extracted[category] = self.pad_fn(data, full_pad_shape, sub_indexing)
 
-            pad_data[sub_index_expr.expression] = data
-            extracted[category] = pad_data
+    @staticmethod
+    def zero_pad(data: np.ndarray, pad_shape, sub_indexing):
+        pad_data = np.zeros(pad_shape, dtype=data.dtype)
+
+        sub_indexing[:, 1] = sub_indexing[:, 0] + data.shape[:sub_indexing.shape[0]]
+        sub_index_expr = expr.IndexExpression(sub_indexing.tolist())
+
+        pad_data[sub_index_expr.expression] = data
+        return pad_data
