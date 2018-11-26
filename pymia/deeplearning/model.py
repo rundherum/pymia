@@ -101,20 +101,18 @@ class TensorFlowModel(Model, abc.ABC):
             logging.info('Epoch {:d}: Saved model at {}'.format(epoch, saved_checkpoint))
 
     def load(self, path: str) -> bool:
-        if os.path.isfile(path):  # todo this does not work: add .index to path?
+        # TensorFlow automatically restores self.best_model_score, self.epoch, self.global_step etc.
+        # check e.g. with self.epoch.eval()
+        latest_checkpoint = tf.train.latest_checkpoint(path)
+        if latest_checkpoint:
+            self.saver.restore(self.session, latest_checkpoint)
+            logging.info('Loaded model from {}'.format(latest_checkpoint))
+            return True
+        else:
+            # try to load model directly
             self.saver.restore(self.session, path)
             logging.info('Loaded model from {}'.format(path))
             return True
-        else:
-            latest_checkpoint = tf.train.latest_checkpoint(path)
-            if latest_checkpoint:
-                self.saver.restore(self.session, latest_checkpoint)
-                # self.best_model_score, self.epoch, and self.global_step have been automatically restored
-                # check e.g. with self.epoch.eval()
-                logging.info('Loaded model from {}'.format(latest_checkpoint))
-                return True
-
-        return False
 
     def set_epoch(self, epoch: int):
         epoch_op = self.epoch.assign(epoch)
