@@ -29,14 +29,34 @@ class Tester(abc.ABC):
         self.data_handler = data_handler
         self.model = model
 
+        self.is_model_loaded = False
+
+    def load(self, model_path: str=None) -> bool:
+        """Loads a pre-trained model.
+
+        Args:
+            model_path (str): The model's path.
+                If `None`, the model will automatically be loaded from the model_dir specified in the constructor.
+
+        Returns:
+            True, if the model was loaded; otherwise, False.
+        """
+        if model_path is not None:
+            self.is_model_loaded = self.model.load(model_path)
+        else:
+            self.is_model_loaded = self.model.load(self.model_dir)
+
+        return self.is_model_loaded
+
     def predict(self):
         """Predicts subjects based on a pre-trained model.
 
         This is the main method, which will call the other methods.
         """
 
-        self.model.load(self.model_dir)
-        
+        if not self.is_model_loaded:
+            self.load()
+
         subject_assembler = self.init_subject_assembler()  # todo: not optimal solution since it keeps everything in memory
         self.data_handler.dataset.set_extractor(self.data_handler.extractor_valid)
         self.data_handler.dataset.set_transform(self.data_handler.extraction_transform_valid)
