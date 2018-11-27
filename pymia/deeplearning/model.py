@@ -108,11 +108,13 @@ class TensorFlowModel(Model, abc.ABC):
             self.saver.restore(self.session, latest_checkpoint)
             logging.info('Loaded model from {}'.format(latest_checkpoint))
             return True
-        else:
+        elif not os.path.isdir(path):
             # try to load model directly
             self.saver.restore(self.session, path)
             logging.info('Loaded model from {}'.format(path))
             return True
+        else:
+            return False
 
     def set_epoch(self, epoch: int):
         epoch_op = self.epoch.assign(epoch)
