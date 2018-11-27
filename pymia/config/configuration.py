@@ -46,7 +46,7 @@ class ConfigurationBase(Dictable, metaclass=abc.ABCMeta):
         pass
 
     def to_dict(self, **kwargs):
-        member_to_dict(self)
+        return member_to_dict(self)
 
     def from_dict(self, d: dict, **kwargs):
         version = kwargs.get('version', self.version())
