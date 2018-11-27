@@ -46,13 +46,7 @@ class ConfigurationBase(Dictable, metaclass=abc.ABCMeta):
         pass
 
     def to_dict(self, **kwargs):
-        d = {}
-        for k, v in vars(self).items():
-            if isinstance(v, Dictable):
-                d[k] = v.to_dict()
-            else:
-                d[k] = v
-        return d
+        member_to_dict(self)
 
     def from_dict(self, d: dict, **kwargs):
         version = kwargs.get('version', self.version())
@@ -97,6 +91,16 @@ def dict_to_member(target_obj, d: dict):
                 members[key].from_dict(d[key])
             else:
                 members[key] = d[key]
+
+
+def member_to_dict(target_obj):
+    d = {}
+    for k, v in vars(target_obj).items():
+        if isinstance(v, Dictable):
+            d[k] = v.to_dict()
+        else:
+            d[k] = v
+    return d
 
 
 class MetaData(Dictable):
