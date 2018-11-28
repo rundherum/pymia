@@ -1,3 +1,8 @@
+"""Provides logging functionality for deep learning algorithms.
+
+Warnings:
+    This module is in development and will change with high certainty in the future. Therefore, use carefully!
+"""
 import abc
 
 import numpy as np
@@ -36,6 +41,12 @@ class TensorFlowLogger(Logger):
         self.batch_summaries = batch_summaries
         self.visualization_summaries = visualization_summaries
 
+        # note that the next lines throw a TypeError: Fetch argument None has invalid type <class 'NoneType'>
+        # in case no summary has been added
+        self.batch_summary_op = tf.summary.merge(self.batch_summaries)
+        self.visualization_summary_op1 = tf.summary.merge(self.visualization_summaries[0])
+        self.visualization_summary_op3 = tf.summary.merge(self.visualization_summaries[3])
+
         #self.summary_op = tf.summary.merge_all()  # note that this should be done AFTER adding operations to tf.summary
         self.writer = tf.summary.FileWriter(log_dir, session.graph)  # create writer and directly write graph
 
@@ -59,10 +70,8 @@ class TensorFlowLogger(Logger):
         self.log_scalar('train/duration', kwargs['duration'], epoch)
 
     def log_batch(self, step, **kwargs):
-        # note that the next line throws a TypeError: Fetch argument None has invalid type <class 'NoneType'>
-        # in case no summary has been added
-        summary_op = tf.summary.merge(self.batch_summaries)
-        summary_str = self.session.run(summary_op, feed_dict=kwargs['feed_dict'])
+        # summary_op = tf.summary.merge(self.batch_summaries)
+        summary_str = self.session.run(self.batch_summary_op, feed_dict=kwargs['feed_dict'])
         self.writer.add_summary(summary_str, step)
         self.writer.flush()
 
@@ -70,9 +79,8 @@ class TensorFlowLogger(Logger):
         if len(self.visualization_summaries[0]) == 0: # todo check if visualization summaries contains any entries
             # todo: wirte Python logger that no visu summary
             return
-
-        summary_op = tf.summary.merge(self.visualization_summaries[0])
-        summary_str = self.session.run(summary_op)
+        # summary_op = tf.summary.merge(self.visualization_summaries[0])
+        summary_str = self.session.run(self.visualization_summary_op1)
         self.writer.add_summary(summary_str, epoch)
 
         # todo: clean this up a bit...
@@ -102,10 +110,10 @@ class TensorFlowLogger(Logger):
             else:
                 # todo: when??
                 grid = visualization.make_grid(kernel_weights)[np.newaxis, :, :, np.newaxis]
-            self.session.run(self.visualization_summaries[2][idx].assign(grid))
+            # self.session.run(self.visualization_summaries[2][idx].assign(grid))  # todo(fabianbalsiger): disabled since it adds a new op to the graph, which leads to a growing of the graph...
 
-        summary_op = tf.summary.merge(self.visualization_summaries[3])
-        summary_str = self.session.run(summary_op)
+        # summary_op = tf.summary.merge(self.visualization_summaries[3])
+        summary_str = self.session.run(self.visualization_summary_op3)
         self.writer.add_summary(summary_str, epoch)
         self.writer.flush()
 
