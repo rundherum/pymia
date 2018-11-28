@@ -71,8 +71,12 @@ class TensorFlowModel(Model, abc.ABC):
         self.global_step = tf.train.get_or_create_global_step()  # todo: with tf.variable_scope('global_step')
         # initialize epoch, i.e. the number of epochs trained (starts at 1)
         self.epoch = tf.Variable(1, name='epoch', trainable=False)
+        self.epoch_placeholder = tf.placeholder(self.epoch.dtype)
+        self.epoch_op = self.epoch.assign(self.epoch_placeholder)
         # initialize best model score
         self.best_model_score = tf.Variable(0.0, name='best_model_score', trainable=False)
+        self.best_model_score_placeholder = tf.placeholder(self.best_model_score.dtype)
+        self.best_model_score_op = self.best_model_score.assign(self.best_model_score_placeholder)
 
         self.network = self.inference(self.x_placeholder)
         self.loss = self.loss_function(self.x_placeholder, self.y_placeholder)
@@ -86,12 +90,10 @@ class TensorFlowModel(Model, abc.ABC):
         raise NotImplementedError('placeholders')
 
     def save(self, path: str, epoch: int, **kwargs):
-        # todo: add write_meta_graph=False to not save graph after first time saving? How is file deleting handled?
         if 'best_model_score' in kwargs:
             # update best model score variable in graph (such that it gets automatically restored
             score = kwargs['best_model_score']
-            best_model_score_op = self.best_model_score.assign(score)
-            self.session.run(best_model_score_op)
+            self.session.run(self.best_model_score_op, feed_dict={self.best_model_score_placeholder: score})
             # we save with a different checkpoint file, such that max_to_keep applies only to the epoch savings
             # and the best model does not get overridden
             saved_checkpoint = self.saver_best.save(self.session, path, latest_filename='checkpoint_best')
@@ -117,8 +119,7 @@ class TensorFlowModel(Model, abc.ABC):
             return False
 
     def set_epoch(self, epoch: int):
-        epoch_op = self.epoch.assign(epoch)
-        self.session.run(epoch_op)
+        self.session.run(self.epoch_op, feed_dict={self.epoch_placeholder: epoch})
 
 
 class TorchModel(Model, abc.ABC):
