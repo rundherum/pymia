@@ -298,7 +298,7 @@ class PadDataExtractor(Extractor):
         if self.pad_fn is None:
             self.pad_fn = PadDataExtractor.zero_pad
 
-        if isinstance(padding, tuple):
+        if isinstance(padding[0], int):
             padding = [(pad, pad) for pad in padding]
         index_diffs = np.asarray(padding)
         index_diffs[:, 0] = -index_diffs[:, 0]
