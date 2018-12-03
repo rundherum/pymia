@@ -7,6 +7,8 @@ import torch
 
 ENTRY_NOT_EXTRACTED_ERR_MSG = 'Transform can not be applied because entry "{}" was not extracted'
 
+raise_error_if_entry_not_extracted = True
+
 
 # follows the principle of torchvision transform
 class Transform(metaclass=abc.ABCMeta):
@@ -37,7 +39,7 @@ class IntensityRescale(Transform):
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
-            if entry not in sample:
+            if entry not in sample and raise_error_if_entry_not_extracted:
                 raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
 
             np_entry = check_and_return(sample[entry], np.ndarray)
@@ -72,7 +74,7 @@ class IntensityNormalization(Transform):
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
-            if entry not in sample:
+            if entry not in sample and raise_error_if_entry_not_extracted:
                 raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
 
             np_entry = check_and_return(sample[entry], np.ndarray)
@@ -104,7 +106,7 @@ class LambdaTransform(Transform):
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
-            if entry not in sample:
+            if entry not in sample and raise_error_if_entry_not_extracted:
                 raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
 
             if self.loop_axis is None:
@@ -133,7 +135,7 @@ class ClipPercentile(Transform):
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
-            if entry not in sample:
+            if entry not in sample and raise_error_if_entry_not_extracted:
                 raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
 
             np_entry = check_and_return(sample[entry], np.ndarray)
@@ -166,7 +168,7 @@ class Relabel(Transform):
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
-            if entry not in sample:
+            if entry not in sample and raise_error_if_entry_not_extracted:
                 raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
 
             np_entry = check_and_return(sample[entry], np.ndarray)
@@ -190,7 +192,7 @@ class Reshape(Transform):
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.shapes:
-            if entry not in sample:
+            if entry not in sample and raise_error_if_entry_not_extracted:
                 raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
 
             np_entry = check_and_return(sample[entry], np.ndarray)
@@ -206,7 +208,7 @@ class ToTorchTensor(Transform):
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
-            if entry not in sample:
+            if entry not in sample and raise_error_if_entry_not_extracted:
                 raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
 
             np_entry = check_and_return(sample[entry], np.ndarray)
@@ -223,7 +225,7 @@ class Permute(Transform):
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
-            if entry not in sample:
+            if entry not in sample and raise_error_if_entry_not_extracted:
                 raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
 
             np_entry = check_and_return(sample[entry], np.ndarray)
@@ -240,7 +242,7 @@ class Squeeze(Transform):
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
-            if entry not in sample:
+            if entry not in sample and raise_error_if_entry_not_extracted:
                 raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
 
             np_entry = check_and_return(sample[entry], np.ndarray)
@@ -256,7 +258,7 @@ class UnSqueeze(Transform):
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
-            if entry not in sample:
+            if entry not in sample and raise_error_if_entry_not_extracted:
                 raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
 
             np_entry = check_and_return(sample[entry], np.ndarray)
@@ -287,7 +289,7 @@ class SizeCorrection(Transform):
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
-            if entry not in sample:
+            if entry not in sample and raise_error_if_entry_not_extracted:
                 raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
 
             np_entry = check_and_return(sample[entry], np.ndarray)
@@ -330,7 +332,7 @@ class Mask(Transform):
         np_mask = check_and_return(sample[self.mask_key], np.ndarray)
 
         for entry in self.entries:
-            if entry not in sample:
+            if entry not in sample and raise_error_if_entry_not_extracted:
                 raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
 
             np_entry = check_and_return(sample[entry], np.ndarray)
