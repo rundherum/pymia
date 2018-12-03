@@ -16,7 +16,7 @@ def numpy_zeros(shape: tuple, id_: str):
 
 
 def default_sample_fn(params: dict):
-    key = '__prediction'
+    key = params['key']
     batch = params['batch']
     idx = params['batch_idx']
 
@@ -87,7 +87,8 @@ class SubjectAssembler(Assembler):
 
         for key in to_assemble:
             data = to_assemble[key][idx]
-            sample_data, index_expr = self.on_sample_fn({key: data,
+            sample_data, index_expr = self.on_sample_fn({'key': key,
+                                                         key: data,
                                                          'batch': batch,
                                                          'batch_idx': idx,
                                                          'predictions': self.predictions})
