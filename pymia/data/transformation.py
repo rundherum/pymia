@@ -39,8 +39,10 @@ class IntensityRescale(Transform):
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
-            if entry not in sample and raise_error_if_entry_not_extracted:
-                raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+            if entry not in sample:
+                if raise_error_if_entry_not_extracted:
+                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+                continue
 
             np_entry = check_and_return(sample[entry], np.ndarray)
             if self.loop_axis is None:
@@ -74,8 +76,10 @@ class IntensityNormalization(Transform):
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
-            if entry not in sample and raise_error_if_entry_not_extracted:
-                raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+            if entry not in sample:
+                if raise_error_if_entry_not_extracted:
+                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+                continue
 
             np_entry = check_and_return(sample[entry], np.ndarray)
             if not np.issubdtype(np_entry.dtype, np.floating):
@@ -106,8 +110,10 @@ class LambdaTransform(Transform):
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
-            if entry not in sample and raise_error_if_entry_not_extracted:
-                raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+            if entry not in sample:
+                if raise_error_if_entry_not_extracted:
+                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+                continue
 
             if self.loop_axis is None:
                 np_entry = self.lambda_fn(sample[entry])
@@ -135,8 +141,10 @@ class ClipPercentile(Transform):
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
-            if entry not in sample and raise_error_if_entry_not_extracted:
-                raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+            if entry not in sample:
+                if raise_error_if_entry_not_extracted:
+                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+                continue
 
             np_entry = check_and_return(sample[entry], np.ndarray)
 
@@ -168,8 +176,10 @@ class Relabel(Transform):
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
-            if entry not in sample and raise_error_if_entry_not_extracted:
-                raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+            if entry not in sample:
+                if raise_error_if_entry_not_extracted:
+                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+                continue
 
             np_entry = check_and_return(sample[entry], np.ndarray)
             for new_label, old_label in self.label_changes.items():
@@ -192,8 +202,10 @@ class Reshape(Transform):
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.shapes:
-            if entry not in sample and raise_error_if_entry_not_extracted:
-                raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+            if entry not in sample:
+                if raise_error_if_entry_not_extracted:
+                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+                continue
 
             np_entry = check_and_return(sample[entry], np.ndarray)
             sample[entry] = np.reshape(np_entry, self.shapes[entry])
@@ -208,8 +220,10 @@ class ToTorchTensor(Transform):
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
-            if entry not in sample and raise_error_if_entry_not_extracted:
-                raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+            if entry not in sample:
+                if raise_error_if_entry_not_extracted:
+                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+                continue
 
             np_entry = check_and_return(sample[entry], np.ndarray)
             sample[entry] = torch.from_numpy(np_entry)
@@ -225,8 +239,10 @@ class Permute(Transform):
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
-            if entry not in sample and raise_error_if_entry_not_extracted:
-                raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+            if entry not in sample:
+                if raise_error_if_entry_not_extracted:
+                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+                continue
 
             np_entry = check_and_return(sample[entry], np.ndarray)
             sample[entry] = np.transpose(np_entry, self.permutation)
@@ -242,8 +258,10 @@ class Squeeze(Transform):
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
-            if entry not in sample and raise_error_if_entry_not_extracted:
-                raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+            if entry not in sample:
+                if raise_error_if_entry_not_extracted:
+                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+                continue
 
             np_entry = check_and_return(sample[entry], np.ndarray)
             sample[entry] = np_entry.squeeze(self.squeeze_axis)
@@ -258,8 +276,10 @@ class UnSqueeze(Transform):
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
-            if entry not in sample and raise_error_if_entry_not_extracted:
-                raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+            if entry not in sample:
+                if raise_error_if_entry_not_extracted:
+                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+                continue
 
             np_entry = check_and_return(sample[entry], np.ndarray)
             sample[entry] = np.expand_dims(np_entry, -1)
@@ -289,8 +309,10 @@ class SizeCorrection(Transform):
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
-            if entry not in sample and raise_error_if_entry_not_extracted:
-                raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+            if entry not in sample:
+                if raise_error_if_entry_not_extracted:
+                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+                continue
 
             np_entry = check_and_return(sample[entry], np.ndarray)
             if not len(self.shape) <= np_entry.ndim:
@@ -332,8 +354,10 @@ class Mask(Transform):
         np_mask = check_and_return(sample[self.mask_key], np.ndarray)
 
         for entry in self.entries:
-            if entry not in sample and raise_error_if_entry_not_extracted:
-                raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+            if entry not in sample:
+                if raise_error_if_entry_not_extracted:
+                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+                continue
 
             np_entry = check_and_return(sample[entry], np.ndarray)
 
