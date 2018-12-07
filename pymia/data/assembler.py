@@ -3,6 +3,8 @@ import pickle
 
 import numpy as np
 
+import pymia.data.transformation as tfm
+
 
 class Assembler(abc.ABC):
 
@@ -16,7 +18,7 @@ def numpy_zeros(shape: tuple, id_: str):
 
 
 def default_sample_fn(params: dict):
-    key = '__prediction'
+    key = params['key']
     batch = params['batch']
     idx = params['batch_idx']
 
@@ -87,7 +89,8 @@ class SubjectAssembler(Assembler):
 
         for key in to_assemble:
             data = to_assemble[key][idx]
-            sample_data, index_expr = self.on_sample_fn({key: data,
+            sample_data, index_expr = self.on_sample_fn({'key': key,
+                                                         key: data,
                                                          'batch': batch,
                                                          'batch_idx': idx,
                                                          'predictions': self.predictions})
@@ -122,3 +125,113 @@ class SubjectAssembler(Assembler):
         if '__prediction' in assembled:
             return assembled['__prediction']
         return assembled
+
+
+def mean_merge_fn(planes: list):
+    return np.stack(planes).mean(axis=0)
+
+
+class TransformSampleFn:
+
+    def __init__(self, transform: tfm.Transform) -> None:
+        self.transform = transform
+
+    def __call__(self, params: dict):
+        key = params['key']
+        batch = params['batch']
+        idx = params['batch_idx']
+
+        index_expr = batch['index_expr'][idx]
+        if isinstance(index_expr, bytes):
+            # is pickled
+            index_expr = pickle.loads(index_expr)
+
+        temp = tfm.raise_error_if_entry_not_extracted
+        tfm.raise_error_entry_not_extracted = False
+        ret = self.transform({key: params[key], 'index_expr': index_expr})
+        tfm.raise_error_entry_not_extracted = temp
+
+        return ret[key], ret['index_expr']
+
+
+class PlaneSubjectAssembler(Assembler):
+    def __init__(self, merge_fn=mean_merge_fn, zero_fn=numpy_zeros):
+        self.planes = {}  # type: t.Dict[int, SubjectAssembler]
+        self.subjects_ready = set()
+        self.zero_fn = zero_fn
+        self.merge_fn = merge_fn
+
+    def add_batch(self, to_assemble, batch: dict, last_batch=False):
+        if 'index_expr' not in batch:
+            raise ValueError('SubjectAssembler requires "index_expr" to be extracted (use IndexingExtractor)')
+        if 'shape' not in batch:
+            raise ValueError('SubjectAssembler requires "shape" to be extracted (use ImageShapeExtractor)')
+
+        if not isinstance(to_assemble, dict):
+            to_assemble = {'__prediction': to_assemble}
+
+        for idx in range(len(batch['index_expr'])):
+            index_expr = batch['index_expr'][idx]
+            if isinstance(index_expr, bytes):
+                # is pickled
+                index_expr = pickle.loads(index_expr)
+            plane_dimension = self._get_plane_dimension(index_expr)
+
+            if plane_dimension not in self.planes:
+                self.planes[plane_dimension] = SubjectAssembler(self.zero_fn)
+
+            required_plane_shape = list(batch['shape'][idx])
+            required_plane_shape.pop(plane_dimension)  # delete the non-plane dimension
+            transform = tfm.SizeCorrection(tuple(required_plane_shape), entries=tuple(to_assemble.keys()))
+            self.planes[plane_dimension].on_sample_fn = TransformSampleFn(transform)
+
+            self.planes[plane_dimension].add_sample(to_assemble, batch, idx)
+
+        ready = None
+        for plane_assembler in self.planes.values():
+            if last_batch:
+                plane_assembler.end()
+
+            if ready is None:
+                ready = set(plane_assembler.subjects_ready)
+            else:
+                ready.intersection_update(plane_assembler.subjects_ready)
+        self.subjects_ready = ready
+
+    def get_assembled_subject(self, subject_index: int):
+        """Gets the prediction of a subject.
+s
+        Args:
+            subject_index (int): The subject's index.
+
+        Returns:
+            np.ndarray: The prediction of the subject.
+        """
+        try:
+            self.subjects_ready.remove(subject_index)
+        except KeyError:
+            # check if subject is assembled but not listed as ready
+            # this can happen if only one subject was assembled or last
+            if subject_index not in self.planes[0].predictions:
+                raise ValueError('Subject with index {} not in assembler'.format(subject_index))
+
+        assembled = {}
+        for plane in self.planes.values():
+            ret_val = plane.get_assembled_subject(subject_index)
+            if not isinstance(ret_val, dict):
+                ret_val = {'__prediction': ret_val}
+            for key, value in ret_val.items():
+                assembled.setdefault(key, []).append(value)
+
+        for key in assembled:
+            assembled[key] = self.merge_fn(assembled[key])
+
+        if '__prediction' in assembled:
+            return assembled['__prediction']
+        return assembled
+
+    @staticmethod
+    def _get_plane_dimension(index_expr):
+        for i, entry in enumerate(index_expr.expression):
+            if isinstance(entry, int):
+                return i

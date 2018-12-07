@@ -19,6 +19,7 @@ REQUIRED_PACKAGES = [
     'tensorboardX',
     'tensorflow',
     'torch',
+    'pyyaml'
 ]
 
 TEST_PACKAGES = [

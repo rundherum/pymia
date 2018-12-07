@@ -1,6 +1,7 @@
+import os
 import abc
 import json
-import os
+import yaml
 
 
 class Dictable(metaclass=abc.ABCMeta):
@@ -120,9 +121,9 @@ class MetaData(Dictable):
 class ConfigurationParser(metaclass=abc.ABCMeta):
     """Represents the configuration parser interface."""
 
-    @staticmethod
+    @classmethod
     @abc.abstractmethod
-    def load(file_path: str, config_cls):
+    def load(cls, file_path: str, config_cls):
         """Load the configuration file.
 
         Args:
@@ -134,9 +135,9 @@ class ConfigurationParser(metaclass=abc.ABCMeta):
         """
         pass
 
-    @staticmethod
+    @classmethod
     @abc.abstractmethod
-    def save(file_path: str, config: ConfigurationBase):
+    def save(cls, file_path: str, config: ConfigurationBase):
         """Save the configuration to file.
 
         Args:
@@ -145,17 +146,39 @@ class ConfigurationParser(metaclass=abc.ABCMeta):
         """
         pass
 
+    @staticmethod
+    @abc.abstractmethod
+    def read(file_path):
+        """ Read the file content
+
+        Args:
+            file_path: The configuration file path
+
+        Returns:
+            The file content in the format of the underlying reader
+
+        """
+
+    @staticmethod
+    @abc.abstractmethod
+    def write(file_path, content):
+        """Write the content file content
+
+        Args:
+            file_path: The configuration file path
+            content: The content to write
+        """
+
 
 class JSONConfigurationParser(ConfigurationParser):
     """Represents a JSON configuration parser."""
 
-    @staticmethod
-    def load(file_path: str, config_cls):
+    @classmethod
+    def load(cls, file_path: str, config_cls):
         if not os.path.isfile(file_path):
             raise ValueError('File {} does not exist'.format(file_path))
 
-        with open(file_path, 'r') as f:
-            d = json.load(f)
+        d = cls.read(file_path)
 
         meta_dict = d['meta']
         config_dict = d['config']
@@ -171,13 +194,38 @@ class JSONConfigurationParser(ConfigurationParser):
         config.from_dict(config_dict, version=meta.version)
         return config
 
-    @staticmethod
-    def save(file_path: str, config: ConfigurationBase):
+    @classmethod
+    def save(cls, file_path: str, config: ConfigurationBase):
         meta = MetaData(config.version(), config.type())
         d = {'meta': meta.to_dict(), 'config': config.to_dict()}
 
+        cls.write(file_path, d)
+
+    @staticmethod
+    def read(file_path):
+        with open(file_path, 'r') as f:
+            d = json.load(f)
+        return d
+
+    @staticmethod
+    def write(file_path, content):
         with open(file_path, 'w') as f:
-            json.dump(d, f, sort_keys=True, indent=4)
+            json.dump(content, f, sort_keys=True, indent=4)
+
+
+class YamlConfigurationParser(JSONConfigurationParser):
+    """Represents a YAML configuration parser."""
+
+    @staticmethod
+    def read(file_path):
+        with open(file_path, 'r') as f:
+            d = yaml.load(f)
+        return d
+
+    @staticmethod
+    def write(file_path, content):
+        with open(file_path, 'w') as f:
+            yaml.dump(content, f, default_flow_style=False)
 
 
 def load(file_path: str, config_cls) -> ConfigurationBase:
@@ -212,7 +260,26 @@ def save(file_path: str, config: ConfigurationBase) -> None:
     return parser_registry[extension].save(file_path, config)
 
 
-parser_registry = {'.json': JSONConfigurationParser}
+def load_meta(file_path: str) -> MetaData:
+    """ Load the meta data of a configuration
+
+    Args:
+        file_path: The configuration file path
+
+    Returns:
+        MetaData: The meta data of the configuration
+    """
+    extension = os.path.splitext(file_path)[1]
+    if extension not in parser_registry:
+        raise ValueError('unknown configuration file extension "{}"'.format(extension))
+
+    d = parser_registry[extension].read(file_path)
+    meta_data = MetaData()
+    meta_data.from_dict(d['meta'])
+    return meta_data
+
+
+parser_registry = {'.json': JSONConfigurationParser, '.yaml': YamlConfigurationParser, '.yml': YamlConfigurationParser}
 
 
 
