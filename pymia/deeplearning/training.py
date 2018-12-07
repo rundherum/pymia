@@ -55,7 +55,7 @@ class Trainer(abc.ABC):
 
         self.best_model_score = 0  # the score (e.g., the value of a metric) of the best performing model
 
-        self.seed = 42  # used as initial seed in set_seed
+        self.seed = config.seed  # used as initial seed in set_seed
 
         # logging properties
         self.log_nth_epoch = config.log_nth_epoch
