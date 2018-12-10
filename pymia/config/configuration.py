@@ -1,6 +1,7 @@
 import os
 import abc
 import json
+
 import yaml
 
 
@@ -280,6 +281,3 @@ def load_meta(file_path: str) -> MetaData:
 
 
 parser_registry = {'.json': JSONConfigurationParser, '.yaml': YamlConfigurationParser, '.yml': YamlConfigurationParser}
-
-
-
