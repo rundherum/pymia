@@ -18,6 +18,8 @@ class DeepLearningConfiguration(cfg.ConfigurationBase, abc.ABC):
         self.model_file_name = 'model'  # to save the model with this file name
         self.best_model_file_name = 'model-best'
 
+        self.seed = 42  # initial seed during training
+
         # training configuration
         self.epochs = 200  # number of epochs
         self.batch_size_training = 4
