@@ -1,5 +1,6 @@
 import abc
 import pickle
+import typing
 
 import numpy as np
 
@@ -12,8 +13,17 @@ class Assembler(abc.ABC):
     def add_batch(self, prediction, batch: dict):
         pass
 
+    @abc.abstractmethod
+    def get_assembled_subject(self, subject_index: int):
+        pass
 
-def numpy_zeros(shape: tuple, id_: str):
+    @property
+    @abc.abstractmethod
+    def subjects_ready(self):
+        pass
+
+
+def numpy_zeros(shape: tuple, id_: str, batch: dict):
     return np.zeros(shape)
 
 
@@ -51,9 +61,13 @@ class SubjectAssembler(Assembler):
                 Returns tuple of data and index expression, i.e. the processed data and index expression.
         """
         self.predictions = {}
-        self.subjects_ready = set()
+        self._subjects_ready = set()
         self.zero_fn = zero_fn
         self.on_sample_fn = on_sample_fn
+
+    @property
+    def subjects_ready(self):
+        return self._subjects_ready
 
     def add_batch(self, to_assemble, batch: dict, last_batch=False):
         if 'subject_index' not in batch:
@@ -74,7 +88,7 @@ class SubjectAssembler(Assembler):
             self.end()
 
     def end(self):
-        self.subjects_ready = set(self.predictions.keys())
+        self._subjects_ready = set(self.predictions.keys())
 
     def add_sample(self, to_assemble, batch, idx):
 
@@ -84,7 +98,7 @@ class SubjectAssembler(Assembler):
         if subject_index not in self.predictions and not self.predictions:
             self.predictions[subject_index] = self._init_new_subject(batch, to_assemble, idx)
         elif subject_index not in self.predictions:
-            self.subjects_ready = set(self.predictions.keys())
+            self._subjects_ready = set(self.predictions.keys())
             self.predictions[subject_index] = self._init_new_subject(batch, to_assemble, idx)
 
         for key in to_assemble:
@@ -102,7 +116,7 @@ class SubjectAssembler(Assembler):
         for key in to_assemble:
             subject_shape = batch['shape'][idx]
             subject_shape += (to_assemble[key].shape[-1],)
-            subject_prediction[key] = self.zero_fn(subject_shape, key)
+            subject_prediction[key] = self.zero_fn(subject_shape, key, batch)
         return subject_prediction
 
     def get_assembled_subject(self, subject_index: int):
@@ -115,7 +129,7 @@ class SubjectAssembler(Assembler):
             np.ndarray: The prediction of the subject.
         """
         try:
-            self.subjects_ready.remove(subject_index)
+            self._subjects_ready.remove(subject_index)
         except KeyError:
             # check if subject is assembled but not listed as ready
             # this can happen if only one subject was assembled or last
@@ -156,10 +170,14 @@ class TransformSampleFn:
 
 class PlaneSubjectAssembler(Assembler):
     def __init__(self, merge_fn=mean_merge_fn, zero_fn=numpy_zeros):
-        self.planes = {}  # type: t.Dict[int, SubjectAssembler]
-        self.subjects_ready = set()
+        self.planes = {}  # type: typing.Dict[int, SubjectAssembler]
+        self._subjects_ready = set()
         self.zero_fn = zero_fn
         self.merge_fn = merge_fn
+
+    @property
+    def subjects_ready(self):
+        return self._subjects_ready
 
     def add_batch(self, to_assemble, batch: dict, last_batch=False):
         if 'index_expr' not in batch:
@@ -196,11 +214,11 @@ class PlaneSubjectAssembler(Assembler):
                 ready = set(plane_assembler.subjects_ready)
             else:
                 ready.intersection_update(plane_assembler.subjects_ready)
-        self.subjects_ready = ready
+        self._subjects_ready = ready
 
     def get_assembled_subject(self, subject_index: int):
         """Gets the prediction of a subject.
-s
+
         Args:
             subject_index (int): The subject's index.
 
@@ -208,7 +226,7 @@ s
             np.ndarray: The prediction of the subject.
         """
         try:
-            self.subjects_ready.remove(subject_index)
+            self._subjects_ready.remove(subject_index)
         except KeyError:
             # check if subject is assembled but not listed as ready
             # this can happen if only one subject was assembled or last
@@ -235,3 +253,43 @@ s
         for i, entry in enumerate(index_expr.expression):
             if isinstance(entry, int):
                 return i
+
+
+class Subject2dAssembler(Assembler):
+
+    def __init__(self, id_entry='ids') -> None:
+        super().__init__()
+        self._subjects_ready = set()
+        self.predictions = {}
+        self.id_entry = id_entry
+
+    @property
+    def subjects_ready(self):
+        return self._subjects_ready
+
+    def add_batch(self, to_assemble, batch: dict, last_batch=False):
+        if self.id_entry not in batch:
+            raise ValueError('Subject2dAssembler requires "{}" to be in the batch'.format(self.id_entry))
+
+        if not isinstance(to_assemble, dict):
+            to_assemble = {'__prediction': to_assemble}
+
+        for idx in range(len(batch[self.id_entry])):
+            subject_index = batch[self.id_entry][idx]
+            for key in to_assemble:
+                self.predictions.setdefault(subject_index, {})[key] = to_assemble[key][idx]
+                self._subjects_ready.add(subject_index)
+
+    def get_assembled_subject(self, subject_index):
+        try:
+            self._subjects_ready.remove(subject_index)
+        except KeyError:
+            # check if subject is assembled but not listed as ready
+            # this can happen if only one subject was assembled or last
+            if subject_index not in self.predictions:
+                raise ValueError('Subject with index {} not in assembler'.format(subject_index))
+        assembled = self.predictions.pop(subject_index)
+        if '__prediction' in assembled:
+            return assembled['__prediction']
+        return assembled
+
