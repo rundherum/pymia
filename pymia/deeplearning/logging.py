@@ -129,13 +129,14 @@ class TensorFlowLogger(Logger):
 
 class TorchLogger(Logger):
 
-    def __init__(self, log_dir: str,
-                 epoch_summaries, batch_summaries, visualization_summaries):
-        self.epoch_summaries = epoch_summaries
-        self.batch_summaries = batch_summaries
-        self.visualization_summaries = visualization_summaries
-
+    def __init__(self, log_dir: str, model,
+                 visualize_weights: bool = True, visualize_bias: bool = True, visualize_kernels: bool = True):
+        self.model = model
         self.writer = tbx.SummaryWriter(log_dir)
+
+        self.visualize_weights = visualize_weights
+        self.visualize_bias = visualize_bias
+        self.visualize_kernels = visualize_kernels
 
     def __del__(self):
         self.writer.close()
@@ -151,4 +152,17 @@ class TorchLogger(Logger):
         pass
 
     def log_visualization(self, epoch: int):
-        pass
+        for k, v in self.model.state_dict().items():
+            if self.visualize_bias and k.endswith('.conv.bias'):
+                # visualize bias of current convolution layer
+                self.writer.add_histogram(k, v.data.cpu().numpy(), epoch)
+            elif k.endswith('.conv.weight'):
+                if self.visualize_weights:
+                    # visualize weights of current convolution layer
+                    self.writer.add_histogram(k, v.data.cpu().numpy(), epoch)
+                if self.visualize_kernels:
+
+                    # use v.size() to get size of conv and visualize kernel as image...
+                    #print(k, v.size()) # eg. 64, 64, 3, 3
+                    pass
+                    # self.writer.add_image(k, img) # img needs to be of shape (3, H, W) torchvision.utils.make_grid()
