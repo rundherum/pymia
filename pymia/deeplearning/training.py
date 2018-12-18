@@ -396,8 +396,7 @@ class TorchTrainer(Trainer, abc.ABC):
         random.seed(seed)
         np.random.seed(seed)
         torch.manual_seed(seed)
-        if torch.cuda.is_available():
-            torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
 
     def _check_and_load_if_model_exists(self):
         if self.model.load(self.model_dir):
