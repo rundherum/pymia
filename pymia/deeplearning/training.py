@@ -105,7 +105,7 @@ class Trainer(abc.ABC):
             if epoch % self.validate_nth_epoch == 0:
                 loss_validation, model_score = self.validate()
 
-                self.logger.log_scalar('valid/loss', loss_validation, self.current_epoch)
+                self.logger.log_scalar('loss', loss_validation, self.current_epoch, False)
                 logging.info('Epoch {:d}: Validation loss of {:.5f}'.format(self.current_epoch, loss_validation))
                 logging.info('Epoch {:d}: Model score of {:.5f}'.format(self.current_epoch, model_score))
 

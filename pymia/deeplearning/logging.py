@@ -4,6 +4,7 @@ Warnings:
     This module is in development and will change with high certainty in the future. Therefore, use carefully!
 """
 import abc
+import os
 
 import numpy as np
 import pymia.deeplearning.visualization as visualization
@@ -14,7 +15,7 @@ import tensorflow as tf
 class Logger:
 
     @abc.abstractmethod
-    def log_scalar(self, tag: str, value, step: int):
+    def log_scalar(self, tag: str, value, step: int, is_training: bool = True):
         """Logs a scalar value."""
         pass
 
@@ -48,32 +49,42 @@ class TensorFlowLogger(Logger):
         self.visualization_summary_op3 = tf.summary.merge(self.visualization_summaries[3])
 
         #self.summary_op = tf.summary.merge_all()  # note that this should be done AFTER adding operations to tf.summary
-        self.writer = tf.summary.FileWriter(log_dir, session.graph)  # create writer and directly write graph
+
+        log_dir_train = os.path.join(log_dir, 'train')
+        log_dir_valid = os.path.join(log_dir, 'valid')
+        os.makedirs(log_dir_train, exist_ok=True)
+        os.makedirs(log_dir_valid, exist_ok=True)
+
+        self.writer_train = tf.summary.FileWriter(log_dir_train, session.graph)  # create writer and directly write graph
+        self.writer_valid = tf.summary.FileWriter(log_dir_valid)
 
     def __del__(self):
-        self.writer.close()
+        self.writer_train.close()
+        self.writer_valid.close()
 
-    def log_scalar(self, tag: str, value, step: int):
+    def log_scalar(self, tag: str, value, step: int, is_training: bool = True):
         """Logs a scalar value to the TensorBoard.
 
         Args:
             tag: The scalar's tag.
             value: The value (int, float).
             step: The step the scalar belongs to (global step or epoch).
+            is_training: Log using the training writer if True; otherwise, use the validation writer.
         """
+        writer = self.writer_train if is_training else self.writer_valid
         summary = tf.Summary(value=[tf.Summary.Value(tag=tag, simple_value=value)])
-        self.writer.add_summary(summary, step)
-        self.writer.flush()
+        writer.add_summary(summary, step)
+        writer.flush()
 
     def log_epoch(self, epoch: int, **kwargs):
-        self.log_scalar('train/loss', kwargs['loss'], epoch)
-        self.log_scalar('train/duration', kwargs['duration'], epoch)
+        self.log_scalar('loss', kwargs['loss'], epoch, True)
+        self.log_scalar('duration', kwargs['duration'], epoch, True)
 
     def log_batch(self, step, **kwargs):
         # summary_op = tf.summary.merge(self.batch_summaries)
         summary_str = self.session.run(self.batch_summary_op, feed_dict=kwargs['feed_dict'])
-        self.writer.add_summary(summary_str, step)
-        self.writer.flush()
+        self.writer_train.add_summary(summary_str, step)
+        self.writer_train.flush()
 
     def log_visualization(self, epoch: int):
         if len(self.visualization_summaries[0]) == 0: # todo check if visualization summaries contains any entries
@@ -81,7 +92,7 @@ class TensorFlowLogger(Logger):
             return
         # summary_op = tf.summary.merge(self.visualization_summaries[0])
         summary_str = self.session.run(self.visualization_summary_op1)
-        self.writer.add_summary(summary_str, epoch)
+        self.writer_train.add_summary(summary_str, epoch)
 
         # todo: clean this up a bit...
         for idx, kernel_name in enumerate(self.visualization_summaries[1]):
@@ -114,8 +125,8 @@ class TensorFlowLogger(Logger):
 
         # summary_op = tf.summary.merge(self.visualization_summaries[3])
         summary_str = self.session.run(self.visualization_summary_op3)
-        self.writer.add_summary(summary_str, epoch)
-        self.writer.flush()
+        self.writer_train.add_summary(summary_str, epoch)
+        self.writer_train.flush()
 
     # Add histograms for trainable variables.
     # for var in tf.trainable_variables():
@@ -132,21 +143,30 @@ class TorchLogger(Logger):
     def __init__(self, log_dir: str, model,
                  visualize_weights: bool = True, visualize_bias: bool = True, visualize_kernels: bool = True):
         self.model = model
-        self.writer = tbx.SummaryWriter(log_dir)
+
+        log_dir_train = os.path.join(log_dir, 'train')
+        log_dir_valid = os.path.join(log_dir, 'valid')
+        os.makedirs(log_dir_train, exist_ok=True)
+        os.makedirs(log_dir_valid, exist_ok=True)
+
+        self.writer_train = tbx.SummaryWriter(log_dir_train)
+        self.writer_valid = tbx.SummaryWriter(log_dir_valid)
 
         self.visualize_weights = visualize_weights
         self.visualize_bias = visualize_bias
         self.visualize_kernels = visualize_kernels
 
     def __del__(self):
-        self.writer.close()
+        self.writer_train.close()
+        self.writer_valid.close()
 
-    def log_scalar(self, tag: str, value, step: int):
-        self.writer.add_scalar(tag, value, step)
+    def log_scalar(self, tag: str, value, step: int, is_training: bool = True):
+        writer = self.writer_train if is_training else self.writer_valid
+        writer.add_scalar(tag, value, step)
 
     def log_epoch(self, epoch: int, **kwargs):
-        self.log_scalar('train/loss', kwargs['loss'], epoch)
-        self.log_scalar('train/duration', kwargs['duration'], epoch)
+        self.log_scalar('loss', kwargs['loss'], epoch, True)
+        self.log_scalar('duration', kwargs['duration'], epoch, True)
 
     def log_batch(self, step, **kwargs):
         pass
@@ -155,11 +175,11 @@ class TorchLogger(Logger):
         for k, v in self.model.state_dict().items():
             if self.visualize_bias and k.endswith('.conv.bias'):
                 # visualize bias of current convolution layer
-                self.writer.add_histogram(k, v.data.cpu().numpy(), epoch)
+                self.writer_train.add_histogram(k, v.data.cpu().numpy(), epoch)
             elif k.endswith('.conv.weight'):
                 if self.visualize_weights:
                     # visualize weights of current convolution layer
-                    self.writer.add_histogram(k, v.data.cpu().numpy(), epoch)
+                    self.writer_train.add_histogram(k, v.data.cpu().numpy(), epoch)
                 if self.visualize_kernels:
 
                     # use v.size() to get size of conv and visualize kernel as image...
