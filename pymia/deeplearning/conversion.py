@@ -1,3 +1,5 @@
+import collections
+
 import torch.utils.data.dataloader as loader
 
 
@@ -15,7 +17,7 @@ class TorchCollate:
         self.entries = entries
 
     def __call__(self, batch):
-        if not isinstance(batch[0], loader.collections.Mapping):
+        if not isinstance(batch[0], collections.Mapping):
             raise TypeError('only mapping type allowed. Found {}'.format(type(batch[0])))
 
         new_batch = {}
