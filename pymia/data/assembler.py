@@ -23,7 +23,7 @@ class Assembler(abc.ABC):
         pass
 
 
-def numpy_zeros(shape: tuple, id_: str, batch: dict):
+def numpy_zeros(shape: tuple, id_: str, batch: dict, idx: int):
     return np.zeros(shape)
 
 
@@ -116,7 +116,7 @@ class SubjectAssembler(Assembler):
         for key in to_assemble:
             subject_shape = batch['shape'][idx]
             subject_shape += (to_assemble[key].shape[-1],)
-            subject_prediction[key] = self.zero_fn(subject_shape, key, batch)
+            subject_prediction[key] = self.zero_fn(subject_shape, key, batch, idx)
         return subject_prediction
 
     def get_assembled_subject(self, subject_index: int):
