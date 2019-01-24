@@ -326,7 +326,7 @@ class TensorFlowTrainer(Trainer, abc.ABC):
 class TorchTrainer(Trainer, abc.ABC):
 
     def __init__(self, data_handler: hdlr.DataHandler, logger: log.Logger, config: cfg.DeepLearningConfiguration,
-                 model: mdl.TorchModel, cudnn_deterministic: bool = False):
+                 model: mdl.TorchModel):
         """Initializes a new instance of the TorchTrainer class.
 
         The subclasses need to implement following methods:
@@ -347,7 +347,7 @@ class TorchTrainer(Trainer, abc.ABC):
         self.model = model  # only required for IntellISense
         self.model.device = self.device
         self.model.network.to(self.device)
-        self.cudnn_deterministic = cudnn_deterministic
+        self.cudnn_deterministic = config.cudnn_determinism
 
     def train_batch(self, idx, batch: dict):
         images = self._get_x(batch)

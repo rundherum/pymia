@@ -19,6 +19,7 @@ class DeepLearningConfiguration(cfg.ConfigurationBase, abc.ABC):
         self.best_model_file_name = 'model-best'
 
         self.seed = 42  # initial seed during training
+        self.cudnn_determinism = False  # whether to enable CuDNN determinism or not
 
         # training configuration
         self.epochs = 200  # number of epochs
