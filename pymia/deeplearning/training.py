@@ -326,7 +326,7 @@ class TensorFlowTrainer(Trainer, abc.ABC):
 class TorchTrainer(Trainer, abc.ABC):
 
     def __init__(self, data_handler: hdlr.DataHandler, logger: log.Logger, config: cfg.DeepLearningConfiguration,
-                 model: mdl.TorchModel):
+                 model: mdl.TorchModel, cudnn_deterministic: bool = False):
         """Initializes a new instance of the TorchTrainer class.
 
         The subclasses need to implement following methods:
@@ -339,6 +339,7 @@ class TorchTrainer(Trainer, abc.ABC):
             logger: A logger, which logs the training process.
             config: A configuration with training parameters.
             model: The model to train.
+            cudnn_deterministic: Set CUDA to be deterministic if True, otherwise results might not be fully reproducible.
         """
         super().__init__(data_handler, logger, config, model)
 
@@ -346,6 +347,7 @@ class TorchTrainer(Trainer, abc.ABC):
         self.model = model  # only required for IntellISense
         self.model.device = self.device
         self.model.network.to(self.device)
+        self.cudnn_deterministic = cudnn_deterministic
 
     def train_batch(self, idx, batch: dict):
         images = self._get_x(batch)
@@ -397,6 +399,7 @@ class TorchTrainer(Trainer, abc.ABC):
         np.random.seed(seed)
         torch.manual_seed(seed)
         torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.deterministic = self.cudnn_deterministic
 
     def _check_and_load_if_model_exists(self):
         if self.model.load(self.model_dir):
