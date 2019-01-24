@@ -19,8 +19,6 @@ class Traverser(metaclass=abc.ABCMeta):
 
 
 def default_concat(data: t.List[np.ndarray]) -> np.ndarray:
-    if len(data) == 1:
-        return data[0]
     return np.stack(data, axis=-1)
 
 
