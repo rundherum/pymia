@@ -44,11 +44,14 @@ class TensorFlowLogger(Logger):
 
         # note that the next lines throw a TypeError: Fetch argument None has invalid type <class 'NoneType'>
         # in case no summary has been added
-        self.batch_summary_op = tf.summary.merge(self.batch_summaries)
-        self.visualization_summary_op1 = tf.summary.merge(self.visualization_summaries[0])
-        self.visualization_summary_op3 = tf.summary.merge(self.visualization_summaries[3])
+        self.batch_summary_op = tf.summary.merge(self.batch_summaries) if self._is_summary_valid(
+            self.batch_summaries) else None
+        self.visualization_summary_op1 = tf.summary.merge(self.visualization_summaries[0]) if self._is_summary_valid(
+            self.visualization_summaries[0]) else None
+        self.visualization_summary_op3 = tf.summary.merge(self.visualization_summaries[3]) if self._is_summary_valid(
+            self.visualization_summaries[3]) else None
 
-        #self.summary_op = tf.summary.merge_all()  # note that this should be done AFTER adding operations to tf.summary
+        # self.summary_op = tf.summary.merge_all()  # note that this should be done AFTER adding operations to tf.summary
 
         log_dir_train = os.path.join(log_dir, 'train')
         log_dir_valid = os.path.join(log_dir, 'valid')
@@ -61,6 +64,10 @@ class TensorFlowLogger(Logger):
     def __del__(self):
         self.writer_train.close()
         self.writer_valid.close()
+
+    @staticmethod
+    def _is_summary_valid(summary):
+        return not (summary is None or len(summary) == 0)
 
     def log_scalar(self, tag: str, value, step: int, is_training: bool = True):
         """Logs a scalar value to the TensorBoard.
@@ -81,6 +88,8 @@ class TensorFlowLogger(Logger):
         self.log_scalar('duration', kwargs['duration'], epoch, True)
 
     def log_batch(self, step, **kwargs):
+        if self.batch_summary_op is None:
+            return
         # summary_op = tf.summary.merge(self.batch_summaries)
         summary_str = self.session.run(self.batch_summary_op, feed_dict=kwargs['feed_dict'])
         self.writer_train.add_summary(summary_str, step)
@@ -173,10 +182,11 @@ class TorchLogger(Logger):
 
     def log_visualization(self, epoch: int):
         for k, v in self.model.state_dict().items():
-            if self.visualize_bias and k.endswith('.conv.bias'):
+            # todo(fabianbalsiger): find generic way to identify conv etc. or do we pass a Regex?
+            if self.visualize_bias and k.endswith('.bias'):
                 # visualize bias of current convolution layer
                 self.writer_train.add_histogram(k, v.data.cpu().numpy(), epoch)
-            elif k.endswith('.conv.weight'):
+            elif k.endswith('.weight'):
                 if self.visualize_weights:
                     # visualize weights of current convolution layer
                     self.writer_train.add_histogram(k, v.data.cpu().numpy(), epoch)
