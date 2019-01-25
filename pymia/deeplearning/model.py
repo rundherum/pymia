@@ -79,7 +79,7 @@ class TensorFlowModel(Model, abc.ABC):
         self.best_model_score_op = self.best_model_score.assign(self.best_model_score_placeholder)
 
         self.network = self.inference(self.x_placeholder)
-        self.loss = self.loss_function(self.x_placeholder, self.y_placeholder)
+        self.loss = self.loss_function(self.network, self.y_placeholder)
         self.optimizer = self.optimize()
 
         self.saver = tf.train.Saver(max_to_keep=max_to_keep)
