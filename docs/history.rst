@@ -10,6 +10,7 @@ Change history
  * New extractor :py:class:`PadDataExtractor`, which replaces the `PadPatchDataExtractor` (see migration guide below)
  * New metric :py:class:`NormalizedRootMeanSquaredError`
  * New data augmentation module :py:mod:`augmentation`
+ * New filter :py:class:`BinaryThreshold`
  * Replaced the transformation in :py:mod:`SubjectAssembler` by a more flexible function (see migration guide below)
  * Minor bug fixes and maintenance
  * Several improvements to the documentation
