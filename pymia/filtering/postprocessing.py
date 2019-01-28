@@ -7,6 +7,35 @@ import SimpleITK as sitk
 import pymia.filtering.filter as pymia_fltr
 
 
+class BinaryThreshold(pymia_fltr.IFilter):
+    """Represents a binary threshold image filter."""
+
+    def __init__(self, threshold: float):
+        """Initializes a new instance of the BinaryThreshold class.
+
+        Args:
+            threshold: The threshold value.
+        """
+        super().__init__()
+        self.threshold = threshold
+        self.filter = sitk.BinaryThresholdImageFilter()
+        self.filter.SetInsideValue(0)
+        self.filter.SetOutsideValue(1)
+        self.filter.SetUpperThreshold(self.threshold)
+
+    def execute(self, image: sitk.Image, params: pymia_fltr.IFilterParams = None) -> sitk.Image:
+        """Executes the binary threshold filter on an image.
+
+        Args:
+            image (sitk.Image): The image.
+            params (IFilterParams): The parameters (unused).
+
+        Returns:
+            sitk.Image: The filtered image.
+        """
+        return self.filter.Execute(image)
+
+
 class LargestNConnectedComponents(pymia_fltr.IFilter):
     """Represents a largest N connected components filter.
 
