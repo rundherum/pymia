@@ -153,7 +153,7 @@ class TorchModel(Model, abc.ABC):
         state_dict = {
             'best_model_score': self.best_model_score,
             'epoch': epoch,
-            'global_step': self.global_step,
+            'global_step': self.global_step,  # todo(fabianbalsiger): is always zero
             'network_state_dict': self.network.state_dict(),
             'optimizer_state_dict': self.optimizer.state_dict(),
         }
