@@ -24,3 +24,10 @@ DATA_PLACEHOLDER = 'data/{}'
 # DATA_IMAGE = '{}/images'.format(DATA)
 # DATA_LABEL = '{}/labels'.format(DATA)
 
+# keys for a batch dictionary
+KEY_FILE_ROOT = 'file_root'
+KEY_IMAGES = 'images'
+KEY_LABELS = 'labels'
+KEY_PROPERTIES = 'properties'
+KEY_SUBJECT = 'subject'
+KEY_SUBJECT_INDEX = 'subject_index'
