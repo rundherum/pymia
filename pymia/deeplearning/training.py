@@ -267,11 +267,11 @@ class TensorFlowTrainer(Trainer, abc.ABC):
         if idx % self.log_nth_batch == 0:
             self.logger.log_batch(self.current_step, feed_dict=feed_dict)
 
-            print('Epoch {}, batch {}/{:d}: loss={:5f}'
-                  .format(str(self.current_epoch).zfill(len(str(self.epochs))),
-                          str(idx + 1).zfill(len(str(len(self.data_handler.loader_train)))),
-                          len(self.data_handler.loader_train),
-                          loss_val))
+            logging.info('Epoch {}, batch {}/{:d}: loss={:5f}'
+                         .format(str(self.current_epoch).zfill(len(str(self.epochs))),
+                                 str(idx + 1).zfill(len(str(len(self.data_handler.loader_train)))),
+                                 len(self.data_handler.loader_train),
+                                 loss_val))
 
         self.current_step += 1
 
@@ -362,11 +362,11 @@ class TorchTrainer(Trainer, abc.ABC):
         self.model.optimize()
 
         if idx % self.log_nth_batch == 0:
-            print('Epoch {}, batch {}/{:d}: loss={:5f}'
-                  .format(str(self.current_epoch).zfill(len(str(self.epochs))),
-                          str(idx + 1).zfill(len(str(len(self.data_handler.loader_train)))),
-                          len(self.data_handler.loader_train),
-                          loss_val.item()))
+            logging.info('Epoch {}, batch {}/{:d}: loss={:5f}'
+                         .format(str(self.current_epoch).zfill(len(str(self.epochs))),
+                                 str(idx + 1).zfill(len(str(len(self.data_handler.loader_train)))),
+                                 len(self.data_handler.loader_train),
+                                 loss_val.item()))
 
         self.current_step += 1
 

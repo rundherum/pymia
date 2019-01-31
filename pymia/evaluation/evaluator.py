@@ -3,6 +3,7 @@
 The module provides the possibility of calculate several evaluation metrics in parallel and output them in any format.
 """
 import csv
+import logging
 import os
 from abc import ABCMeta, abstractmethod
 from typing import Union
@@ -87,16 +88,18 @@ class CSVEvaluatorWriter(IEvaluatorWriter):
 class ConsoleEvaluatorWriter(IEvaluatorWriter):
     """Represents a console evaluator writer."""
 
-    def __init__(self, precision: int=3):
+    def __init__(self, precision: int = 3, use_logging: bool = False):
         """Initializes a new instance of the ConsoleEvaluatorWriter class.
 
         Args:
             precision (int): The float precision.
+            use_logging (bool): Indicates whether to use the Python logging module or not.
         """
         super().__init__()
 
         self.header = None
         self.precision = precision
+        self.use_logging = use_logging
 
     def write(self, data: list):
         """Writes the evaluation results.
@@ -120,7 +123,10 @@ class ConsoleEvaluatorWriter(IEvaluatorWriter):
         # format for output alignment
         out = [['{0:<{1}}'.format(val, lengths[idx]) for idx, val in enumerate(line)] for line in out_as_string]
 
-        print('\n'.join(''.join(line) for line in out), sep='', end='\n')
+        if self.use_logging:
+            logging.info('\n'.join(''.join(line) for line in out))
+        else:
+            print('\n'.join(''.join(line) for line in out), sep='', end='\n')
 
     def write_header(self, header: list):
         """Writes the evaluation header.
