@@ -6,6 +6,7 @@ import logging
 import os
 import re
 
+import numpy as np
 import tensorflow as tf
 import torch
 
@@ -50,6 +51,15 @@ class Model(abc.ABC):
 
     @abc.abstractmethod
     def set_epoch(self, epoch: int):
+        pass
+
+    @abc.abstractmethod
+    def get_number_parameters(self) -> int:
+        """Gets the number of trainable parameters of the model.
+
+        Returns:
+            The number of parameters.
+        """
         pass
 
 
@@ -121,6 +131,10 @@ class TensorFlowModel(Model, abc.ABC):
     def set_epoch(self, epoch: int):
         self.session.run(self.epoch_op, feed_dict={self.epoch_placeholder: epoch})
 
+    def get_number_parameters(self) -> int:
+        no_parameters = np.sum([np.prod(v.shape.as_list()) for v in tf.trainable_variables()])
+        return int(no_parameters)
+
 
 class TorchModel(Model, abc.ABC):
 
@@ -191,3 +205,7 @@ class TorchModel(Model, abc.ABC):
 
     def set_epoch(self, epoch: int):
         self.epoch = epoch
+
+    def get_number_parameters(self) -> int:
+        no_parameters = np.sum([np.prod(p.size()) for p in self.network.parameters() if p.requires_grad])
+        return int(no_parameters)
