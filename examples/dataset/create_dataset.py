@@ -141,12 +141,8 @@ def main(hdf_file: str, data_dir: str):
     with pymia_crt.get_writer(hdf_file) as writer:
         callbacks = pymia_crt.get_default_callbacks(writer)
 
-        # normalize the images and unsqueeze the labels and mask.
-        # Unsqueeze is needed due to the convention to have the number of channels as last dimension.
-        # I.e., here we have the shape 10 x 256 x 256 before the unsqueeze operation and after 10 x 256 x 256 x 1
-        transform = pymia_tfm.ComposeTransform([pymia_tfm.IntensityNormalization(loop_axis=3, entries=('images',)),
-                                                pymia_tfm.UnSqueeze(entries=('labels', 'mask'))
-                                                ])
+        # add a transform to normalize the images
+        transform = pymia_tfm.IntensityNormalization(loop_axis=3, entries=('images',))
 
         traverser = pymia_crt.SubjectFileTraverser()
         traverser.traverse(subjects, callback=callbacks, load=LoadData(), transform=transform)
