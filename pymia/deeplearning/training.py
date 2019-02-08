@@ -72,11 +72,11 @@ class Trainer(abc.ABC):
 
         self._check_and_load_if_model_exists()
         for epoch in range(self.current_epoch, self.epochs + 1):
-            logging.info('Epoch {:d}: Start training'.format(epoch))
-            start_time = time.time()  # measure the epoch's time
-
             self.current_epoch = epoch
             self.model.set_epoch(self.current_epoch)
+
+            logging.info('Epoch {}: Start training'.format(self._get_current_epoch_formatted()))
+            start_time = time.time()  # measure the epoch's time
 
             self.set_seed()
             subject_assembler = self.init_subject_assembler()  # todo: not optimal solution since it keeps everything in memory
@@ -93,8 +93,10 @@ class Trainer(abc.ABC):
 
             self.epoch_duration = time.time() - start_time
 
-            logging.info('Epoch {:d}: Ended training in {:.5f} s'.format(self.current_epoch, self.epoch_duration))
-            logging.info('Epoch {:d}: Training loss of {:.5f}'.format(self.current_epoch, loss_value_of_epoch))
+            logging.info('Epoch {}: Ended training in {:.5f} s'.format(self._get_current_epoch_formatted(),
+                                                                       self.epoch_duration))
+            logging.info('Epoch {}: Training loss of {:.5f}'.format(self._get_current_epoch_formatted(),
+                                                                    loss_value_of_epoch))
 
             if epoch % self.log_nth_epoch == 0:
                 self.logger.log_epoch(self.current_epoch, loss=loss_value_of_epoch, duration=self.epoch_duration)
@@ -106,8 +108,10 @@ class Trainer(abc.ABC):
                 loss_validation, model_score = self.validate()
 
                 self.logger.log_scalar('loss', loss_validation, self.current_epoch, False)
-                logging.info('Epoch {:d}: Validation loss of {:.5f}'.format(self.current_epoch, loss_validation))
-                logging.info('Epoch {:d}: Model score of {:.5f}'.format(self.current_epoch, model_score))
+                logging.info('Epoch {}: Validation loss of {:.5f}'.format(self._get_current_epoch_formatted(),
+                                                                          loss_validation))
+                logging.info('Epoch {}: Model score of {:.5f}'.format(self._get_current_epoch_formatted(),
+                                                                      model_score))
 
                 if model_score > self.best_model_score:
                     self.best_model_score = model_score
@@ -209,6 +213,22 @@ class Trainer(abc.ABC):
         """
         pass
 
+    def _get_current_epoch_formatted(self) -> str:
+        """Gets the current epoch formatted with leading zeros.
+
+        Returns:
+            A string with the formatted current epoch.
+        """
+        return str(self.current_epoch).zfill(len(str(self.epochs)))
+
+    def _get_batch_index_formatted(self, batch_idx) -> str:
+        """Gets the current batch index formatted with leading zeros.
+
+        Returns:
+            A string with the formatted batch index.
+        """
+        return str(batch_idx + 1).zfill(len(str(len(self.data_handler.loader_train))))
+
 
 class TensorFlowTrainer(Trainer, abc.ABC):
 
@@ -268,8 +288,8 @@ class TensorFlowTrainer(Trainer, abc.ABC):
             self.logger.log_batch(self.current_step, feed_dict=feed_dict)
 
             logging.info('Epoch {}, batch {}/{:d}: loss={:5f}'
-                         .format(str(self.current_epoch).zfill(len(str(self.epochs))),
-                                 str(idx + 1).zfill(len(str(len(self.data_handler.loader_train)))),
+                         .format(self._get_current_epoch_formatted(),
+                                 self._get_batch_index_formatted(idx),
                                  len(self.data_handler.loader_train),
                                  loss_val))
 
@@ -297,7 +317,7 @@ class TensorFlowTrainer(Trainer, abc.ABC):
         The seed is updated at the beginning of every epoch to ensure reproducible experiments.
         """
         seed = self.seed + self.current_epoch
-        logging.info('Epoch {:d}: Set seed to {}'.format(self.current_epoch, seed))
+        logging.info('Epoch {}: Set seed to {}'.format(self._get_current_epoch_formatted(), seed))
         random.seed(seed)
         np.random.seed(seed)
         tf.set_random_seed(seed)
@@ -363,8 +383,8 @@ class TorchTrainer(Trainer, abc.ABC):
 
         if idx % self.log_nth_batch == 0:
             logging.info('Epoch {}, batch {}/{:d}: loss={:5f}'
-                         .format(str(self.current_epoch).zfill(len(str(self.epochs))),
-                                 str(idx + 1).zfill(len(str(len(self.data_handler.loader_train)))),
+                         .format(self._get_current_epoch_formatted(),
+                                 self._get_batch_index_formatted(idx),
                                  len(self.data_handler.loader_train),
                                  loss_val.item()))
 
@@ -394,7 +414,7 @@ class TorchTrainer(Trainer, abc.ABC):
     def set_seed(self):
         """Sets the seed depending of the current epoch."""
         seed = self.seed + self.current_epoch
-        logging.info('Epoch {:d}: Set seed to {}'.format(self.current_epoch, seed))
+        logging.info('Epoch {}: Set seed to {}'.format(self._get_current_epoch_formatted(), seed))
         random.seed(seed)
         np.random.seed(seed)
         torch.manual_seed(seed)
