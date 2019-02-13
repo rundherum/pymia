@@ -29,6 +29,7 @@ If you are new to pymia, here are a few resources to get you up to speed right a
 
     pymia.config
     pymia.data
+    pymia.deeplearning
     pymia.evaluation
     pymia.filtering
     pymia.plotting

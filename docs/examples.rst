@@ -9,3 +9,4 @@ Here are a few example scripts to get you started as fast as possible with pymia
     :maxdepth: 1
 
     examples.dataset
+    examples.deeplearning
