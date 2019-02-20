@@ -8,10 +8,13 @@ from .base import INumpyArrayMetric
 class MeanAbsoluteError(INumpyArrayMetric):
     """Represents a mean absolute error metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the MeanAbsoluteError class."""
-        super().__init__()
-        self.metric = 'MAE'
+    def __init__(self, metric: str = 'MAE'):
+        """Initializes a new instance of the MeanAbsoluteError class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the mean absolute error."""
@@ -22,10 +25,13 @@ class MeanAbsoluteError(INumpyArrayMetric):
 class MeanSquaredError(INumpyArrayMetric):
     """Represents a mean squared error metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the MeanSquaredError class."""
-        super().__init__()
-        self.metric = 'MSE'
+    def __init__(self, metric: str = 'MSE'):
+        """Initializes a new instance of the MeanSquaredError class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the mean squared error."""
@@ -36,10 +42,13 @@ class MeanSquaredError(INumpyArrayMetric):
 class RootMeanSquaredError(INumpyArrayMetric):
     """Represents a root mean squared error metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the RootMeanSquaredError class."""
-        super().__init__()
-        self.metric = 'RMSE'
+    def __init__(self, metric: str = 'RMSE'):
+        """Initializes a new instance of the RootMeanSquaredError class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the root mean squared error."""
@@ -50,10 +59,13 @@ class RootMeanSquaredError(INumpyArrayMetric):
 class NormalizedRootMeanSquaredError(INumpyArrayMetric):
     """Represents a normalized root mean squared error metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the NormalizedRootMeanSquaredError class."""
-        super().__init__()
-        self.metric = 'NRMSE'
+    def __init__(self, metric: str = 'NRMSE'):
+        """Initializes a new instance of the NormalizedRootMeanSquaredError class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the normalized root mean squared error."""
@@ -65,10 +77,13 @@ class NormalizedRootMeanSquaredError(INumpyArrayMetric):
 class CoefficientOfDetermination(INumpyArrayMetric):
     """Represents a coefficient of determination (R^2) error metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the CoefficientOfDetermination class."""
-        super().__init__()
-        self.metric = 'R2'
+    def __init__(self, metric: str = 'R2'):
+        """Initializes a new instance of the CoefficientOfDetermination class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the coefficient of determination (R^2) error.

@@ -422,11 +422,16 @@ class Distances:
         self.surfel_areas_pred = surfel_areas_pred
 
 
-class IMetric(metaclass=abc.ABCMeta):
+class IMetric(abc.ABC):
     """Represents an evaluation metric."""
 
-    def __init__(self):
-        self.metric = 'IMetric'
+    def __init__(self, metric: str = 'IMetric'):
+        """Initializes a new instance of the IMetric class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        self.metric = metric
 
     @abc.abstractmethod
     def calculate(self):
@@ -440,17 +445,19 @@ class IMetric(metaclass=abc.ABCMeta):
         Returns:
             str: String representation.
         """
-        return '{self.metric}' \
-            .format(self=self)
+        return '{self.metric}'.format(self=self)
 
 
 class IConfusionMatrixMetric(IMetric):
     """Represents an evaluation metric based on the confusion matrix."""
 
-    def __init__(self):
-        """Initializes a new instance of the IConfusionMatrixMetric class."""
-        super().__init__()
-        self.metric = 'IConfusionMatrixMetric'
+    def __init__(self, metric: str = 'IConfusionMatrixMetric'):
+        """Initializes a new instance of the IConfusionMatrixMetric class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
         self.confusion_matrix = None  # ConfusionMatrix
 
     @abc.abstractmethod
@@ -463,10 +470,13 @@ class IConfusionMatrixMetric(IMetric):
 class IDistanceMetric(IMetric):
     """Represents an evaluation metric based on distances."""
 
-    def __init__(self):
-        """Initializes a new instance of the IDistanceMetric class."""
-        super().__init__()
-        self.metric = 'IDistanceMetric'
+    def __init__(self, metric: str = 'IDistanceMetric'):
+        """Initializes a new instance of the IDistanceMetric class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
         self.distances = None  # Distances
 
     @abc.abstractmethod
@@ -479,10 +489,13 @@ class IDistanceMetric(IMetric):
 class ISimpleITKImageMetric(IMetric):
     """Represents an evaluation metric based on SimpleITK images."""
 
-    def __init__(self):
-        """Initializes a new instance of the ISimpleITKImageMetric class."""
-        super(ISimpleITKImageMetric, self).__init__()
-        self.metric = 'ISimpleITKImageMetric'
+    def __init__(self, metric: str = 'ISimpleITKImageMetric'):
+        """Initializes a new instance of the ISimpleITKImageMetric class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
         self.ground_truth = None  # SimpleITK.Image
         self.segmentation = None  # SimpleITK.Image
 
@@ -496,10 +509,13 @@ class ISimpleITKImageMetric(IMetric):
 class INumpyArrayMetric(IMetric):
     """Represents an evaluation metric based on numpy arrays."""
 
-    def __init__(self):
-        """Initializes a new instance of the INumpyArrayMetric class."""
-        super(INumpyArrayMetric, self).__init__()
-        self.metric = 'INumpyArrayMetric'
+    def __init__(self, metric: str = 'INumpyArrayMetric'):
+        """Initializes a new instance of the INumpyArrayMetric class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
         self.ground_truth = None  # np.ndarray
         self.segmentation = None  # np.ndarray
 
@@ -517,9 +533,13 @@ class Information(IMetric):
     """
 
     def __init__(self, column_name: str, value: str):
-        """Initializes a new instance of the Information class."""
-        super().__init__()
-        self.metric = column_name
+        """Initializes a new instance of the Information class.
+
+        Args:
+            column_name (str): The identification string of the information.
+            value (str): The information.
+        """
+        super().__init__(column_name)
         self.value = value
 
     def calculate(self):

@@ -10,10 +10,13 @@ from .base import (IConfusionMatrixMetric, IDistanceMetric, ISimpleITKImageMetri
 class AreaMetric(ISimpleITKImageMetric):
     """Represents an area metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the AreaMetric class."""
-        super().__init__()
-        self.metric = 'AREA'
+    def __init__(self, metric: str = 'AREA'):
+        """Initializes a new instance of the AreaMetric class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     @abc.abstractmethod
     def calculate(self):
@@ -21,7 +24,7 @@ class AreaMetric(ISimpleITKImageMetric):
         raise NotImplementedError
 
     @staticmethod
-    def _calculate_area(image: sitk.Image, slice_number: int=-1) -> float:
+    def _calculate_area(image: sitk.Image, slice_number: int = -1) -> float:
         """Calculates the area of a slice in a label image.
 
         Args:
@@ -41,10 +44,13 @@ class AreaMetric(ISimpleITKImageMetric):
 class VolumeMetric(ISimpleITKImageMetric):
     """Represents a volume metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the VolumeMetric class."""
-        super().__init__()
-        self.metric = 'VOL'
+    def __init__(self, metric: str = 'VOL'):
+        """Initializes a new instance of the VolumeMetric class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     @abc.abstractmethod
     def calculate(self):
@@ -68,10 +74,13 @@ class VolumeMetric(ISimpleITKImageMetric):
 class Accuracy(IConfusionMatrixMetric):
     """Represents an accuracy metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the Accuracy class."""
-        super().__init__()
-        self.metric = 'ACURCY'
+    def __init__(self, metric: str = 'ACURCY'):
+        """Initializes a new instance of the Accuracy class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the accuracy."""
@@ -87,10 +96,13 @@ class Accuracy(IConfusionMatrixMetric):
 class AdjustedRandIndex(IConfusionMatrixMetric):
     """Represents an adjusted rand index metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the AdjustedRandIndex class."""
-        super().__init__()
-        self.metric = 'ADJRIND'
+    def __init__(self, metric: str = 'ADJRIND'):
+        """Initializes a new instance of the AdjustedRandIndex class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the adjusted rand index."""
@@ -128,10 +140,13 @@ class AdjustedRandIndex(IConfusionMatrixMetric):
 class AreaUnderCurve(IConfusionMatrixMetric):
     """Represents an area under the curve metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the AreaUnderCurve class."""
-        super().__init__()
-        self.metric = 'AUC'
+    def __init__(self, metric: str = 'AUC'):
+        """Initializes a new instance of the AreaUnderCurve class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the area under the curve."""
@@ -159,10 +174,13 @@ class AverageDistance(ISimpleITKImageMetric):
         is the directed Hausdorff distance and :math:`A` and :math:`B` are the set of non-zero pixels in the images.
         """
 
-    def __init__(self):
-        """Initializes a new instance of the AverageDistance class."""
-        super().__init__()
-        self.metric = 'AVGDIST'
+    def __init__(self, metric: str = 'AVGDIST'):
+        """Initializes a new instance of the AverageDistance class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the average (Hausdorff) distance."""
@@ -175,10 +193,13 @@ class AverageDistance(ISimpleITKImageMetric):
 class CohenKappaMetric(IConfusionMatrixMetric):
     """Represents a Cohen's kappa coefficient metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the CohenKappaMetric class."""
-        super().__init__()
-        self.metric = 'KAPPA'
+    def __init__(self, metric: str = 'KAPPA'):
+        """Initializes a new instance of the CohenKappaMetric class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the Cohen's kappa coefficient."""
@@ -200,10 +221,13 @@ class CohenKappaMetric(IConfusionMatrixMetric):
 class DiceCoefficient(IConfusionMatrixMetric):
     """Represents a Dice coefficient metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the DiceCoefficient class."""
-        super().__init__()
-        self.metric = 'DICE'
+    def __init__(self, metric: str = 'DICE'):
+        """Initializes a new instance of the DiceCoefficient class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the Dice coefficient."""
@@ -215,10 +239,13 @@ class DiceCoefficient(IConfusionMatrixMetric):
 class FalseNegative(IConfusionMatrixMetric):
     """Represents a false negative metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the FalseNegative class."""
-        super().__init__()
-        self.metric = 'FN'
+    def __init__(self, metric: str = 'FN'):
+        """Initializes a new instance of the FalseNegative class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the false negatives."""
@@ -229,10 +256,13 @@ class FalseNegative(IConfusionMatrixMetric):
 class FalsePositive(IConfusionMatrixMetric):
     """Represents a false positive metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the FalsePositive class."""
-        super().__init__()
-        self.metric = 'FP'
+    def __init__(self, metric: str = 'FP'):
+        """Initializes a new instance of the FalsePositive class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the false positives."""
@@ -243,10 +273,13 @@ class FalsePositive(IConfusionMatrixMetric):
 class Fallout(IConfusionMatrixMetric):
     """Represents a fallout (false positive rate) metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the Fallout class."""
-        super().__init__()
-        self.metric = 'FALLOUT'
+    def __init__(self, metric: str = 'FALLOUT'):
+        """Initializes a new instance of the Fallout class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the fallout (false positive rate)."""
@@ -258,9 +291,13 @@ class Fallout(IConfusionMatrixMetric):
 class FalseNegativeRate(IConfusionMatrixMetric):
     """Represents a false negative rate metric."""
 
-    def __init__(self):
-        super().__init__()
-        self.metric = 'FNR'
+    def __init__(self, metric: str = 'FNR'):
+        """Initializes a new instance of the FalseNegativeRate class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the false negative rate."""
@@ -272,10 +309,13 @@ class FalseNegativeRate(IConfusionMatrixMetric):
 class FMeasure(IConfusionMatrixMetric):
     """Represents a F-measure metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the FMeasure class."""
-        super().__init__()
-        self.metric = 'FMEASR'
+    def __init__(self, metric: str = 'FMEASR'):
+        """Initializes a new instance of the FMeasure class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the F1 measure."""
@@ -304,10 +344,13 @@ class GlobalConsistencyError(IConfusionMatrixMetric):
     Implementation based on Martin 2001.
     """
 
-    def __init__(self):
-        """Initializes a new instance of the GlobalConsistencyError class."""
-        super().__init__()
-        self.metric = 'GCOERR'
+    def __init__(self, metric: str = 'GCOERR'):
+        """Initializes a new instance of the GlobalConsistencyError class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the global consistency error."""
@@ -327,15 +370,15 @@ class GlobalConsistencyError(IConfusionMatrixMetric):
 class GroundTruthArea(AreaMetric):
     """Represents a ground truth area metric."""
 
-    def __init__(self, slice_number: int=-1):
+    def __init__(self, slice_number: int = -1, metric: str = 'GTAREA'):
         """Initializes a new instance of the GroundTruthArea class.
 
         Args:
             slice_number (int): The slice number to calculate the area.
                 Defaults to -1, which will calculate the area on the intermediate slice.
+            metric (str): The identification string of the metric.
         """
-        super().__init__()
-        self.metric = 'GTAREA'
+        super().__init__(metric)
         self.slice_number = slice_number
 
     def calculate(self):
@@ -347,10 +390,13 @@ class GroundTruthArea(AreaMetric):
 class GroundTruthVolume(VolumeMetric):
     """Represents a ground truth volume metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the GroundTruthVolume class."""
-        super().__init__()
-        self.metric = 'GTVOL'
+    def __init__(self, metric: str = 'GTVOL'):
+        """Initializes a new instance of the GroundTruthVolume class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the ground truth volume in mm3."""
@@ -385,9 +431,8 @@ class HausdorffDistance(IDistanceMetric):
                 95 computes the 95th Hausdorff distance.
             metric (str): The identification string of the metric.
         """
-        super().__init__()
+        super().__init__(metric)
         self.percentile = percentile
-        self.metric = metric
 
     def calculate(self):
         """Calculates the Hausdorff distance."""
@@ -415,10 +460,13 @@ class HausdorffDistance(IDistanceMetric):
 class InterclassCorrelation(INumpyArrayMetric):
     """Represents a interclass correlation metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the InterclassCorrelation class."""
-        super().__init__()
-        self.metric = 'ICCORR'
+    def __init__(self, metric: str = 'ICCORR'):
+        """Initializes a new instance of the InterclassCorrelation class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the interclass correlation."""
@@ -444,10 +492,13 @@ class InterclassCorrelation(INumpyArrayMetric):
 class JaccardCoefficient(IConfusionMatrixMetric):
     """Represents a Jaccard coefficient metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the JaccardCoefficient class."""
-        super().__init__()
-        self.metric = 'JACRD'
+    def __init__(self, metric: str = 'JACRD'):
+        """Initializes a new instance of the JaccardCoefficient class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the Jaccard coefficient."""
@@ -462,10 +513,13 @@ class JaccardCoefficient(IConfusionMatrixMetric):
 class MahalanobisDistance(INumpyArrayMetric):
     """Represents a Mahalanobis distance metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the MahalanobisDistance class."""
-        super().__init__()
-        self.metric = 'MAHLNBS'
+    def __init__(self, metric: str = 'MAHLNBS'):
+        """Initializes a new instance of the MahalanobisDistance class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the Mahalanobis distance."""
@@ -492,10 +546,13 @@ class MahalanobisDistance(INumpyArrayMetric):
 class MutualInformation(IConfusionMatrixMetric):
     """Represents a mutual information metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the MutualInformation class."""
-        super().__init__()
-        self.metric = 'MUTINF'
+    def __init__(self, metric: str = 'MUTINF'):
+        """Initializes a new instance of the MutualInformation class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the mutual information."""
@@ -538,10 +595,13 @@ class MutualInformation(IConfusionMatrixMetric):
 class Precision(IConfusionMatrixMetric):
     """Represents a precision metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the Precision class."""
-        super().__init__()
-        self.metric = 'PRCISON'
+    def __init__(self, metric: str = 'PRCISON'):
+        """Initializes a new instance of the Precision class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the precision."""
@@ -557,10 +617,13 @@ class Precision(IConfusionMatrixMetric):
 class ProbabilisticDistance(INumpyArrayMetric):
     """Represents a probabilistic distance metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the ProbabilisticDistance class."""
-        super().__init__()
-        self.metric = 'PROBDST'
+    def __init__(self, metric: str = 'PROBDST'):
+        """Initializes a new instance of the ProbabilisticDistance class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the probabilistic distance."""
@@ -580,10 +643,13 @@ class ProbabilisticDistance(INumpyArrayMetric):
 class RandIndex(IConfusionMatrixMetric):
     """Represents a rand index metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the RandIndex class."""
-        super().__init__()
-        self.metric = 'RNDIND'
+    def __init__(self, metric: str = 'RNDIND'):
+        """Initializes a new instance of the RandIndex class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the rand index."""
@@ -613,10 +679,13 @@ class RandIndex(IConfusionMatrixMetric):
 class Recall(IConfusionMatrixMetric):
     """Represents a recall metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the Recall class."""
-        super().__init__()
-        self.metric = 'RECALL'
+    def __init__(self, metric: str = 'RECALL'):
+        """Initializes a new instance of the Recall class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the recall."""
@@ -632,15 +701,15 @@ class Recall(IConfusionMatrixMetric):
 class SegmentationArea(AreaMetric):
     """Represents a segmentation area metric."""
 
-    def __init__(self, slice_number: int = -1):
+    def __init__(self, slice_number: int = -1, metric: str = 'SEGAREA'):
         """Initializes a new instance of the SegmentationArea class.
 
         Args:
             slice_number (int): The slice number to calculate the area.
                 Defaults to -1, which will calculate the area on the intermediate slice.
+            metric (str): The identification string of the metric.
         """
-        super().__init__()
-        self.metric = 'SEGAREA'
+        super().__init__(metric)
         self.slice_number = slice_number
 
     def calculate(self):
@@ -652,10 +721,13 @@ class SegmentationArea(AreaMetric):
 class SegmentationVolume(VolumeMetric):
     """Represents a segmentation volume metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the SegmentationVolume class."""
-        super().__init__()
-        self.metric = 'SEGVOL'
+    def __init__(self, metric: str = 'SEGVOL'):
+        """Initializes a new instance of the SegmentationVolume class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the segmented volume in mm3."""
@@ -666,10 +738,13 @@ class SegmentationVolume(VolumeMetric):
 class Sensitivity(IConfusionMatrixMetric):
     """Represents a sensitivity (true positive rate or recall) metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the Sensitivity class."""
-        super().__init__()
-        self.metric = 'SNSVTY'
+    def __init__(self, metric: str = 'SNSVTY'):
+        """Initializes a new instance of the Sensitivity class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the sensitivity (true positive rate)."""
@@ -680,10 +755,13 @@ class Sensitivity(IConfusionMatrixMetric):
 class Specificity(IConfusionMatrixMetric):
     """Represents a specificity metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the Specificity class."""
-        super().__init__()
-        self.metric = 'SPCFTY'
+    def __init__(self, metric: str = 'SPCFTY'):
+        """Initializes a new instance of the Specificity class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the specificity."""
@@ -707,9 +785,8 @@ class SurfaceDiceOverlap(IDistanceMetric):
             tolerance (float): The tolerance of the surface distance in mm.
             metric (str): The identification string of the metric.
         """
-        super().__init__()
+        super().__init__(metric)
         self.tolerance = tolerance
-        self.metric = metric
 
     def calculate(self):
         """Calculates the surface Dice coefficient overlap."""
@@ -742,10 +819,9 @@ class SurfaceOverlap(IDistanceMetric):
             prediction_to_label (bool): Computes the prediction to labels if `True`, otherwise the label to prediction.
             metric (str): The identification string of the metric.
         """
-        super().__init__()
+        super().__init__(metric)
         self.tolerance = tolerance
         self.prediction_to_label = prediction_to_label
-        self.metric = metric
 
     def calculate(self):
         """Calculates the surface overlap."""
@@ -761,10 +837,13 @@ class SurfaceOverlap(IDistanceMetric):
 class TrueNegative(IConfusionMatrixMetric):
     """Represents a true negative metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the TrueNegative class."""
-        super().__init__()
-        self.metric = 'TN'
+    def __init__(self, metric: str = 'TN'):
+        """Initializes a new instance of the TrueNegative class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the true negatives."""
@@ -775,10 +854,13 @@ class TrueNegative(IConfusionMatrixMetric):
 class TruePositive(IConfusionMatrixMetric):
     """Represents a true positive metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the TruePositive class."""
-        super().__init__()
-        self.metric = 'TP'
+    def __init__(self, metric: str = 'TP'):
+        """Initializes a new instance of the TruePositive class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the true positives."""
@@ -789,10 +871,13 @@ class TruePositive(IConfusionMatrixMetric):
 class VariationOfInformation(IConfusionMatrixMetric):
     """Represents a variation of information metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the VariationOfInformation class."""
-        super().__init__()
-        self.metric = 'VARINFO'
+    def __init__(self, metric: str = 'VARINFO'):
+        """Initializes a new instance of the VariationOfInformation class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the variation of information."""
@@ -837,10 +922,13 @@ class VariationOfInformation(IConfusionMatrixMetric):
 class VolumeSimilarity(IConfusionMatrixMetric):
     """Represents a volume similarity metric."""
 
-    def __init__(self):
-        """Initializes a new instance of the VolumeSimilarity class."""
-        super().__init__()
-        self.metric = 'VOLSMTY'
+    def __init__(self, metric: str = 'VOLSMTY'):
+        """Initializes a new instance of the VolumeSimilarity class.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
 
     def calculate(self):
         """Calculates the volume similarity."""
