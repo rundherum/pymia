@@ -4,6 +4,10 @@ import numpy as np
 import scipy.ndimage as ndimage
 
 
+class NotComputableMetricWarning(RuntimeWarning):
+    """Warning class to raise if a metric cannot be computed."""
+
+
 class ConfusionMatrix:
     """Represents a confusion matrix (or error matrix)."""
 
