@@ -31,7 +31,7 @@ class Distances:
 
     See Also:
         - Nikolov et al., 2018 Deep learning to achieve clinically applicable segmentation of head and neck anatomy for
-            radiotherapy. `arXiv <https://arxiv.org/abs/1809.04430>`_
+        radiotherapy. `arXiv <https://arxiv.org/abs/1809.04430>`_
         - `Original implementation <https://github.com/deepmind/surface-distance>`_
     """
     
