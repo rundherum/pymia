@@ -2,10 +2,10 @@
 
 The module provides the possibility of calculate several evaluation metrics in parallel and output them in any format.
 """
+import abc
 import csv
 import logging
 import os
-from abc import ABCMeta, abstractmethod
 from typing import Union
 
 import numpy as np
@@ -14,10 +14,10 @@ import SimpleITK as sitk
 import pymia.evaluation.metric as pymia_metric
 
 
-class IEvaluatorWriter(metaclass=ABCMeta):
+class IEvaluatorWriter(abc.ABC):
     """Represents an evaluator writer interface, which enables to write evaluation results."""
 
-    @abstractmethod
+    @abc.abstractmethod
     def write(self, data: list):
         """Writes the evaluation results.
 
@@ -26,7 +26,7 @@ class IEvaluatorWriter(metaclass=ABCMeta):
         """
         raise NotImplementedError
 
-    @abstractmethod
+    @abc.abstractmethod
     def write_header(self, header: list):
         """Writes the evaluation header.
 
