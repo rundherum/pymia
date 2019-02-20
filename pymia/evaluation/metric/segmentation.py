@@ -1,10 +1,12 @@
 import abc
 import math
+import warnings
 
 import numpy as np
 import SimpleITK as sitk
 
-from .base import (IConfusionMatrixMetric, IDistanceMetric, ISimpleITKImageMetric, INumpyArrayMetric)
+from .base import (IConfusionMatrixMetric, IDistanceMetric, ISimpleITKImageMetric, INumpyArrayMetric,
+                   NotComputableMetricWarning)
 
 
 class AreaMetric(ISimpleITKImageMetric):
@@ -184,6 +186,15 @@ class AverageDistance(ISimpleITKImageMetric):
 
     def calculate(self):
         """Calculates the average (Hausdorff) distance."""
+
+        if np.count_nonzero(sitk.GetArrayFromImage(self.ground_truth)) == 0:
+            warnings.warn('Unable to compute average distance due to empty label mask, returning inf',
+                          NotComputableMetricWarning)
+            return float('inf')
+        if np.count_nonzero(sitk.GetArrayFromImage(self.segmentation)) == 0:
+            warnings.warn('Unable to compute average distance due to empty segmentation mask, returning inf',
+                          NotComputableMetricWarning)
+            return float('inf')
 
         distance_filter = sitk.HausdorffDistanceImageFilter()
         distance_filter.Execute(self.ground_truth, self.segmentation)
@@ -437,21 +448,25 @@ class HausdorffDistance(IDistanceMetric):
     def calculate(self):
         """Calculates the Hausdorff distance."""
 
-        if len(self.distances.distances_gt_to_pred) > 0:
+        if self.distances.distances_gt_to_pred is not None:
             surfel_areas_cum_gt = np.cumsum(self.distances.surfel_areas_gt) / np.sum(self.distances.surfel_areas_gt)
             idx = np.searchsorted(surfel_areas_cum_gt, self.percentile / 100.0)
             perc_distance_gt_to_pred = self.distances.distances_gt_to_pred[
                 min(idx, len(self.distances.distances_gt_to_pred) - 1)]
         else:
+            warnings.warn('Unable to compute Hausdorff distance due to empty label mask, returning inf',
+                          NotComputableMetricWarning)
             return float('inf')
 
-        if len(self.distances.distances_pred_to_gt) > 0:
+        if self.distances.distances_pred_to_gt is not None:
             surfel_areas_cum_pred = (np.cumsum(self.distances.surfel_areas_pred) / 
                                      np.sum(self.distances.surfel_areas_pred))
             idx = np.searchsorted(surfel_areas_cum_pred, self.percentile / 100.0)
             perc_distance_pred_to_gt = self.distances.distances_pred_to_gt[
                 min(idx, len(self.distances.distances_pred_to_gt) - 1)]
         else:
+            warnings.warn('Unable to compute Hausdorff distance due to empty segmentation mask, returning inf',
+                          NotComputableMetricWarning)
             return float('inf')
 
         return max(perc_distance_gt_to_pred, perc_distance_pred_to_gt)
@@ -565,18 +580,14 @@ class MutualInformation(IConfusionMatrixMetric):
 
         fn_tp = fn + tp
         fp_tp = fp + tp
+        
+        if fn_tp == 0 or fn_tp / n == 1 or fp_tp == 0 or fp_tp / n == 1:
+            warnings.warn('Unable to compute mutual information due to log2 of 0, returning -inf',
+                          NotComputableMetricWarning)
+            return float('-inf')
 
-        if fn_tp != 0 and fn_tp/n != 1:
-            h1 = -((fn_tp / n) * math.log2(fn_tp / n) +
-                   (1 - fn_tp / n) * math.log2(1 - fn_tp / n))
-        else:
-            return 0
- 
-        if fp_tp != 0 and fp_tp/n != 1:
-            h2 = -((fp_tp / n) * math.log2(fp_tp / n) +
-                   (1 - fp_tp / n) * math.log2(1 - fp_tp / n))
-        else:
-            return 0
+        h1 = -((fn_tp / n) * math.log2(fn_tp / n) + (1 - fn_tp / n) * math.log2(1 - fn_tp / n))
+        h2 = -((fp_tp / n) * math.log2(fp_tp / n) + (1 - fp_tp / n) * math.log2(1 - fp_tp / n))
 
         p00 = 1 if tn == 0 else (tn / n)
         p01 = 1 if fn == 0 else (fn / n)
@@ -891,17 +902,13 @@ class VariationOfInformation(IConfusionMatrixMetric):
         fn_tp = fn + tp
         fp_tp = fp + tp
 
-        if fn_tp != 0 and fn_tp / n != 1:
-            h1 = -((fn_tp / n) * math.log2(fn_tp / n) +
-                   (1 - fn_tp / n) * math.log2(1 - fn_tp / n))
-        else:
-            return 0
- 
-        if fp_tp != 0 and fp_tp / n != 1:
-            h2 = -((fp_tp / n) * math.log2(fp_tp / n) +
-                   (1 - fp_tp / n) * math.log2(1 - fp_tp / n))
-        else:
-            return 0
+        if fn_tp == 0 or fn_tp / n == 1 or fp_tp == 0 or fp_tp / n == 1:
+            warnings.warn('Unable to compute variation of information due to log2 of 0, returning -inf',
+                          NotComputableMetricWarning)
+            return float('-inf')
+
+        h1 = -((fn_tp / n) * math.log2(fn_tp / n) + (1 - fn_tp / n) * math.log2(1 - fn_tp / n))
+        h2 = -((fp_tp / n) * math.log2(fp_tp / n) + (1 - fp_tp / n) * math.log2(1 - fp_tp / n))
 
         p00 = 1 if tn == 0 else (tn / n)
         p01 = 1 if fn == 0 else (fn / n)
