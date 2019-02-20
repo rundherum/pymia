@@ -247,6 +247,9 @@ class Evaluator:
             predictions_as_image = None
             labels_as_image = None
 
+            # for distance metric
+            distances = None
+
             # calculate the metrics
             for param_index, metric in enumerate(self.metrics):
                 if isinstance(metric, pymia_metric.IConfusionMatrixMetric):
@@ -266,6 +269,16 @@ class Evaluator:
 
                     metric.ground_truth = labels_as_image
                     metric.segmentation = predictions_as_image
+                elif isinstance(metric, pymia_metric.IDistanceMetric):
+                    if distances is None:
+                        if isinstance(image, sitk.Image):
+                            spacing = image.GetSpacing()[::-1]
+                        else:
+                            spacing = (1.0,) * labels.ndim  # use isotropic spacing of 1 mm
+
+                        distances = pymia_metric.Distances(predictions, labels, spacing)
+
+                    metric.distances = distances
 
                 label_results.append(metric.calculate())
 

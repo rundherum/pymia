@@ -4,7 +4,7 @@ import math
 import numpy as np
 import SimpleITK as sitk
 
-from .base import (IConfusionMatrixMetric, ISimpleITKImageMetric, INumpyArrayMetric)
+from .base import (IConfusionMatrixMetric, IDistanceMetric, ISimpleITKImageMetric, INumpyArrayMetric)
 
 
 class AreaMetric(ISimpleITKImageMetric):
@@ -358,7 +358,7 @@ class GroundTruthVolume(VolumeMetric):
         return self._calculate_volume(self.ground_truth)
 
 
-class HausdorffDistance(ISimpleITKImageMetric):
+class HausdorffDistance(IDistanceMetric):
     """Represents a Hausdorff distance metric.
 
     Calculates the distance between the set of non-zero pixels of two images using the following equation:
@@ -370,19 +370,46 @@ class HausdorffDistance(ISimpleITKImageMetric):
     .. math:: h(A,B) = \\max_{a \\in A} \\min_{b \\in B} \\lVert a - b \\rVert
 
     is the directed Hausdorff distance and :math:`A` and :math:`B` are the set of non-zero pixels in the images.
+
+    See Also:
+        - Nikolov et al., 2018 Deep learning to achieve clinically applicable segmentation of head and neck anatomy for
+            radiotherapy. `arXiv <https://arxiv.org/abs/1809.04430>`_
+        - `Original implementation <https://github.com/deepmind/surface-distance>`_
     """
 
-    def __init__(self):
-        """Initializes a new instance of the HausdorffDistance class."""
+    def __init__(self, percentile: float = 100.0, metric: str = 'HDRFDST'):
+        """Initializes a new instance of the HausdorffDistance class.
+
+        Args:
+            percentile (float): The percentile (0, 100] to compute, i.e. 100 computes the Hausdorff distance and
+                95 computes the 95th Hausdorff distance.
+            metric (str): The identification string of the metric.
+        """
         super().__init__()
-        self.metric = 'HDRFDST'
+        self.percentile = percentile
+        self.metric = metric
 
     def calculate(self):
         """Calculates the Hausdorff distance."""
 
-        distance_filter = sitk.HausdorffDistanceImageFilter()
-        distance_filter.Execute(self.ground_truth, self.segmentation)
-        return distance_filter.GetHausdorffDistance()
+        if len(self.distances.distances_gt_to_pred) > 0:
+            surfel_areas_cum_gt = np.cumsum(self.distances.surfel_areas_gt) / np.sum(self.distances.surfel_areas_gt)
+            idx = np.searchsorted(surfel_areas_cum_gt, self.percentile / 100.0)
+            perc_distance_gt_to_pred = self.distances.distances_gt_to_pred[
+                min(idx, len(self.distances.distances_gt_to_pred) - 1)]
+        else:
+            return float('inf')
+
+        if len(self.distances.distances_pred_to_gt) > 0:
+            surfel_areas_cum_pred = (np.cumsum(self.distances.surfel_areas_pred) / 
+                                     np.sum(self.distances.surfel_areas_pred))
+            idx = np.searchsorted(surfel_areas_cum_pred, self.percentile / 100.0)
+            perc_distance_pred_to_gt = self.distances.distances_pred_to_gt[
+                min(idx, len(self.distances.distances_pred_to_gt) - 1)]
+        else:
+            return float('inf')
+
+        return max(perc_distance_gt_to_pred, perc_distance_pred_to_gt)
 
 
 class InterclassCorrelation(INumpyArrayMetric):
@@ -662,6 +689,73 @@ class Specificity(IConfusionMatrixMetric):
         """Calculates the specificity."""
 
         return self.confusion_matrix.tn / (self.confusion_matrix.tn + self.confusion_matrix.fp)
+
+
+class SurfaceDiceOverlap(IDistanceMetric):
+    """Represents a surface Dice coefficient overlap metric.
+
+    See Also:
+        - Nikolov et al., 2018 Deep learning to achieve clinically applicable segmentation of head and neck anatomy for
+            radiotherapy. `arXiv <https://arxiv.org/abs/1809.04430>`_
+        - `Original implementation <https://github.com/deepmind/surface-distance>`_
+    """
+
+    def __init__(self, tolerance: float = 1, metric: str = 'SURFDICE'):
+        """Initializes a new instance of the SurfaceDiceOverlap class.
+
+        Args:
+            tolerance (float): The tolerance of the surface distance in mm.
+            metric (str): The identification string of the metric.
+        """
+        super().__init__()
+        self.tolerance = tolerance
+        self.metric = metric
+
+    def calculate(self):
+        """Calculates the surface Dice coefficient overlap."""
+
+        overlap_gt = np.sum(self.distances.surfel_areas_gt[self.distances.distances_gt_to_pred <= self.tolerance])
+        overlap_pred = np.sum(self.distances.surfel_areas_pred[self.distances.distances_pred_to_gt <= self.tolerance])
+        surface_dice = (overlap_gt + overlap_pred) / \
+                       (np.sum(self.distances.surfel_areas_gt) + np.sum(self.distances.surfel_areas_pred))
+        return float(surface_dice)
+
+
+class SurfaceOverlap(IDistanceMetric):
+    """Represents a surface overlap metric.
+
+    Computes the overlap of the ground truth surface with the predicted surface and vice versa allowing a
+    specified tolerance (maximum surface-to-surface distance that is regarded as overlapping).
+    The overlapping fraction is computed by correctly taking the area of each surface element into account.
+
+    See Also:
+        - Nikolov et al., 2018 Deep learning to achieve clinically applicable segmentation of head and neck anatomy for
+            radiotherapy. `arXiv <https://arxiv.org/abs/1809.04430>`_
+        - `Original implementation <https://github.com/deepmind/surface-distance>`_
+    """
+
+    def __init__(self, tolerance: float = 1.0, prediction_to_label: bool = True, metric: str = 'SURFOVLP'):
+        """Initializes a new instance of the SurfaceOverlap class.
+
+        Args:
+            tolerance (float): The tolerance of the surface distance in mm.
+            prediction_to_label (bool): Computes the prediction to labels if `True`, otherwise the label to prediction.
+            metric (str): The identification string of the metric.
+        """
+        super().__init__()
+        self.tolerance = tolerance
+        self.prediction_to_label = prediction_to_label
+        self.metric = metric
+
+    def calculate(self):
+        """Calculates the surface overlap."""
+
+        if self.prediction_to_label:
+            return float(np.sum(self.distances.surfel_areas_pred[self.distances.distances_pred_to_gt <= self.tolerance])
+                         / np.sum(self.distances.surfel_areas_pred))
+        else:
+            return float(np.sum(self.distances.surfel_areas_gt[self.distances.distances_gt_to_pred <= self.tolerance])
+                         / np.sum(self.distances.surfel_areas_gt))
 
 
 class TrueNegative(IConfusionMatrixMetric):

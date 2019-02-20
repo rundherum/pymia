@@ -8,7 +8,8 @@ Change history
 
  * New `deeplearning` package
  * New extractor :py:class:`PadDataExtractor`, which replaces the `PadPatchDataExtractor` (see migration guide below)
- * New metric :py:class:`NormalizedRootMeanSquaredError`
+ * New metrics :py:class:`NormalizedRootMeanSquaredError`, :py:class:`SurfaceDiceOverlap`, and :py:class:`SurfaceOverlap`
+ * Faster and more generic implementation of :py:class`HausdorffDistance`
  * New data augmentation module :py:mod:`augmentation`
  * New filter :py:class:`BinaryThreshold`
  * Replaced the transformation in :py:mod:`SubjectAssembler` by a more flexible function (see migration guide below)
