@@ -7,6 +7,7 @@ and the math.
 It is possible to implement your own metrics and use them with the :class:`pymia.evaluation.evaluator.Evaluator`.
 Just inherit from :class:`pymia.evaluation.metric.base.IMetric`,
 :class:`pymia.evaluation.metric.base.IConfusionMatrixMetric`,
+:class:`pymia.evaluation.metric.base.IDistanceMetric`,
 :class:`pymia.evaluation.metric.base.ISimpleITKImageMetric` or
 :class:`pymia.evaluation.metric.base.INumpyArrayMetric`
 and implement the function :func:`pymia.evaluation.metric.base.IMetric.calculate`.
