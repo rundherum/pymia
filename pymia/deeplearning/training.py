@@ -419,7 +419,9 @@ class TorchTrainer(Trainer, abc.ABC):
         np.random.seed(seed)
         torch.manual_seed(seed)
         torch.cuda.manual_seed_all(seed)
-        torch.backends.cudnn.deterministic = self.cudnn_deterministic
+        if self.cudnn_deterministic:
+            torch.backends.cudnn.deterministic = True
+            torch.backends.cudnn.benchmark = False
 
     def _check_and_load_if_model_exists(self):
         if self.model.load(self.model_dir):
