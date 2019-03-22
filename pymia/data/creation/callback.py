@@ -1,4 +1,5 @@
 import os
+import typing
 
 import numpy as np
 
@@ -23,7 +24,7 @@ class Callback:
 
 class ComposeCallback(Callback):
 
-    def __init__(self, callbacks) -> None:
+    def __init__(self, callbacks: typing.List[Callback]) -> None:
         self.callbacks = callbacks
 
     def on_start(self, params: dict):
@@ -155,7 +156,7 @@ class WriteFilesCallback(Callback):
                 self.writer.fill(df.FILES_PLACEHOLDER.format(category), relative_path, index_expr)
 
 
-def get_default_callbacks(writer: wr.Writer):
+def get_default_callbacks(writer: wr.Writer) -> ComposeCallback:
     return ComposeCallback([MonitoringCallback(),
                             WriteDataCallback(writer),
                             WriteFilesCallback(writer),
