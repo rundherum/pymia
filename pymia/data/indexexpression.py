@@ -50,4 +50,4 @@ class IndexExpression:
                 indexing.append(index)
             else:
                 raise ValueError("only 'int', 'slice', and 'None' types possible in expression")
-        return indexing if len(indexing) > 1 else indexing[0]
+        return indexing
