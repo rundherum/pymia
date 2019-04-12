@@ -10,3 +10,4 @@ Here are a few example scripts to get you started as fast as possible with pymia
 
     examples.dataset
     examples.deeplearning
+    examples.evaluation
