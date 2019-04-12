@@ -30,6 +30,8 @@ If you are new to pymia, here are a few resources to get you up to speed right a
 
 * :doc:`history`.
 
+* :doc:`acknowledgment`.
+
 Citation
 ========
 If you use pymia for your research, please acknowledge it accordingly by referencing ``https://github.com/rundherum/pymia`` in a footnote or your acknowledgments.
