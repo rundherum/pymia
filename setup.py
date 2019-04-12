@@ -1,13 +1,16 @@
+import os
 import sys
 from setuptools import find_packages, setup
 
 if sys.version_info < (3, 6):
     sys.exit("Requires Python 3.6 or higher")
 
-with open('README.rst') as f:
+directory = os.path.abspath(os.path.dirname(__file__))
+
+with open(os.path.join('README.rst')) as f:
     readme = f.read()
 
-with open('LICENSE') as f:
+with open(os.path.join('LICENSE')) as f:
     license_ = f.read()
 
 REQUIRED_PACKAGES = [
