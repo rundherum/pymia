@@ -1,5 +1,12 @@
 .. include:: ../README.rst
 
+Main Features
+=============
+pymia's main features are data handling, a deep learning interface, and metrics for result evaluation.
+We recommend to follow our example series "How to use the pymia for deep learning projects" under :doc:`examples`.
+Further, it provides basic image filtering and plotting functionality.
+
+
 Getting Started
 ===============
 
@@ -22,6 +29,11 @@ If you are new to pymia, here are a few resources to get you up to speed right a
 * Do you want to contribute? See :doc:`contribution`.
 
 * :doc:`history`.
+
+Citation
+========
+If you use pymia for your research, please acknowledge it accordingly by referencing ``https://github.com/rundherum/pymia`` in a footnote or your acknowledgments.
+
 
 .. toctree::
     :maxdepth: 3
