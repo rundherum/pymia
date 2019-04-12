@@ -198,8 +198,20 @@ class PlaneSubjectAssembler(Assembler):
             if plane_dimension not in self.planes:
                 self.planes[plane_dimension] = SubjectAssembler(self.zero_fn)
 
+            indexing = index_expr.get_indexing()
+            if not isinstance(indexing, list):
+                indexing = [indexing]
+
             required_plane_shape = list(batch['shape'][idx])
-            required_plane_shape.pop(plane_dimension)  # delete the non-plane dimension
+
+            index_at_plane = indexing[plane_dimension]
+            if isinstance(index_at_plane, tuple):
+                # is a range in the off plane direction (tuple)
+                required_off_plane_size = index_at_plane[1] - index_at_plane[0]
+                required_plane_shape[plane_dimension] = required_off_plane_size
+            else:  # isinstance of int
+                # is one slice in off plane direction (int)
+                required_plane_shape.pop(plane_dimension)
             transform = tfm.SizeCorrection(tuple(required_plane_shape), entries=tuple(to_assemble.keys()))
             self.planes[plane_dimension].on_sample_fn = TransformSampleFn(transform)
 
@@ -252,6 +264,8 @@ class PlaneSubjectAssembler(Assembler):
     def _get_plane_dimension(index_expr):
         for i, entry in enumerate(index_expr.expression):
             if isinstance(entry, int):
+                return i
+            if isinstance(entry, slice) and entry != slice(None):
                 return i
 
 
