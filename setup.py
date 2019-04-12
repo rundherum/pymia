@@ -1,8 +1,8 @@
 import sys
 from setuptools import find_packages, setup
 
-if sys.version_info < (3, 5):
-    sys.exit("Requires Python 3.5 or higher")
+if sys.version_info < (3, 6):
+    sys.exit("Requires Python 3.6 or higher")
 
 with open('README.rst') as f:
     readme = f.read()
@@ -29,12 +29,12 @@ TEST_PACKAGES = [
 
 setup(
     name='pymia',
-    version='0.1.1',
+    version='0.2.0',
     description='pymia facilitates medical image analysis',
     long_description=readme,
     long_description_content_type='text/x-rst',
-    author='Medical Image Analysis Group, University of Bern',
-    author_email='fabian.balsiger@istb.unibe.ch',
+    author='Fabian Balsiger and Alain Jungo',
+    author_email='fabian.balsiger@artorg.unibe.ch',
     url='https://github.com/rundherum/pymia',
     license=license_,
     python_requires='>=3.6',
@@ -57,7 +57,8 @@ setup(
     keywords=[
         'medical image analysis',
         'deep learning',
-        'ITK'
-        'SimpleITK'
+        'data handling',
+        'evaluation',
+        'metrics'
     ]
 )

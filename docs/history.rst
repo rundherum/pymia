@@ -3,8 +3,8 @@
 Change history
 ==============
 
-0.1.2 (to be released)
-----------------------
+0.2.0 (2019-04-12)
+------------------
 
  * New `deeplearning` package
  * New extractor :py:class:`PadDataExtractor`, which replaces the `PadPatchDataExtractor` (see migration guide below)
