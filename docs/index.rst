@@ -4,7 +4,7 @@ Main Features
 =============
 pymia's main features are data handling, a deep learning interface, and metrics for result evaluation.
 We recommend to follow our example series "How to use the pymia for deep learning projects" under :doc:`examples`.
-Further, it provides basic image filtering and plotting functionality.
+Further, pymia provides basic image filtering and plotting functionality.
 
 
 Getting Started
