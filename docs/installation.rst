@@ -16,17 +16,23 @@ Alternatively, you can download or clone the code from `GitHub <https://github.c
 
 .. code-block:: bash
 
+    git clone https://github.com/rundherum/pymia
+    cd pymia
     python setup.py install
 
 Dependencies
 ------------
-pymia requires Python 3.5 (or higher) and depends on the following packages:
+pymia requires Python 3.6 (or higher) and depends on the following packages:
 
  - `h5py <https://www.h5py.org/>`_
  - `Matplotlib <https://matplotlib.org/>`_
  - `NumPy <http://www.numpy.org/>`_
+ - `SciPy <https://www.scipy.org/>`_
  - `SimpleITK <http://www.simpleitk.org/>`_
- - `PyTorch <https://pytorch.org/>`_ (we plan to remove this dependency asap)
+ - `PyYAML <https://pyyaml.org/>`_
+ - `PyTorch <https://pytorch.org/>`_ (we plan to remove this dependency in the near future)
+ - `tensorboardX <https://tensorboardx.readthedocs.io/en/latest/tensorboard.html>`_
+ - `TensorFlow <https://www.tensorflow.org/>`_
  - `VTK <https://www.vtk.org/>`_
 
 Building the documentation
