@@ -7,11 +7,8 @@ if sys.version_info < (3, 6):
 
 directory = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join('README.rst')) as f:
+with open(os.path.join('README.rst'), encoding='utf-8') as f:
     readme = f.read()
-
-with open(os.path.join('LICENSE')) as f:
-    license_ = f.read()
 
 REQUIRED_PACKAGES = [
     'h5py',
@@ -39,7 +36,7 @@ setup(
     author='Fabian Balsiger and Alain Jungo',
     author_email='fabian.balsiger@artorg.unibe.ch',
     url='https://github.com/rundherum/pymia',
-    license=license_,
+    license='Apache License',
     python_requires='>=3.6',
     packages=find_packages(exclude=['docs', 'examples', 'test']),
     install_requires=REQUIRED_PACKAGES,
