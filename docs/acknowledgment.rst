@@ -14,7 +14,7 @@ Thank you very much guys!
 
 Open source code
 ================
-Parts of pymia bases on open source code, which we acknowledge hereby:
+Parts of pymia base on open source code, which we acknowledge hereby:
 
  - https://github.com/deepmind/surface-distance
  - https://github.com/Visceral-Project/EvaluateSegmentation
