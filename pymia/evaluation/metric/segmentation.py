@@ -448,7 +448,7 @@ class HausdorffDistance(IDistanceMetric):
     def calculate(self):
         """Calculates the Hausdorff distance."""
 
-        if self.distances.distances_gt_to_pred is not None and len(self.distances.distances_pred_to_gt) > 0:
+        if self.distances.distances_gt_to_pred is not None and len(self.distances.distances_gt_to_pred) > 0:
             surfel_areas_cum_gt = np.cumsum(self.distances.surfel_areas_gt) / np.sum(self.distances.surfel_areas_gt)
             idx = np.searchsorted(surfel_areas_cum_gt, self.percentile / 100.0)
             perc_distance_gt_to_pred = self.distances.distances_gt_to_pred[
