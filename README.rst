@@ -2,8 +2,8 @@ pymia
 =====
 
 .. image:: https://readthedocs.org/projects/pymia/badge/?version=latest
-	:target: http://pymia.readthedocs.io/en/latest/?badge=latest
-	:alt: Documentation Status
+   :target: http://pymia.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
 
 pymia contains generic and modular code for medical image analysis (mia) with Python (py).
 pymia aims at accelerating state-of-the-art research in medical image analysis using machine learning, especially deep learning.
