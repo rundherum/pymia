@@ -1,9 +1,11 @@
 import abc
+import logging
 
 import numpy as np
 import tensorflow as tf
 import torch
 
+import pymia.data.definition as defn
 import pymia.data.assembler as asmbl
 import pymia.deeplearning.data_handler as hdlr
 import pymia.deeplearning.model as mdl
@@ -11,7 +13,7 @@ import pymia.deeplearning.model as mdl
 
 class Tester(abc.ABC):
 
-    def __init__(self, data_handler: hdlr.DataHandler, model: mdl.Model, model_dir: str):
+    def __init__(self, data_handler: hdlr.DataHandler, model: mdl.Model, model_dir: str, log_nth_batch: int):
         """Initializes a new instance of the Tester class.
 
         The subclasses need to implement following methods:
@@ -24,6 +26,7 @@ class Tester(abc.ABC):
             data_handler: A data handler for the testing dataset.
             model: The model to use for testing.
             model_dir: The directory of the pre-trained model.
+            log_nth_batch: Log the progress each n-th predicted batch.
         """
         self.model_dir = model_dir
         self.data_handler = data_handler
@@ -31,7 +34,9 @@ class Tester(abc.ABC):
 
         self.is_model_loaded = False
 
-    def load(self, model_path: str=None) -> bool:
+        self.log_nth_batch = log_nth_batch
+
+    def load(self, model_path: str = None) -> bool:
         """Loads a pre-trained model.
 
         Args:
@@ -63,6 +68,10 @@ class Tester(abc.ABC):
         for batch_idx, batch in enumerate(self.data_handler.loader_test):
             prediction = self.predict_batch(batch_idx, batch)
             subject_assembler.add_batch(prediction, batch)
+
+            if batch_idx % self.log_nth_batch == 0:
+                logging.info('Batch {}/{:d}'.format(self._get_batch_index_formatted(batch_idx),
+                                                    len(self.data_handler.loader_test)))
 
         self.process_predictions(subject_assembler)
 
@@ -99,25 +108,34 @@ class Tester(abc.ABC):
         """
         pass
 
+    def _get_batch_index_formatted(self, batch_idx) -> str:
+        """Gets the current batch index formatted with leading zeros.
+
+        Returns:
+            A string with the formatted batch index.
+        """
+        return str(batch_idx + 1).zfill(len(str(len(self.data_handler.loader_test))))
+
 
 class TensorFlowTester(Tester, abc.ABC):
 
     def __init__(self, data_handler: hdlr.DataHandler, model: mdl.TensorFlowModel, model_dir: str,
-                 session: tf.Session):
+                 session: tf.Session, log_nth_batch: int = 50):
         """Initializes a new instance of the TensorFlowTester class.
 
         The subclasses need to implement following methods:
 
          - init_subject_assembler
-         - predict_batch
+         - process_predictions
 
         Args:
-            data_handler: A data handler for the training and validation datasets.
-            model: The model to train.
+            data_handler: A data handler for the testing dataset.
+            model: The model to use for testing.
             model_dir: The directory of the pre-trained model.
             session: A TensorFlow session.
+            log_nth_batch: Log the progress each n-th predicted batch.
         """
-        super().__init__(data_handler, model, model_dir)
+        super().__init__(data_handler, model, model_dir, log_nth_batch)
 
         self.session = session
         self.model = model  # only required for IntellISense
@@ -150,7 +168,7 @@ class TensorFlowTester(Tester, abc.ABC):
         Returns:
             The feed dictionary.
         """
-        feed_dict = {self.model.x_placeholder: np.stack(batch['images'], axis=0),
+        feed_dict = {self.model.x_placeholder: np.stack(batch[defn.KEY_IMAGES], axis=0),
                      self.model.is_training_placeholder: False}
 
         return feed_dict
@@ -166,21 +184,22 @@ class TensorFlowTester(Tester, abc.ABC):
 
 class TorchTester(Tester, abc.ABC):
 
-    def __init__(self, data_handler: hdlr.DataHandler, model: mdl.TorchModel, model_dir: str):
+    def __init__(self, data_handler: hdlr.DataHandler, model: mdl.TorchModel, model_dir: str, log_nth_batch: int = 50):
         """Initializes a new instance of the TorchTester class.
 
         The subclasses need to implement following methods:
 
          - init_subject_assembler
-         - predict_batch
+         - process_predictions
 
         Args:
-            data_handler: A data handler for the training and validation datasets.
-            logger: A logger, which logs the training process.
-            config: A configuration with training parameters.
+            data_handler: A data handler for the testing dataset.
+            model: The model to use for testing.
+            model_dir: The directory of the pre-trained model.
+            log_nth_batch: Log the progress each n-th predicted batch.
             model: The model to train.
         """
-        super().__init__(data_handler, model, model_dir)
+        super().__init__(data_handler, model, model_dir, log_nth_batch)
 
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model = model  # only required for IntellISense
