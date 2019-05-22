@@ -270,9 +270,10 @@ class Squeeze(Transform):
 
 class UnSqueeze(Transform):
 
-    def __init__(self, entries=('images', 'labels')) -> None:
+    def __init__(self, axis=-1, entries=('images', 'labels')) -> None:
         super().__init__()
         self.entries = entries
+        self.axis = axis
 
     def __call__(self, sample: dict) -> dict:
         for entry in self.entries:
@@ -282,7 +283,7 @@ class UnSqueeze(Transform):
                 continue
 
             np_entry = check_and_return(sample[entry], np.ndarray)
-            sample[entry] = np.expand_dims(np_entry, -1)
+            sample[entry] = np.expand_dims(np_entry, self.axis)
         return sample
 
 
