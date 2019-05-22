@@ -128,6 +128,7 @@ class MultiModalRegistration(pymia_fltr.IFilter):
                  shrink_factors: [int]=(2, 1, 1),
                  smoothing_sigmas: [float]=(2, 1, 0),
                  sampling_percentage: float=0.2,
+                 sampling_seed: int=sitk.sitkWallClock,
                  resampling_interpolator=sitk.sitkBSpline):
         """Initializes a new instance of the MultiModalRegistration class.
 
@@ -143,6 +144,7 @@ class MultiModalRegistration(pymia_fltr.IFilter):
             sampling_percentage (float): Fraction of voxel of the fixed image that will be used for registration (0, 1].
                 Typical values range from 0.01 (1 %) for low detail images to 0.2 (20 %) for high detail images.
                 The higher the fraction, the higher the computational time.
+            sampling_seed: The seed for reproducible behavior.
             resampling_interpolator: Interpolation to be applied while resampling the image by the determined
                 transformation.
         """
@@ -160,6 +162,7 @@ class MultiModalRegistration(pymia_fltr.IFilter):
         self.shrink_factors = shrink_factors
         self.smoothing_sigmas = smoothing_sigmas
         self.sampling_percentage = sampling_percentage
+        self.sampling_seed = sampling_seed
         self.resampling_interpolator = resampling_interpolator
 
         registration = sitk.ImageRegistrationMethod()
@@ -169,7 +172,7 @@ class MultiModalRegistration(pymia_fltr.IFilter):
         # registration.SetMetricAsJointHistogramMutualInformation(self.number_of_histogram_bins, 1.5)
         registration.SetMetricAsMattesMutualInformation(self.number_of_histogram_bins)
         registration.SetMetricSamplingStrategy(registration.RANDOM)
-        registration.SetMetricSamplingPercentage(self.sampling_percentage)
+        registration.SetMetricSamplingPercentage(self.sampling_percentage, self.sampling_seed)
 
         # An image gradient calculator based on ImageFunction is used instead of image gradient filters
         # set to True uses GradientRecursiveGaussianImageFilter
