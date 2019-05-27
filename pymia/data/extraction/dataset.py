@@ -33,14 +33,19 @@ class ParameterizableDataset(data.Dataset):
     def set_extractor(self, extractor: extr.Extractor):
         self.extractor = extractor
 
-    def set_indexing_strategy(self, indexing_strategy: idx.IndexingStrategy, subject_subset: list=None):
+    def set_indexing_strategy(self, indexing_strategy: idx.IndexingStrategy, subject_subset: list = None):
         self.indices.clear()
         self.indexing_strategy = indexing_strategy
         with rd.get_reader(self.dataset_path) as reader:
             all_subjects = reader.get_subjects()
+            last_shape = None
             for i, subject in enumerate(reader.get_subject_entries()):
                 if subject_subset is None or all_subjects[i] in subject_subset:
-                    subject_indices = self.indexing_strategy(reader.get_shape(subject))
+                    current_shape = reader.get_shape(subject)
+                    if not last_shape == current_shape:
+                        subject_indices = self.indexing_strategy(current_shape)
+                        last_shape = current_shape
+
                     subject_and_indices = zip(len(subject_indices) * [i], subject_indices)
                     self.indices.extend(subject_and_indices)
 
