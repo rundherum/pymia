@@ -38,7 +38,7 @@ class ParameterizableDataset(data.Dataset):
         self.indexing_strategy = indexing_strategy
         with rd.get_reader(self.dataset_path) as reader:
             all_subjects = reader.get_subjects()
-            last_shape = None
+            last_shape = None  # remember shape to optimize initialization
             for i, subject in enumerate(reader.get_subject_entries()):
                 if subject_subset is None or all_subjects[i] in subject_subset:
                     current_shape = reader.get_shape(subject)
