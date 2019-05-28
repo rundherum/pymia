@@ -230,7 +230,12 @@ class CohenKappaMetric(IConfusionMatrixMetric):
 
 
 class DiceCoefficient(IConfusionMatrixMetric):
-    """Represents a Dice coefficient metric."""
+    """Represents a Dice coefficient metric with empty target handling, defined as:
+
+        .. math:: \\begin{cases} 1 & \\left\\vert{y}\\right\\vert = \\left\\vert{\\hat y}\\right\\vert = 0 \\\\ Dice(y,\\hat y) & \\left\\vert{y}\\right\\vert > 0 \\\\ \\end{cases}
+
+        where :math:`\\hat y` is the prediction and :math:`y` the target.
+    """
 
     def __init__(self, metric: str = 'DICE'):
         """Initializes a new instance of the DiceCoefficient class.
@@ -242,6 +247,10 @@ class DiceCoefficient(IConfusionMatrixMetric):
 
     def calculate(self):
         """Calculates the Dice coefficient."""
+
+        if (self.confusion_matrix.tp == 0) and \
+                ((self.confusion_matrix.tp + self.confusion_matrix.fp + self.confusion_matrix.fn) == 0):
+            return 1.
 
         return 2 * self.confusion_matrix.tp / \
                (2 * self.confusion_matrix.tp + self.confusion_matrix.fp + self.confusion_matrix.fn)
