@@ -31,6 +31,10 @@ class Logger:
     def log_visualization(self, epoch: int):
         pass
 
+    @abc.abstractmethod
+    def close(self):
+        pass
+
 
 class TensorFlowLogger(Logger):
 
@@ -62,6 +66,9 @@ class TensorFlowLogger(Logger):
         self.writer_valid = tf.summary.FileWriter(log_dir_valid)
 
     def __del__(self):
+        self.close()
+
+    def close(self):
         self.writer_train.close()
         self.writer_valid.close()
 
@@ -166,6 +173,9 @@ class TorchLogger(Logger):
         self.visualize_kernels = visualize_kernels
 
     def __del__(self):
+        self.close()
+
+    def close(self):
         self.writer_train.close()
         self.writer_valid.close()
 
