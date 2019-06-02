@@ -7,7 +7,7 @@ class DeepLearningConfiguration(cfg.ConfigurationBase, abc.ABC):
     """Represents a basic deep learning configuration."""
 
     def __init__(self):
-        """Initializes a new instance of the Configuration class.
+        """Initializes a new instance of the DeepLearningConfiguration class.
 
         Args:
             config (dict): A dictionary representing the configuration.
@@ -27,6 +27,8 @@ class DeepLearningConfiguration(cfg.ConfigurationBase, abc.ABC):
         self.batch_size_testing = 4  # is also used for evaluation
 
         self.validate_nth_epoch = 1  # validate the performance each nth epoch
+
+        self.best_model_score_is_positive = True  # whether the best model score is positive or negative
 
         # logging configuration
         self.log_nth_epoch = 1  # log each nth epoch

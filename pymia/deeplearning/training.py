@@ -1,5 +1,6 @@
 import abc
 import logging
+import math
 import os
 import random
 import time
@@ -53,7 +54,11 @@ class Trainer(abc.ABC):
 
         self.validate_nth_epoch = config.validate_nth_epoch
 
-        self.best_model_score = 0  # the score (e.g., the value of a metric) of the best performing model
+        # the best model score used to save the best model and also to log the training progress
+        self.best_model_score = math.inf  # the score (e.g., the value of a metric) of the best performing model
+        self.best_model_score_is_positive = config.best_model_score_is_positive  # whether the best score is positive
+        if self.best_model_score_is_positive:
+            self.best_model_score = -math.inf
 
         self.seed = config.seed  # used as initial seed in set_seed
 
@@ -110,10 +115,12 @@ class Trainer(abc.ABC):
                 self.logger.log_scalar('loss', loss_validation, self.current_epoch, False)
                 logging.info('Epoch {}: Validation loss of {:.5f}'.format(self._get_current_epoch_formatted(),
                                                                           loss_validation))
+                self.logger.log_scalar('model_score', model_score, self.current_epoch, False)
                 logging.info('Epoch {}: Model score of {:.5f}'.format(self._get_current_epoch_formatted(),
                                                                       model_score))
 
-                if model_score > self.best_model_score:
+                if (model_score > self.best_model_score and self.best_model_score_is_positive) or \
+                        (model_score < self.best_model_score and not self.best_model_score_is_positive):
                     self.best_model_score = model_score
                     self.model.save(self.best_model_path, self.current_epoch, best_model_score=self.best_model_score)
 
