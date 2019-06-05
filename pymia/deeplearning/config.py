@@ -29,6 +29,7 @@ class DeepLearningConfiguration(cfg.ConfigurationBase, abc.ABC):
         self.validate_nth_epoch = 1  # validate the performance each nth epoch
 
         self.best_model_score_is_positive = True  # whether the best model score is positive or negative
+        self.best_model_score_name = 'unknown'
 
         # logging configuration
         self.log_nth_epoch = 1  # log each nth epoch

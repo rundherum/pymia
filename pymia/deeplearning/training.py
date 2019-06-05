@@ -59,6 +59,7 @@ class Trainer(abc.ABC):
         self.best_model_score_is_positive = config.best_model_score_is_positive  # whether the best score is positive
         if self.best_model_score_is_positive:
             self.best_model_score = -math.inf
+        self.best_model_score_name = config.best_model_score_name
 
         self.seed = config.seed  # used as initial seed in set_seed
 
@@ -122,7 +123,8 @@ class Trainer(abc.ABC):
                 if (model_score > self.best_model_score and self.best_model_score_is_positive) or \
                         (model_score < self.best_model_score and not self.best_model_score_is_positive):
                     self.best_model_score = model_score
-                    self.model.save(self.best_model_path, self.current_epoch, best_model_score=self.best_model_score)
+                    self.model.save(self.best_model_path, self.current_epoch, best_model_score=self.best_model_score,
+                                    best_model_score_name=self.best_model_score_name)
 
                 self.validate_on_subject(subject_assembler, True)  # also pass the test set to the validator
 

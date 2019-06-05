@@ -87,6 +87,9 @@ class TensorFlowModel(Model, abc.ABC):
         self.best_model_score = tf.Variable(0.0, name='best_model_score', trainable=False)
         self.best_model_score_placeholder = tf.placeholder(self.best_model_score.dtype)
         self.best_model_score_op = self.best_model_score.assign(self.best_model_score_placeholder)
+        # self.best_model_score_name = tf.Variable('unknown score', name='best_model_score_name', trainable=False)
+        # self.best_model_score_name_placeholder = tf.placeholder(self.best_model_score_name.dtype)
+        # self.best_model_score_name_op = self.best_model_score_name.assign(self.best_model_score_name_placeholder)
 
         self.network = self.inference(self.x_placeholder)
         self.loss = self.loss_function(self.network, self.y_placeholder)
@@ -104,10 +107,20 @@ class TensorFlowModel(Model, abc.ABC):
             # update best model score variable in graph (such that it gets automatically restored
             score = kwargs['best_model_score']
             self.session.run(self.best_model_score_op, feed_dict={self.best_model_score_placeholder: score})
+
+            if 'best_model_score_name' in kwargs:
+                score_name = kwargs['best_model_score_name']
+            else:
+                score_name = 'score'
+
+            #  self.session.run(self.best_model_score_name_op,
+            #                   feed_dict={self.best_model_score_name_placeholder: score_name})
+
             # we save with a different checkpoint file, such that max_to_keep applies only to the epoch savings
             # and the best model does not get overridden
             saved_checkpoint = self.saver_best.save(self.session, path, latest_filename='checkpoint_best')
-            logging.info('Epoch {:d}: Saved best model with score of {:.6f} at {}'.format(epoch, score, saved_checkpoint))
+            logging.info('Epoch {:d}: Saved best model with {} of {:.6f} at {}'.format(
+                epoch, score_name, score, saved_checkpoint))
         else:
             saved_checkpoint = self.saver.save(self.session, path, global_step=epoch)
             logging.info('Epoch {:d}: Saved model at {}'.format(epoch, saved_checkpoint))
@@ -151,21 +164,25 @@ class TorchModel(Model, abc.ABC):
         self.epoch = 1
         # initialize best model score
         self.best_model_score = 0
+        self.best_model_score_name = 'unknown score'
 
         self.device = None
 
     def save(self, path: str, epoch: int, **kwargs):
         if 'best_model_score' in kwargs:
             self.best_model_score = kwargs['best_model_score']
+            if 'best_model_score_name' in kwargs:
+                self.best_model_score_name = kwargs['best_model_score_name']
             save_path = path + '.pt'
-            logging_str = 'Epoch {:d}: Saved best model with score of {:.6f} at {}'.format(epoch, self.best_model_score,
-                                                                                           save_path)
+            logging_str = 'Epoch {:d}: Saved best model with {} of {:.6f} at {}'.format(
+                self.best_model_score_name, epoch, self.best_model_score, save_path)
         else:
             save_path = path + '-{}.pt'.format(epoch)
             logging_str = 'Epoch {:d}: Saved model at {}'.format(epoch, save_path)
 
         state_dict = {
             'best_model_score': self.best_model_score,
+            'best_model_score_name': self.best_model_score_name,
             'epoch': epoch,
             'global_step': self.global_step,  # todo(fabianbalsiger): is always zero
             'network_state_dict': self.network.state_dict(),
@@ -196,6 +213,9 @@ class TorchModel(Model, abc.ABC):
             state_dict = torch.load(saved_models[-1])
 
         self.best_model_score = state_dict['best_model_score']
+        if 'best_model_score_name' in state_dict:
+            # todo(fabianbalsiger): remove condition in next major release (which will brake backwards compatibility)?
+            self.best_model_score_name = state_dict['best_model_score_name']
         self.epoch = state_dict['epoch']
         self.global_step = state_dict['global_step']
         self.network.load_state_dict(state_dict['network_state_dict'])
