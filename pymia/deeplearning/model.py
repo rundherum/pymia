@@ -175,7 +175,7 @@ class TorchModel(Model, abc.ABC):
                 self.best_model_score_name = kwargs['best_model_score_name']
             save_path = path + '.pt'
             logging_str = 'Epoch {:d}: Saved best model with {} of {:.6f} at {}'.format(
-                self.best_model_score_name, epoch, self.best_model_score, save_path)
+                epoch, self.best_model_score_name, self.best_model_score, save_path)
         else:
             save_path = path + '-{}.pt'.format(epoch)
             logging_str = 'Epoch {:d}: Saved model at {}'.format(epoch, save_path)
