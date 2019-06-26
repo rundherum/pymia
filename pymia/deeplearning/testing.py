@@ -1,5 +1,6 @@
 import abc
 import logging
+import time
 
 import numpy as np
 import tensorflow as tf
@@ -62,6 +63,8 @@ class Tester(abc.ABC):
         if not self.is_model_loaded:
             self.load()
 
+        start_time = time.time()  # measure the prediction time
+
         subject_assembler = self.init_subject_assembler()  # todo: not optimal solution since it keeps everything in memory
         self.data_handler.dataset.set_extractor(self.data_handler.extractor_valid)
         self.data_handler.dataset.set_transform(self.data_handler.extraction_transform_valid)
@@ -72,6 +75,9 @@ class Tester(abc.ABC):
             if batch_idx % self.log_nth_batch == 0:
                 logging.info('Batch {}/{:d}'.format(self._get_batch_index_formatted(batch_idx),
                                                     len(self.data_handler.loader_test)))
+
+        prediction_duration = time.time() - start_time
+        logging.info('Prediction time {:.3f} s'.format(prediction_duration))
 
         self.process_predictions(subject_assembler)
 
