@@ -36,6 +36,8 @@ def bland_altman_plot(path, data1: np.ndarray, data2: np.ndarray, variable_name)
     plt.text(x, md, 'Mean', ha='left', va='bottom')
     plt.text(x, md, '{:.3f}'.format(md), ha='left', va='top')
 
+    fig.subplots_adjust(right=0.89)  # adjust slightly such that "+1.96 SD" is not cut off
+
     plt.savefig(path)
     plt.close()
 
