@@ -29,7 +29,7 @@ TEST_PACKAGES = [
 
 setup(
     name='pymia',
-    version='0.2.0',
+    version='0.2.1',
     description='pymia facilitates medical image analysis',
     long_description=readme,
     long_description_content_type='text/x-rst',

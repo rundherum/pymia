@@ -3,10 +3,11 @@
 Change history
 ==============
 
-master
-------
+0.2.1 (2019-09-04)
+------------------
 
- * Minor bug fixes and maintenance
+ * New statistics plotting module :py:mod:`statistics` (subject to heavy changes and possibly removal!)
+ * Bug fixes and code maintenance
  * Several improvements to the documentation
 
 0.2.0 (2019-04-12)
