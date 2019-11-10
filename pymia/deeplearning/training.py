@@ -341,7 +341,6 @@ class TensorFlowTrainer(Trainer, abc.ABC):
         else:
             self.current_epoch = 1
             self.current_step = 0
-            self.best_model_score = 0
 
     @abc.abstractmethod
     def init_subject_assembler(self) -> asmbl.Assembler:
@@ -441,7 +440,6 @@ class TorchTrainer(Trainer, abc.ABC):
         else:
             self.current_epoch = 1
             self.current_step = 0
-            self.best_model_score = 0
 
     def _get_x(self, batch):
         return batch['images'].to(self.device)
