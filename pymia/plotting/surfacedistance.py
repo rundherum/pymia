@@ -31,7 +31,10 @@ Examples:
 import pathlib
 
 import SimpleITK as sitk
-import vtk
+try:
+    import vtk
+except ImportError:
+    raise ImportError('Module "vtk" not found. Install "vtk==8.1.2" to use the surfacedistance module.')
 
 
 def compute_isocontour(image_label: vtk.vtkImageData, label: int=1) -> vtk.vtkPolyData:

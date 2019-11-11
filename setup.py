@@ -11,16 +11,12 @@ with open(os.path.join('README.rst'), encoding='utf-8') as f:
     readme = f.read()
 
 REQUIRED_PACKAGES = [
-    'h5py',
-    'matplotlib >= 2.0.2',
+    'h5py >= 2.10.0',
+    'matplotlib >= 3.1.1',
     'numpy >= 1.12.1',
-    'SimpleITK >= 1.0.0',
-    'vtk >= 7.1.0',
-    'tensorboardX',
-    'tensorflow',
-    'torch',
-    'pyyaml',
-    'scipy'
+    'SimpleITK >= 1.2.3',
+    'pyyaml >= 5.1.2',
+    'scipy >= 1.3.2'
 ]
 
 TEST_PACKAGES = [
