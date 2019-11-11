@@ -3,6 +3,12 @@
 Change history
 ==============
 
+0.2.2 (2019-11-11)
+------------------
+
+ * Removed the ``tensorflow``, ``tensorboardX``, and ``torch`` dependencies during installation
+ * Bug fixes and code maintenance
+
 0.2.1 (2019-09-04)
 ------------------
 
