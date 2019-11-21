@@ -220,7 +220,7 @@ class YamlConfigurationParser(JSONConfigurationParser):
     @staticmethod
     def read(file_path):
         with open(file_path, 'r') as f:
-            d = yaml.load(f)
+            d = yaml.load(f, yaml.FullLoader)
         return d
 
     @staticmethod
