@@ -4,6 +4,7 @@ import abc
 import os
 import logging
 
+import numpy as np
 import tensorflow as tf
 
 import pymia.deeplearning.model as model
