@@ -43,10 +43,11 @@ class LoopEntryTransform(Transform, abc.ABC):
                     raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
                 continue
 
+            np_entry = check_and_return(sample[entry], np.ndarray)
+
             if loop_axis is None:
-                np_entry = fn(sample[entry], entry)
+                np_entry = fn(np_entry, entry)
             else:
-                np_entry = check_and_return(sample[entry], np.ndarray)
                 slicing = [slice(None) for _ in range(np_entry.ndim)]
                 for i in range(np_entry.shape[loop_axis]):
                     slicing[loop_axis] = i
@@ -62,33 +63,15 @@ class LoopEntryTransform(Transform, abc.ABC):
         pass
 
 
-class IntensityRescale(Transform):
+class IntensityRescale(LoopEntryTransform):
 
     def __init__(self, lower, upper, loop_axis=None, entries=('images',)) -> None:
-        super().__init__()
+        super().__init__(loop_axis=loop_axis, entries=entries)
         self.lower = lower
         self.upper = upper
-        self.loop_axis = loop_axis
-        self.entries = entries
 
-    def __call__(self, sample: dict) -> dict:
-        for entry in self.entries:
-            if entry not in sample:
-                if raise_error_if_entry_not_extracted:
-                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
-                continue
-
-            np_entry = check_and_return(sample[entry], np.ndarray)
-            if self.loop_axis is None:
-                np_entry = self._normalize(np_entry, self.lower, self.upper)
-            else:
-                slicing = [slice(None) for _ in range(np_entry.ndim)]
-                for i in range(np_entry.shape[self.loop_axis]):
-                    slicing[self.loop_axis] = i
-                    np_entry[tuple(slicing)] = self._normalize(np_entry[tuple(slicing)], self.lower, self.upper)
-
-            sample[entry] = np_entry
-        return sample
+    def transform_entry(self, np_entry, entry, loop_i=None) -> np.ndarray:
+        return self._normalize(np_entry, self.lower, self.upper)
 
     @staticmethod
     def _normalize(arr: np.ndarray, lower, upper):
@@ -100,98 +83,44 @@ class IntensityRescale(Transform):
         return arr.astype(dtype)
 
 
-class IntensityNormalization(Transform):
+class IntensityNormalization(LoopEntryTransform):
 
     def __init__(self, loop_axis=None, entries=('images',)) -> None:
-        super().__init__()
-        self.loop_axis = loop_axis
-        self.entries = entries
+        super().__init__(loop_axis=loop_axis, entries=entries)
         self.normalize_fn = self._normalize
 
-    def __call__(self, sample: dict) -> dict:
-        for entry in self.entries:
-            if entry not in sample:
-                if raise_error_if_entry_not_extracted:
-                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
-                continue
-
-            np_entry = check_and_return(sample[entry], np.ndarray)
-            if not np.issubdtype(np_entry.dtype, np.floating):
-                raise ValueError('Array must be floating type')
-
-            if self.loop_axis is None:
-                np_entry = self.normalize_fn(np_entry)
-            else:
-                slicing = [slice(None) for _ in range(np_entry.ndim)]
-                for i in range(np_entry.shape[self.loop_axis]):
-                    slicing[self.loop_axis] = i
-                    np_entry[tuple(slicing)] = self.normalize_fn(np_entry[tuple(slicing)])
-            sample[entry] = np_entry
-        return sample
+    def transform_entry(self, np_entry, entry, loop_i=None) -> np.ndarray:
+        if not np.issubdtype(np_entry.dtype, np.floating):
+            raise ValueError('Array must be floating type')
+        return self._normalize(np_entry)
 
     @staticmethod
     def _normalize(arr: np.ndarray):
         return (arr - arr.mean()) / arr.std()
 
 
-class LambdaTransform(Transform):
+class LambdaTransform(LoopEntryTransform):
 
     def __init__(self, lambda_fn, loop_axis=None, entries=('images',)) -> None:
-        super().__init__()
+        super().__init__(loop_axis=loop_axis, entries=entries)
         self.lambda_fn = lambda_fn
-        self.loop_axis = loop_axis
-        self.entries = entries
 
-    def __call__(self, sample: dict) -> dict:
-        for entry in self.entries:
-            if entry not in sample:
-                if raise_error_if_entry_not_extracted:
-                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
-                continue
-
-            if self.loop_axis is None:
-                np_entry = self.lambda_fn(sample[entry])
-            else:
-                np_entry = check_and_return(sample[entry], np.ndarray)
-                slicing = [slice(None) for _ in range(np_entry.ndim)]
-                for i in range(np_entry.shape[self.loop_axis]):
-                    slicing[self.loop_axis] = i
-                    np_entry[tuple(slicing)] = self.lambda_fn(np_entry[tuple(slicing)])
-            sample[entry] = np_entry
-        return sample
+    def transform_entry(self, np_entry, entry, loop_i=None) -> np.ndarray:
+        return self.lambda_fn(np_entry)
 
 
-class ClipPercentile(Transform):
+class ClipPercentile(LoopEntryTransform):
 
     def __init__(self, upper_percentile: float, lower_percentile: float=None,
                  loop_axis=None, entries=('images',)) -> None:
-        super().__init__()
+        super().__init__(loop_axis=loop_axis, entries=entries)
         self.upper_percentile = upper_percentile
         if lower_percentile is None:
             lower_percentile = 100 - upper_percentile
         self.lower_percentile = lower_percentile
-        self.loop_axis = loop_axis
-        self.entries = entries
 
-    def __call__(self, sample: dict) -> dict:
-        for entry in self.entries:
-            if entry not in sample:
-                if raise_error_if_entry_not_extracted:
-                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
-                continue
-
-            np_entry = check_and_return(sample[entry], np.ndarray)
-
-            if self.loop_axis is None:
-                np_entry = self._clip(np_entry)
-            else:
-                slicing = [slice(None) for _ in range(np_entry.ndim)]
-                for i in range(np_entry.shape[self.loop_axis]):
-                    slicing[self.loop_axis] = i
-                    np_entry[tuple(slicing)] = self._clip(np_entry[tuple(slicing)])
-
-            sample[entry] = np_entry
-        return sample
+    def transform_entry(self, np_entry, entry, loop_i=None) -> np.ndarray:
+        return self._clip(np_entry)
 
     def _clip(self, arr: np.ndarray):
         upper_max = np.percentile(arr, self.upper_percentile)
@@ -201,28 +130,19 @@ class ClipPercentile(Transform):
         return arr
 
 
-class Relabel(Transform):
+class Relabel(LoopEntryTransform):
 
     def __init__(self, label_changes: typing.Dict[int, int], entries=('labels',)) -> None:
-        super().__init__()
+        super().__init__(loop_axis=None, entries=entries)
         self.label_changes = label_changes
-        self.entries = entries
 
-    def __call__(self, sample: dict) -> dict:
-        for entry in self.entries:
-            if entry not in sample:
-                if raise_error_if_entry_not_extracted:
-                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
-                continue
-
-            np_entry = check_and_return(sample[entry], np.ndarray)
-            for new_label, old_label in self.label_changes.items():
-                np_entry[np_entry == old_label] = new_label
-            sample[entry] = np_entry
-        return sample
+    def transform_entry(self, np_entry, entry, loop_i=None) -> np.ndarray:
+        for new_label, old_label in self.label_changes.items():
+            np_entry[np_entry == old_label] = new_label
+        return np_entry
 
 
-class Reshape(Transform):
+class Reshape(LoopEntryTransform):
 
     def __init__(self, shapes: dict) -> None:
         """Initializes a new instance of the Reshape class.
@@ -231,94 +151,50 @@ class Reshape(Transform):
             shapes (dict): A dict with keys being the entries and the values the new shapes of the entries.
                 E.g. shapes = {'images': (-1, 4), 'labels' : (-1, 1)}
         """
-        super().__init__()
+        super().__init__(loop_axis=None, entries=tuple(shapes.keys()))
         self.shapes = shapes
 
-    def __call__(self, sample: dict) -> dict:
-        for entry in self.shapes:
-            if entry not in sample:
-                if raise_error_if_entry_not_extracted:
-                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
-                continue
-
-            np_entry = check_and_return(sample[entry], np.ndarray)
-            sample[entry] = np.reshape(np_entry, self.shapes[entry])
-        return sample
+    def transform_entry(self, np_entry, entry, loop_i=None) -> np.ndarray:
+        return np.reshape(np_entry, self.shapes[entry])
 
 
-class ToTorchTensor(Transform):
+class ToTorchTensor(LoopEntryTransform):
 
     def __init__(self, entries=('images', 'labels')) -> None:
-        super().__init__()
-        self.entries = entries
+        super().__init__(loop_axis=None, entries=entries)
 
-    def __call__(self, sample: dict) -> dict:
-        for entry in self.entries:
-            if entry not in sample:
-                if raise_error_if_entry_not_extracted:
-                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
-                continue
-
-            np_entry = check_and_return(sample[entry], np.ndarray)
-            sample[entry] = torch.from_numpy(np_entry)
-        return sample
+    def transform_entry(self, np_entry, entry, loop_i=None) -> np.ndarray:
+        return torch.from_numpy(np_entry)
 
 
-class Permute(Transform):
+class Permute(LoopEntryTransform):
 
     def __init__(self, permutation: tuple, entries=('images', 'labels')) -> None:
-        super().__init__()
+        super().__init__(loop_axis=None, entries=entries)
         self.permutation = permutation
-        self.entries = entries
 
-    def __call__(self, sample: dict) -> dict:
-        for entry in self.entries:
-            if entry not in sample:
-                if raise_error_if_entry_not_extracted:
-                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
-                continue
-
-            np_entry = check_and_return(sample[entry], np.ndarray)
-            sample[entry] = np.transpose(np_entry, self.permutation)
-        return sample
+    def transform_entry(self, np_entry, entry, loop_i=None) -> np.ndarray:
+        return np.transpose(np_entry, self.permutation)
 
 
-class Squeeze(Transform):
+class Squeeze(LoopEntryTransform):
 
     def __init__(self, entries=('images', 'labels'), squeeze_axis=None) -> None:
-        super().__init__()
-        self.entries = entries
+        super().__init__(loop_axis=None, entries=entries)
         self.squeeze_axis = squeeze_axis
 
-    def __call__(self, sample: dict) -> dict:
-        for entry in self.entries:
-            if entry not in sample:
-                if raise_error_if_entry_not_extracted:
-                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
-                continue
-
-            np_entry = check_and_return(sample[entry], np.ndarray)
-            sample[entry] = np_entry.squeeze(self.squeeze_axis)
-        return sample
+    def transform_entry(self, np_entry, entry, loop_i=None) -> np.ndarray:
+        return np_entry.squeeze(self.squeeze_axis)
 
 
-class UnSqueeze(Transform):
+class UnSqueeze(LoopEntryTransform):
 
     def __init__(self, axis=-1, entries=('images', 'labels')) -> None:
-        super().__init__()
-        self.entries = entries
+        super().__init__(loop_axis=None, entries=entries)
         self.axis = axis
 
-    def __call__(self, sample: dict) -> dict:
-        for entry in self.entries:
-            if entry not in sample:
-                if raise_error_if_entry_not_extracted:
-                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
-                continue
-
-            np_entry = check_and_return(sample[entry], np.ndarray)
-            sample[entry] = np.expand_dims(np_entry, self.axis)
-        return sample
+    def transform_entry(self, np_entry, entry, loop_i=None) -> np.ndarray:
+        return np.expand_dims(np_entry, self.axis)
 
 
 class SizeCorrection(Transform):
