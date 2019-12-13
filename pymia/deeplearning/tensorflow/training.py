@@ -10,7 +10,7 @@ import pymia.data.assembler as asmbl
 import pymia.deeplearning.config as cfg
 import pymia.deeplearning.data_handler as hdlr
 import pymia.deeplearning.logging as log
-import pymia.deeplearning.model as mdl
+import pymia.deeplearning.tensorflow.model as mdl
 import pymia.deeplearning.training as train
 
 
