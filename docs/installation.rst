@@ -31,7 +31,6 @@ pymia requires Python 3.6 (or higher) and depends on the following packages:
  - `SimpleITK <http://www.simpleitk.org/>`_
  - `PyYAML <https://pyyaml.org/>`_
  - `PyTorch <https://pytorch.org/>`_
- - `tensorboardX <https://tensorboardx.readthedocs.io/en/latest/tensorboard.html>`_
  - `TensorFlow <https://www.tensorflow.org/>`_
  - `VTK <https://www.vtk.org/>`_
 
