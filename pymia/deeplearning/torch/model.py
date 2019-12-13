@@ -3,6 +3,7 @@ import os
 import glob
 import logging
 
+import numpy as np
 import torch
 
 import pymia.deeplearning.model as model
