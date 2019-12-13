@@ -83,7 +83,7 @@ class Hdf5Writer(Writer):
             self.h5 = None
 
     def open(self):
-        self.h5 = h5py.File(self.file_path, libver='latest')
+        self.h5 = h5py.File(self.file_path, mode='a', libver='latest')
 
     def reserve(self, entry: str, shape: tuple, dtype=None):
         # special string handling (in order not to use length limited strings)
