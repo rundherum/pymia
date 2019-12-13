@@ -3,6 +3,13 @@
 Change history
 ==============
 
+0.2.3 (2019-12-13)
+------------------
+
+ * Refactored: :py:mod:`transformation`
+ * Bug fixes and code maintenance
+
+
 0.2.2 (2019-11-11)
 ------------------
 
