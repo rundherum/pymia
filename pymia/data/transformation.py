@@ -11,7 +11,7 @@ raise_error_if_entry_not_extracted = True
 
 
 # follows the principle of torchvision transform
-class Transform(metaclass=abc.ABCMeta):
+class Transform(abc.ABC):
     @abc.abstractmethod
     def __call__(self, sample: dict) -> dict:
         pass
@@ -26,6 +26,40 @@ class ComposeTransform(Transform):
         for t in self.transforms:
             sample = t(sample)
         return sample
+
+
+class LoopEntryTransform(Transform, abc.ABC):
+
+    def __init__(self, loop_axis=None, entries=()) -> None:
+        super().__init__()
+        self.loop_axis = loop_axis
+        self.entries = entries
+
+    @staticmethod
+    def loop_entries(sample: dict, fn, entries, loop_axis=None):
+        for entry in entries:
+            if entry not in sample:
+                if raise_error_if_entry_not_extracted:
+                    raise ValueError(ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+                continue
+
+            if loop_axis is None:
+                np_entry = fn(sample[entry], entry)
+            else:
+                np_entry = check_and_return(sample[entry], np.ndarray)
+                slicing = [slice(None) for _ in range(np_entry.ndim)]
+                for i in range(np_entry.shape[loop_axis]):
+                    slicing[loop_axis] = i
+                    np_entry[tuple(slicing)] = fn(np_entry[tuple(slicing)], entry, i)
+            sample[entry] = np_entry
+        return sample
+
+    def __call__(self, sample: dict) -> dict:
+        return self.loop_entries(sample, self.transform_entry, self.entries, self.loop_axis)
+
+    @abc.abstractmethod
+    def transform_entry(self, np_entry, entry, loop_i=None) -> np.ndarray:
+        pass
 
 
 class IntensityRescale(Transform):
@@ -371,6 +405,31 @@ class Mask(Transform):
 
             sample[entry] = np_entry
         return sample
+
+
+class RandomCrop(LoopEntryTransform):
+
+    def __init__(self, size: tuple, loop_axis=None, entries=('images', 'labels')) -> None:
+        super().__init__(loop_axis, entries)
+        self.size = size
+        self.slices = None
+
+    def transform_entry(self, np_entry, entry, loop_i=None) -> np.ndarray:
+        current_size = np_entry.shape[-len(self.size):]
+        dim_diff = np_entry.ndim - len(self.size)
+
+        if entry == self.entries[0]:
+            # define offset for first of the entries -> apply on the others
+            mins = np.zeros(3, dtype=np.int)
+            maxs = np.subtract(current_size, self.size)
+            if (maxs < 0).any():
+                raise ValueError('current size is not large enough for crop')
+
+            offset = np.random.randint(mins, maxs + 1, len(self.size))
+            self.slices = tuple([slice(offset[i], offset[i]+self.size[i]) for i in range(len(offset))])
+
+        slices = dim_diff*(slice(None),) + self.slices
+        return np_entry[slices]
 
 
 def check_and_return(obj, type_):
