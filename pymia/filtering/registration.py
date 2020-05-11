@@ -13,9 +13,6 @@ import enum
 import os
 import typing as t
 
-import matplotlib
-matplotlib.use('Agg')  # use matplotlib without having a window appear
-import matplotlib.pyplot as plt
 import numpy as np
 import SimpleITK as sitk
 
@@ -285,107 +282,6 @@ class MultiModalRegistration(pymia_fltr.IFilter):
                ' sampling_percentage:      {self.sampling_percentage}\n' \
                ' resampling_interpolator:  {self.resampling_interpolator}\n' \
             .format(self=self)
-
-
-class PlotCallback(RegistrationCallback):
-    """Represents a plotter for SimpleITK registrations."""
-
-    def __init__(self, plot_dir: str, file_name_prefix: str='', slice_no: int=-1) -> None:
-        """
-        Args:
-            plot_dir (str): Path to the directory where to save the plots.
-            file_name_prefix (str): The file name prefix for the plots.
-            slice_no (int): The slice number to plot (affects only 3-D images). -1 means to use the middle slice.
-        """
-        super().__init__()
-        self.plot_dir = plot_dir
-        self.file_name_prefix = file_name_prefix
-        self.slice_no = slice_no
-
-        self.metric_values = []
-        self.resolution_iterations = []
-
-    def registration_ended(self):
-        """Callback for the EndEvent."""
-        plt.close()
-
-    def registration_started(self):
-        """Callback for the StartEvent."""
-        self.metric_values = []
-        self.resolution_iterations = []
-
-    def registration_resolution_changed(self):
-        """Callback for the MultiResolutionIterationEvent."""
-        self.resolution_iterations.append(len(self.metric_values))
-
-    def registration_iteration_ended(self):
-        """Callback for the IterationEvent.
-
-        Saves an image including the visualization of the registered images and the metric value plot.
-        """
-
-        self.metric_values.append(self.registration_method.GetMetricValue())
-        # Plot the similarity metric values; resolution changes are marked with a blue star
-        plt.plot(self.metric_values, 'r')
-        plt.plot(self.resolution_iterations, [self.metric_values[index] for index in self.resolution_iterations], 'b*')
-        plt.xlabel('Iteration', fontsize=12)
-        plt.ylabel('Metric Value', fontsize=12)
-
-        # todo(fabianbalsiger): format precision of legends
-        # plt.axes().yaxis.set_major_formatter(matplotlib.ticker.StrMethodFormatter('{x:2f}'))
-        # plt.axes().xaxis.set_major_formatter(matplotlib.ticker.StrMethodFormatter('{x:d}'))
-        # _, ax = plt.subplots()
-        # ax.yaxis.set_major_formatter(matplotlib.ticker.StrMethodFormatter('{x:f2}'))
-
-        # todo(fabianbalsiger): add margin to the left side of the plot
-
-        # Convert the plot to a SimpleITK image (works with the agg matplotlib backend, doesn't work
-        # with the default - the relevant method is canvas_tostring_rgb())
-        plt.gcf().canvas.draw()
-        plot_data = np.fromstring(plt.gcf().canvas.tostring_rgb(), dtype=np.uint8, sep='')
-        plot_data = plot_data.reshape(plt.gcf().canvas.get_width_height()[::-1] + (3,))
-        plot_image = sitk.GetImageFromArray(plot_data, isVector=True)
-
-        # Extract the central axial slice from the two volumes, compose it using the transformation and alpha blend it
-        alpha = 0.7
-
-        moving_transformed = sitk.Resample(self.moving_image, self.fixed_image, self.transform,
-                                           sitk.sitkLinear, 0.0,
-                                           self.moving_image.GetPixelIDValue())
-        # Extract the plotting slice in xy and alpha blend them
-        if self.fixed_image.GetDimension() == 3:
-            slice_index = self.slice_no if self.slice_no != -1 else round((self.fixed_image.GetSize())[2] / 2)
-            image_registration_overlay = (1.0 - alpha) * sitk.Normalize(self.fixed_image[:, :, slice_index]) + \
-                       alpha * sitk.Normalize(moving_transformed[:, :, slice_index])
-        else:
-            image_registration_overlay = (1.0 - alpha) * sitk.Normalize(self.fixed_image) + \
-                       alpha * sitk.Normalize(moving_transformed[:, :])
-
-        combined_slices_image = sitk.ScalarToRGBColormap(image_registration_overlay)
-
-        self._write_combined_image(combined_slices_image, plot_image,
-                                   os.path.join(self.plot_dir,
-                                                self.file_name_prefix + format(len(self.metric_values), '03d') + '.png')
-                                   )
-
-    @staticmethod
-    def _write_combined_image(image1, image2, file_name):
-        """Writes an image including the visualization of the registered images and the metric value plot."""
-        combined_image = sitk.Image(
-            (image1.GetWidth() + image2.GetWidth(), max(image1.GetHeight(), image2.GetHeight())),
-            image1.GetPixelID(), image1.GetNumberOfComponentsPerPixel())
-
-        image1_destination = [0, 0]
-        image2_destination = [image1.GetWidth(), 0]
-
-        if image1.GetHeight() > image2.GetHeight():
-            image2_destination[1] = round((combined_image.GetHeight() - image2.GetHeight()) / 2)
-        else:
-            image1_destination[1] = round((combined_image.GetHeight() - image1.GetHeight()) / 2)
-
-        combined_image = sitk.Paste(combined_image, image1, image1.GetSize(), (0, 0), image1_destination)
-        combined_image = sitk.Paste(combined_image, image2, image2.GetSize(), (0, 0), image2_destination)
-        sitk.WriteImage(combined_image, file_name)
 
 
 class PlotOnResolutionChangeCallback(RegistrationCallback):

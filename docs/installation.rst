@@ -25,14 +25,10 @@ Dependencies
 pymia requires Python 3.6 (or higher) and depends on the following packages:
 
  - `h5py <https://www.h5py.org/>`_
- - `Matplotlib <https://matplotlib.org/>`_
  - `NumPy <http://www.numpy.org/>`_
  - `SciPy <https://www.scipy.org/>`_
  - `SimpleITK <http://www.simpleitk.org/>`_
  - `PyYAML <https://pyyaml.org/>`_
- - `PyTorch <https://pytorch.org/>`_
- - `TensorFlow <https://www.tensorflow.org/>`_
- - `VTK <https://www.vtk.org/>`_
 
 Note that not all dependencies are installed directly but only required when certain modules are used.
 Upon loading a module, pymia will check if the dependencies are fulfilled.
