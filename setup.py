@@ -13,9 +13,8 @@ with open(os.path.join('README.rst'), encoding='utf-8') as f:
 REQUIRED_PACKAGES = [
     'h5py >= 2.10.0',
     'numpy >= 1.12.1',
-    'SimpleITK >= 1.2.3',
-    'pyyaml >= 5.1.2',
-    'scipy >= 1.3.2'
+    'scipy >= 1.3.2',
+    'SimpleITK >= 1.2.3'
 ]
 
 TEST_PACKAGES = [
