@@ -18,7 +18,7 @@ def main(data_dir: str):
 
     np_shape = (Z, XY, XY)
 
-    for n in range(N):
+    for n in range(1, N + 1):
         np.random.seed(n)  # for reproducibility
 
         subject = 'Subject_{}'.format(n)
