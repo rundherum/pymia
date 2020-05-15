@@ -4,7 +4,7 @@ import os
 import SimpleITK as sitk
 import numpy as np
 
-import pymia.data as pymia_data
+import pymia.data as data
 import pymia.data.conversion as conv
 import pymia.data.extraction as extr
 
@@ -13,9 +13,9 @@ def main(hdf_file: str):
     extractor = extr.ComposeExtractor([extr.NamesExtractor(),
                                        extr.DataExtractor(),
                                        extr.SelectiveDataExtractor(),
-                                       extr.DataExtractor(('numerical',), ignore_indexing=True),
-                                       extr.DataExtractor(('sex',), ignore_indexing=True),
-                                       extr.DataExtractor(('mask',), ignore_indexing=False),
+                                       extr.DataExtractor(('numerical', ), ignore_indexing=True),
+                                       extr.DataExtractor(('sex', ), ignore_indexing=True),
+                                       extr.DataExtractor(('mask', ), ignore_indexing=False),
                                        extr.SubjectExtractor(),
                                        extr.FilesExtractor(categories=('images', 'labels', 'mask', 'numerical', 'sex')),
                                        extr.IndexingExtractor(),
@@ -25,7 +25,7 @@ def main(hdf_file: str):
     for i in range(len(dataset)):
         item = dataset[i]
 
-        index_expr = item['index_expr']  # type: pymia_data.IndexExpression
+        index_expr = item['index_expr']  # type: data.IndexExpression
         root = item['file_root']
 
         image = None  # type: sitk.Image
@@ -82,12 +82,12 @@ if __name__ == '__main__':
     Parse the arguments and run the program.
     """
 
-    parser = argparse.ArgumentParser(description='Data set verification')
+    parser = argparse.ArgumentParser(description='Dataset verification')
 
     parser.add_argument(
         '--hdf_file',
         type=str,
-        default='out/test/test.h5',
+        default='../dummy-data/dummy.h5',
         help='Path to the dataset file.'
     )
 

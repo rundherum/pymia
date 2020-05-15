@@ -1,6 +1,7 @@
 How to use the pymia for deep learning projects - Part 3: Evaluate your results
 ===============================================================================
 
-You should have completed :ref:`Part 1 <example-dl1>` and :ref:`Part 2 <example-dl2>` before continuing with this part.
+This example explains how to use the evaluation package to calculate results using several metrics.
+To begin with this example, first create some dummy data by executing `./examples/data/create_dummy_data.py`.
 
 TBD

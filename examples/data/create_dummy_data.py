@@ -45,12 +45,12 @@ if __name__ == '__main__':
     Parse the arguments and run the program.
     """
 
-    parser = argparse.ArgumentParser(description='Sample data creation')
+    parser = argparse.ArgumentParser(description='Dummy data creation')
 
     parser.add_argument(
         '--data_dir',
         type=str,
-        default='out/test',
+        default='../dummy-data',
         help='Path to the data directory.'
     )
 

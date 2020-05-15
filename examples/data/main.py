@@ -8,10 +8,8 @@ import pymia.data.assembler as pymia_asmbl
 import pymia.evaluation.evaluator as pymia_eval
 import pymia.evaluation.metric as pymia_metric
 
-import config as cfg
 
-
-def batch_to_feed_dict(x_placeholder, y_placeholder, batch, is_train: bool=True) -> dict:
+def batch_to_feed_dict(x_placeholder, y_placeholder, batch, is_train: bool = True) -> dict:
     feed_dict = {x_placeholder: np.stack(batch['images'], axis=0).astype(np.float32)}
     if is_train:
         feed_dict[y_placeholder] = np.stack(batch['labels'], axis=0).astype(np.int16)
@@ -34,12 +32,13 @@ def init_evaluator() -> pymia_eval.Evaluator:
     return evaluator
 
 
-def main(config_file: str):
-    config = cfg.load(config_file, cfg.Configuration)
-    print(config)
+def main(hdf_file: str):
+    epochs = 20
+    batch_size_training = 10
+    batch_size_testing = 10
 
     indexing_strategy = pymia_extr.SliceIndexing()  # slice-wise extraction
-    extraction_transform = None  # we do not want to apply any transformation on the slices after extraction
+
     # define an extractor for training, i.e. what information we would like to extract per sample
     train_extractor = pymia_extr.ComposeExtractor([pymia_extr.NamesExtractor(),
                                                    pymia_extr.DataExtractor(),
@@ -60,33 +59,32 @@ def main(config_file: str):
                                                   pymia_extr.ImagePropertiesExtractor()])
 
     # define the data set
-    dataset = pymia_extr.ParameterizableDataset(config.database_file,
+    dataset = pymia_extr.ParameterizableDataset(hdf_file,
                                                 indexing_strategy,
-                                                pymia_extr.SubjectExtractor(),  # for select_indices() below
-                                                extraction_transform)
+                                                pymia_extr.SubjectExtractor())  # for select_indices() below
 
     # generate train / test split for data set
     # we use Subject_0, Subject_1 and Subject_2 for training and Subject_3 for testing
     sampler_ids_train = pymia_extr.select_indices(dataset,
-                                                  pymia_extr.SubjectSelection(('Subject_0', 'Subject_1', 'Subject_2')))
+                                                  pymia_extr.SubjectSelection(('Subject_1', 'Subject_2', 'Subject_3')))
     sampler_ids_test = pymia_extr.select_indices(dataset,
-                                                 pymia_extr.SubjectSelection(('Subject_3')))
+                                                 pymia_extr.SubjectSelection(('Subject_4')))
 
     # set up training data loader
     training_sampler = pymia_extr.SubsetRandomSampler(sampler_ids_train)
-    training_loader = pymia_extr.DataLoader(dataset, config.batch_size_training, sampler=training_sampler,
+    training_loader = pymia_extr.DataLoader(dataset, batch_size_training, sampler=training_sampler,
                                             collate_fn=collate_batch, num_workers=1)
 
     # set up testing data loader
     testing_sampler = pymia_extr.SubsetSequentialSampler(sampler_ids_test)
-    testing_loader = pymia_extr.DataLoader(dataset, config.batch_size_testing, sampler=testing_sampler,
+    testing_loader = pymia_extr.DataLoader(dataset, batch_size_testing, sampler=testing_sampler,
                                            collate_fn=collate_batch, num_workers=1)
 
     sample = dataset.direct_extract(train_extractor, 0)  # extract a subject
 
     evaluator = init_evaluator()  # initialize evaluator
 
-    for epoch in range(config.epochs):  # epochs loop
+    for epoch in range(epochs):  # epochs loop
         dataset.set_extractor(train_extractor)
         for batch in training_loader:  # batches for training
             # feed_dict = batch_to_feed_dict(x, y, batch, True)  # e.g. for TensorFlow
@@ -123,14 +121,14 @@ if __name__ == '__main__':
     Parse the arguments and run the program.
     """
 
-    parser = argparse.ArgumentParser(description='Main script using the dataset.')
+    parser = argparse.ArgumentParser(description='Training loop scaffold using pymia data handling.')
 
     parser.add_argument(
-        '--config_file',
+        '--hdf_file',
         type=str,
-        default='config.json',
-        help='Path to the configuration file.'
+        default='../dummy-data/dummy.h5',
+        help='Path to the dataset file.'
     )
 
     args = parser.parse_args()
-    main(args.config_file)
+    main(args.hdf_file)

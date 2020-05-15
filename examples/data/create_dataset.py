@@ -7,10 +7,11 @@ import typing
 import SimpleITK as sitk
 import numpy as np
 
-import pymia.data as pymia_data
+import pymia.data as data
 import pymia.data.conversion as conv
-import pymia.data.creation as pymia_crt
-import pymia.data.transformation as pymia_tfm
+import pymia.data.definition as defs
+import pymia.data.creation as crt
+import pymia.data.transformation as tfm
 import pymia.data.creation.fileloader as file_load
 
 
@@ -38,18 +39,19 @@ class LoadData(file_load.Load):
                 return value, None
         if id_ == FileTypes.SEX.name:
             with open(file_name, 'r') as f:
-                value = np.asarray([f.readlines()[2].split(':')[1].strip()])
+                value = np.array(f.readlines()[2].split(':')[1].strip())
                 return value, None
 
-        if category == 'images':
+        if category == defs.KEY_IMAGES:
             img = sitk.ReadImage(file_name, sitk.sitkFloat32)
         else:
+            # this is the ground truth (defs.KEY_LABELS), which will be loaded as unsigned integer
             img = sitk.ReadImage(file_name, sitk.sitkUInt8)
 
         return sitk.GetArrayFromImage(img), conv.ImageProperties(img)
 
 
-class Subject(pymia_data.SubjectFile):
+class Subject(data.SubjectFile):
 
     def __init__(self, subject: str, files: dict):
         super().__init__(subject,
@@ -113,13 +115,13 @@ def main(hdf_file: str, data_dir: str):
     if os.path.exists(hdf_file):
         os.remove(hdf_file)
 
-    with pymia_crt.get_writer(hdf_file) as writer:
-        callbacks = pymia_crt.get_default_callbacks(writer)
+    with crt.get_writer(hdf_file) as writer:
+        callbacks = crt.get_default_callbacks(writer)
 
         # add a transform to normalize the images
-        transform = pymia_tfm.IntensityNormalization(loop_axis=3, entries=('images',))
+        transform = tfm.IntensityNormalization(loop_axis=3, entries=(defs.KEY_IMAGES, ))
 
-        traverser = pymia_crt.SubjectFileTraverser()
+        traverser = crt.SubjectFileTraverser()
         traverser.traverse(subjects, callback=callbacks, load=LoadData(), transform=transform)
 
 
@@ -134,14 +136,14 @@ if __name__ == '__main__':
     parser.add_argument(
         '--hdf_file',
         type=str,
-        default='out/test/test.h5',
+        default='../dummy-data/dummy.h5',
         help='Path to the dataset file.'
     )
 
     parser.add_argument(
         '--data_dir',
         type=str,
-        default='out/test',
+        default='../dummy-data',
         help='Path to the data directory.'
     )
 
