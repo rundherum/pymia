@@ -304,6 +304,13 @@ class Distances:
         self._calculate(prediction, label, spacing)
 
     def _calculate(self, segmentation_arr, ground_truth_arr, spacing):
+        if segmentation_arr.ndim == 2 and ground_truth_arr.ndim == 2 and len(spacing) == 2:
+            # the implementation works only for 3-D images, therefore, convert 2-D images to 3-D
+            # with 3rd dimension being of value 1
+            segmentation_arr = np.expand_dims(segmentation_arr, -1)
+            ground_truth_arr = np.expand_dims(ground_truth_arr, -1)
+            spacing = spacing + (1., )
+
         # calculate distances
         neighbour_code_to_surface_area = np.zeros([256])
         for code in range(256):
