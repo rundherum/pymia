@@ -28,7 +28,6 @@ pymia requires Python 3.6 (or higher) and depends on the following packages:
  - `NumPy <http://www.numpy.org/>`_
  - `SciPy <https://www.scipy.org/>`_
  - `SimpleITK <http://www.simpleitk.org/>`_
- - `PyYAML <https://pyyaml.org/>`_
 
 Note that not all dependencies are installed directly but only required when certain modules are used.
 Upon loading a module, pymia will check if the dependencies are fulfilled.

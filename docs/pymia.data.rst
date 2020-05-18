@@ -51,14 +51,6 @@ Index expression (:mod:`pymia.data.indexexpression` module)
     :undoc-members:
     :show-inheritance:
 
-Loading (:mod:`pymia.data.loading` module)
-------------------------------------------
-
-.. automodule:: pymia.data.loading
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 Subject file (:mod:`pymia.data.subjectfile` module)
 ---------------------------------------------------
 

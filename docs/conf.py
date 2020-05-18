@@ -59,7 +59,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'pymia'
-copyright = '2017-2019, Fabian Balsiger and Alain Jungo'
+copyright = '2017-2020, Fabian Balsiger and Alain Jungo'
 author = 'Fabian Balsiger and Alain Jungo'
 
 # The version info for the project you're documenting, acts as replacement for
