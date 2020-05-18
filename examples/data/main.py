@@ -11,14 +11,7 @@ import pymia.evaluation.evaluator as pymia_eval
 import pymia.evaluation.metric as pymia_metric
 
 
-def batch_to_feed_dict(x_placeholder, y_placeholder, batch, is_train: bool = True) -> dict:
-    feed_dict = {x_placeholder: np.stack(batch['images'], axis=0).astype(np.float32)}
-    if is_train:
-        feed_dict[y_placeholder] = np.stack(batch['labels'], axis=0).astype(np.int16)
-
-    return feed_dict
-
-
+# todo(fabian): this should no longer be required, the default collate_batch should be working
 def collate_batch(batch) -> dict:
     # batch is a list of dicts -> change to dict of lists
     return dict(zip(batch[0], zip(*[d.values() for d in batch])))
