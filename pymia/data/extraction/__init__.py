@@ -4,6 +4,6 @@ from .dataset import ParameterizableDataset
 from .extractor import (Extractor, DataExtractor, FilesExtractor, NamesExtractor, SubjectExtractor, IndexingExtractor,
                         SelectiveDataExtractor, RandomDataExtractor, ComposeExtractor,
                         ImagePropertiesExtractor, PadDataExtractor, ImageShapeExtractor)
-from .sample import (select_indices, SubsetSequentialSampler, NonBlackSelection, SelectionStrategy, ComposeSelection,
-                     SubjectSelection, WithForegroundSelection, PercentileSelection, NonConstantSelection)
+from .selection import (select_indices, NonBlackSelection, SelectionStrategy, ComposeSelection,
+                        SubjectSelection, WithForegroundSelection, PercentileSelection, NonConstantSelection)
 
