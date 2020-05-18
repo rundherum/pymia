@@ -3,7 +3,7 @@ import argparse
 import tensorflow as tf
 
 import pymia.data.extraction as extr
-import pymia.data.backends.tensorflow.dataset as ds
+import pymia.data.backends.tensorflow as pymia_tf
 
 
 def main(hdf_file: str):
@@ -17,7 +17,7 @@ def main(hdf_file: str):
 
     data_source = extr.dataset.ParameterizableDataset(hdf_file, extr.SliceIndexing(), extractor)
 
-    gen_fn = ds.get_tf_generator(data_source)
+    gen_fn = pymia_tf.get_tf_generator(data_source)
     dataset = tf.data.Dataset.from_generator(generator=gen_fn,
                                              output_types={'images': tf.float32, 'subject_index': tf.int64, 'subject': tf.string})
 

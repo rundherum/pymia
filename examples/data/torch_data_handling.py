@@ -3,7 +3,7 @@ import argparse
 import torch.utils.data as torch_data
 
 import pymia.data.extraction as extr
-import pymia.data.backends.pytorch.dataset as ds
+import pymia.data.backends.pytorch as pymia_torch
 
 
 def main(hdf_file: str):
@@ -20,7 +20,7 @@ def main(hdf_file: str):
                                               extr.FilesExtractor(categories=('images', 'labels', 'mask', 'numerical', 'sex')),
                                               extr.ImagePropertiesExtractor()])
 
-    dataset = ds.PymiaTorchDataset(hdf_file, extr.SliceIndexing(), extractor)
+    dataset = pymia_torch.PymiaTorchDataset(hdf_file, extr.SliceIndexing(), extractor)
 
     loader = torch_data.dataloader.DataLoader(dataset, batch_size=2, shuffle=False)
 

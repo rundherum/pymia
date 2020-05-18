@@ -1,10 +1,12 @@
 import argparse
 
 import numpy as np
+import torch.utils.data as torch_data
 
 import pymia.data.conversion as pymia_conv
 import pymia.data.extraction as pymia_extr
 import pymia.data.assembler as pymia_asmbl
+import pymia.data.backends.pytorch as pymia_torch
 import pymia.evaluation.evaluator as pymia_eval
 import pymia.evaluation.metric as pymia_metric
 
@@ -59,9 +61,9 @@ def main(hdf_file: str):
                                                   pymia_extr.ImagePropertiesExtractor()])
 
     # define the data set
-    dataset = pymia_extr.ParameterizableDataset(hdf_file,
-                                                indexing_strategy,
-                                                pymia_extr.SubjectExtractor())  # for select_indices() below
+    dataset = pymia_torch.PymiaTorchDataset(hdf_file,
+                                            indexing_strategy,
+                                            pymia_extr.SubjectExtractor())  # for select_indices() below
 
     # generate train / test split for data set
     # we use Subject_0, Subject_1 and Subject_2 for training and Subject_3 for testing
@@ -71,13 +73,13 @@ def main(hdf_file: str):
                                                  pymia_extr.SubjectSelection(('Subject_4')))
 
     # set up training data loader
-    training_sampler = pymia_extr.SubsetRandomSampler(sampler_ids_train)
-    training_loader = pymia_extr.DataLoader(dataset, batch_size_training, sampler=training_sampler,
+    training_sampler = torch_data.SubsetRandomSampler(sampler_ids_train)
+    training_loader = torch_data.DataLoader(dataset, batch_size_training, sampler=training_sampler,
                                             collate_fn=collate_batch, num_workers=1)
 
     # set up testing data loader
-    testing_sampler = pymia_extr.SubsetSequentialSampler(sampler_ids_test)
-    testing_loader = pymia_extr.DataLoader(dataset, batch_size_testing, sampler=testing_sampler,
+    testing_sampler = pymia_torch.SubsetSequentialSampler(sampler_ids_test)
+    testing_loader = torch_data.DataLoader(dataset, batch_size_testing, sampler=testing_sampler,
                                            collate_fn=collate_batch, num_workers=1)
 
     sample = dataset.direct_extract(train_extractor, 0)  # extract a subject
