@@ -7,14 +7,7 @@ import pymia.data.tensorflow.dataset as ds
 
 
 def main(hdf_file: str):
-    # extractor = extr.ComposeExtractor([extr.NamesExtractor(),
-    #                                    extr.DataExtractor(),
-    #                                    extr.SelectiveDataExtractor(),
-    #                                    extr.DataExtractor(('numerical',), ignore_indexing=True),
-    #                                    extr.DataExtractor(('sex',), ignore_indexing=True),
-    #                                    extr.DataExtractor(('mask',), ignore_indexing=False),
-    #                                    extr.SubjectExtractor(),
-    #                                    extr.IndexingExtractor(do_pickle=True)])
+    # todo(alain): add other extractors?
     extractor = extr.ComposeExtractor([extr.DataExtractor(),
                                        extr.SubjectExtractor()])
 
@@ -48,7 +41,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--hdf_file',
         type=str,
-        default='out/test/test.h5',
+        default='../dummy-data/dummy.h5',
         help='Path to the dataset file.'
     )
 

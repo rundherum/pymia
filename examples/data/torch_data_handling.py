@@ -42,7 +42,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--hdf_file',
         type=str,
-        default='out/test/test.h5',
+        default='../dummy-data/dummy.h5',
         help='Path to the dataset file.'
     )
 
