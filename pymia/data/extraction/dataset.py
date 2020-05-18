@@ -1,5 +1,3 @@
-import torch.utils.data.dataset as data
-
 import pymia.data.transformation as tfm
 import pymia.data.indexexpression as expr
 from . import reader as rd
@@ -7,7 +5,7 @@ from . import indexing as idx
 from . import extractor as extr
 
 
-class ParameterizableDataset(data.Dataset):
+class ParameterizableDataset:
 
     def __init__(self, dataset_path: str, indexing_strategy: idx.IndexingStrategy=None, extractor: extr.Extractor=None,
                  transform: tfm.Transform=None, subject_subset: list=None, init_reader_once=True) -> None:
@@ -48,9 +46,6 @@ class ParameterizableDataset(data.Dataset):
 
                     subject_and_indices = zip(len(subject_indices) * [i], subject_indices)
                     self.indices.extend(subject_and_indices)
-
-    def set_transform(self, transform: tfm.Transform):
-        self.transform = transform
 
     def get_subjects(self):
         with rd.get_reader(self.dataset_path) as reader:
