@@ -2,7 +2,6 @@ import abc
 import typing
 
 import numpy as np
-import torch
 
 
 ENTRY_NOT_EXTRACTED_ERR_MSG = 'Transform can not be applied because entry "{}" was not extracted'
@@ -156,15 +155,6 @@ class Reshape(LoopEntryTransform):
 
     def transform_entry(self, np_entry, entry, loop_i=None) -> np.ndarray:
         return np.reshape(np_entry, self.shapes[entry])
-
-
-class ToTorchTensor(LoopEntryTransform):
-
-    def __init__(self, entries=('images', 'labels')) -> None:
-        super().__init__(loop_axis=None, entries=entries)
-
-    def transform_entry(self, np_entry, entry, loop_i=None) -> np.ndarray:
-        return torch.from_numpy(np_entry)
 
 
 class Permute(LoopEntryTransform):
