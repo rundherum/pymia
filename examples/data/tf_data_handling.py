@@ -3,7 +3,7 @@ import argparse
 import tensorflow as tf
 
 import pymia.data.extraction as extr
-import pymia.data.tensorflow.dataset as ds
+import pymia.data.backends.tensorflow.dataset as ds
 
 
 def main(hdf_file: str):

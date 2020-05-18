@@ -3,7 +3,7 @@ import argparse
 import torch.utils.data as torch_data
 
 import pymia.data.extraction as extr
-import pymia.data.pytorch.dataset as ds
+import pymia.data.backends.pytorch.dataset as ds
 
 
 def main(hdf_file: str):
