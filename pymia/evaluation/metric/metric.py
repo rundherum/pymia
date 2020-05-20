@@ -19,7 +19,7 @@ from .segmentation import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageD
                            GlobalConsistencyError, GroundTruthVolume, HausdorffDistance,
                            InterclassCorrelation, JaccardCoefficient, MahalanobisDistance, MutualInformation, Precision,
                            ProbabilisticDistance, RandIndex, Recall, SegmentationVolume,
-                           Sensitivity, Specificity, TrueNegative, TruePositive,
+                           Sensitivity, Specificity, SurfaceOverlap, SurfaceDiceOverlap, TrueNegative, TruePositive,
                            VariationOfInformation, VolumeSimilarity)
 
 
@@ -48,15 +48,17 @@ def get_overlap_metrics():
     Returns:
         list[IMetric]: A list of metrics.
     """
-    return [DiceCoefficient(),
-            JaccardCoefficient(),
+    return [AdjustedRandIndex(),
             AreaUnderCurve(),
             CohenKappaMetric(),
-            RandIndex(),
-            AdjustedRandIndex(),
+            DiceCoefficient(),
             InterclassCorrelation(),
-            VolumeSimilarity(),
-            MutualInformation()]
+            JaccardCoefficient(),
+            MutualInformation(),
+            RandIndex(),
+            SurfaceOverlap(),
+            SurfaceDiceOverlap(),
+            VolumeSimilarity()]
 
 
 def get_distance_metrics():
