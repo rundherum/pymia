@@ -1,12 +1,9 @@
-"""The evaluator module simplifies the evaluation of segmentation results.
+"""The evaluator module simplifies the evaluation of results.
 
 The module provides the possibility of calculate several evaluation metrics in parallel and output them in any format.
 """
 import abc
-import csv
-import logging
-import os
-from typing import Union
+import typing
 
 import numpy as np
 import SimpleITK as sitk
@@ -14,131 +11,41 @@ import SimpleITK as sitk
 import pymia.evaluation.metric as pymia_metric
 
 
-class IEvaluatorWriter(abc.ABC):
-    """Represents an evaluator writer interface, which enables to write evaluation results."""
+class Result:
+
+    def __init__(self, id_: str, label: str, metric: str, value: float):
+        self.id_ = id_
+        self.label = label  # todo(alainjungo): do we need this for the basic Result class. if we don't, how do we write the writer classes for the evaluator below?
+        self.metric = metric
+        self.value = value
+
+
+class EvaluatorBase(abc.ABC):
+
+    def __init__(self, metrics: typing.List[pymia_metric.IMetric]):
+        self.metrics = metrics if metrics else []
+        self.results = []
 
     @abc.abstractmethod
-    def write(self, data: list):
-        """Writes the evaluation results.
-
-        Args:
-            data (list): The evaluation data.
-        """
+    def evaluate(self,
+                 prediction: typing.Union[sitk.Image, np.ndarray],
+                 reference: typing.Union[sitk.Image, np.ndarray],
+                 id_: str, **kwargs):
         raise NotImplementedError
 
-    @abc.abstractmethod
-    def write_header(self, header: list):
-        """Writes the evaluation header.
+    def add_metric(self, metric: pymia_metric.IMetric):
+        """Adds a metric to the evaluation.
 
         Args:
-            header (list): The evaluation header.
+            metric (pymia_metric.IMetric): The metric.
         """
-        raise NotImplementedError
+        self.metrics.append(metric)
+
+    def clear_results(self):
+        self.results = []
 
 
-class CSVEvaluatorWriter(IEvaluatorWriter):
-    """Represents a CSV (comma-separated values) evaluator writer."""
-
-    def __init__(self, path: str):
-        """Initializes a new instance of the CSVEvaluatorWriter class.
-
-        Args:
-            path (path): The file path.
-        """
-        super().__init__()
-
-        self.path = path
-
-        # check file extension
-        if not self.path.lower().endswith('.csv'):
-            self.path = os.path.join(self.path, '.csv')
-
-        open(self.path, 'w', newline='')  # creates (and overrides an existing) file
-
-    def write(self, data: list):
-        """Writes the evaluation results.
-
-        Args:
-            data (list): The evaluation data.
-        """
-
-        for evaluation in data:
-            self.write_line(evaluation)
-
-    def write_header(self, header: list):
-        """Writes the evaluation header.
-
-        Args:
-            header (list): The evaluation header.
-        """
-
-        self.write_line(header)
-
-    def write_line(self, data: list):
-        """Writes a line.
-
-        Args:
-            data (list): The data.
-        """
-        with open(self.path, 'a', newline='') as file:
-            writer = csv.writer(file, delimiter=';')
-            writer.writerow(data)
-
-
-class ConsoleEvaluatorWriter(IEvaluatorWriter):
-    """Represents a console evaluator writer."""
-
-    def __init__(self, precision: int = 3, use_logging: bool = False):
-        """Initializes a new instance of the ConsoleEvaluatorWriter class.
-
-        Args:
-            precision (int): The float precision.
-            use_logging (bool): Indicates whether to use the Python logging module or not.
-        """
-        super().__init__()
-
-        self.header = None
-        self.precision = precision
-        self.use_logging = use_logging
-
-    def write(self, data: list):
-        """Writes the evaluation results.
-
-        Args:
-            data (list of list): The evaluation data,
-                e.g. [['PATIENT1', 'BACKGROUND', 0.90], ['PATIENT1', 'TUMOR', '0.62']]
-        """
-
-        # format all floats with given precision to str
-        out_as_string = [self.header]
-        for line in data:
-            out_as_string.append([val if isinstance(val, str) else "{0:.{1}f}".format(val, self.precision)
-                                  for val in line])
-
-        # determine length of each column for output alignment
-        lengths = np.array([list(map(len, row)) for row in out_as_string])
-        lengths = lengths.max(0)
-        lengths += (len(lengths) - 1) * [2] + [0, ]  # append two spaces except for last column
-
-        # format for output alignment
-        out = [['{0:<{1}}'.format(val, lengths[idx]) for idx, val in enumerate(line)] for line in out_as_string]
-
-        if self.use_logging:
-            logging.info('\n'.join(''.join(line) for line in out))
-        else:
-            print('\n'.join(''.join(line) for line in out), sep='', end='\n')
-
-    def write_header(self, header: list):
-        """Writes the evaluation header.
-
-        Args:
-            header (list of str): The evaluation header.
-        """
-
-        self.header = header
-
-
-class Evaluator:
+class Evaluator(EvaluatorBase):
     """Represents a metric evaluator.
 
     Examples:
@@ -160,56 +67,35 @@ class Evaluator:
     Patient1;Nerve;0.70692469107;0.842776093884
     """
 
-    def __init__(self, writer: IEvaluatorWriter=None):
+    def __init__(self, metrics: typing.List[pymia_metric.IMetric], labels: dict):
         """Initializes a new instance of the Evaluator class.
 
         Args:
-            writer (IEvaluatorWriter): An evaluator writer.
+            metrics (list of pymia_metric.IMetric): A list of metrics.
+            labels (dict): A dictionary with labels (key of type int) and label descriptions (value of type string).
         """
+        super().__init__(metrics)
+        self.labels = labels if labels else {}
 
-        self.metrics = []  # list of IMetrics
-        self.writers = [writer] if writer is not None else []  # list of IEvaluatorWriters
-        self.labels = {}  # dictionary of label: label_str
-        self.is_header_written = False
-
-    def add_label(self, label: Union[tuple, int], description: str):
+    def add_label(self, label: typing.Union[tuple, int], description: str):
         """Adds a label with its description to the evaluation.
 
         Args:
             label (Union[tuple, int]): The label or a tuple of labels that should be merged.
             description (str): The label's description.
         """
-
         self.labels[label] = description
 
-    def add_metric(self, metric: pymia_metric.IMetric):
-        """Adds a metric to the evaluation.
-
-        Args:
-            metric (pymia_metric.IMetric): The metric.
-        """
-
-        self.metrics.append(metric)
-        self.is_header_written = False  # header changed due to new metric
-
-    def add_writer(self, writer: IEvaluatorWriter):
-        """Adds a writer to the evaluation.
-
-        Args:
-            writer (IEvaluatorWriter): The writer.
-        """
-
-        self.writers.append(writer)
-        self.is_header_written = False  # re-write header
-
-    def evaluate(self, image: Union[sitk.Image, np.ndarray], ground_truth: Union[sitk.Image, np.ndarray],
-                 evaluation_id: str):
+    def evaluate(self,
+                 prediction: typing.Union[sitk.Image, np.ndarray],
+                 reference: typing.Union[sitk.Image, np.ndarray],
+                 id_: str, **kwargs):
         """Evaluates the metrics on the provided image and ground truth image.
 
         Args:
-            image (sitk.Image): The segmented image.
-            ground_truth (sitk.Image): The ground truth image.
-            evaluation_id (str): The identification of the evaluation.
+            prediction (sitk.Image): The segmented image.
+            reference (sitk.Image): The ground truth image.
+            id_ (str): The identification of the subject to evaluate.
 
         Raises:
             ValueError: If no labels are defined (see add_label).
@@ -218,22 +104,17 @@ class Evaluator:
         if not self.labels:
             raise ValueError('No labels to evaluate defined')
 
-        if isinstance(image, sitk.Image) and image.GetNumberOfComponentsPerPixel() > 1:
+        if isinstance(prediction, sitk.Image) and prediction.GetNumberOfComponentsPerPixel() > 1:
             raise ValueError('Image has more than one component per pixel')
 
-        if isinstance(ground_truth, sitk.Image) and ground_truth.GetNumberOfComponentsPerPixel() > 1:
+        if isinstance(reference, sitk.Image) and reference.GetNumberOfComponentsPerPixel() > 1:
             raise ValueError('Image has more than one component per pixel')
 
-        if not self.is_header_written:
-            self.write_header()
-
-        image_array = sitk.GetArrayFromImage(image) if isinstance(image, sitk.Image) else image
-        ground_truth_array = sitk.GetArrayFromImage(ground_truth) if isinstance(ground_truth, sitk.Image) else ground_truth
-
-        results = []  # clear results
+        image_array = sitk.GetArrayFromImage(prediction) if isinstance(prediction, sitk.Image) else prediction
+        ground_truth_array = sitk.GetArrayFromImage(reference) if isinstance(reference, sitk.Image) else reference
 
         for label, label_str in self.labels.items():
-            label_results = [evaluation_id, label_str]
+            label_results = [id_, label_str]
 
             # get only current label
             predictions = np.in1d(image_array.ravel(), label, True).reshape(image_array.shape).astype(np.uint8)
@@ -247,7 +128,7 @@ class Evaluator:
             predictions_as_image = None
             labels_as_image = None
 
-            # for distance metric
+            # for distance metrics
             distances = None
 
             # calculate the metrics
@@ -259,20 +140,20 @@ class Evaluator:
                     metric.segmentation = predictions
                 elif isinstance(metric, pymia_metric.ISimpleITKImageMetric):
                     if not converted_to_image:
-                        if not isinstance(image, sitk.Image):
+                        if not isinstance(prediction, sitk.Image):
                             raise ValueError('SimpleITK image is required for SimpleITK-based metrics')
                         predictions_as_image = sitk.GetImageFromArray(predictions)
-                        predictions_as_image.CopyInformation(image)
+                        predictions_as_image.CopyInformation(prediction)
                         labels_as_image = sitk.GetImageFromArray(labels)
-                        labels_as_image.CopyInformation(ground_truth)
+                        labels_as_image.CopyInformation(reference)
                         converted_to_image = True
 
                     metric.ground_truth = labels_as_image
                     metric.segmentation = predictions_as_image
                 elif isinstance(metric, pymia_metric.IDistanceMetric):
                     if distances is None:
-                        if isinstance(image, sitk.Image):
-                            spacing = image.GetSpacing()[::-1]
+                        if isinstance(prediction, sitk.Image):
+                            spacing = prediction.GetSpacing()[::-1]
                         else:
                             spacing = (1.0,) * labels.ndim  # use isotropic spacing of 1 mm
 
@@ -280,23 +161,4 @@ class Evaluator:
 
                     metric.distances = distances
 
-                label_results.append(metric.calculate())
-
-            results.append(label_results)
-
-        # write the results
-        for writer in self.writers:
-            writer.write(results)
-
-    def write_header(self):
-        """Writes the header."""
-
-        header = ['ID', 'LABEL']
-
-        for metric in self.metrics:
-            header.append(str(metric))
-
-        for writer in self.writers:
-            writer.write_header(header)
-
-        self.is_header_written = True
+                self.results.append(Result(id_, label_str, metric.metric, metric.calculate()))
