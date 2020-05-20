@@ -357,12 +357,12 @@ class Distances:
         cropmask_pred = np.zeros((bbox_max - bbox_min) + 2, np.uint8)
 
         cropmask_gt[0:-1, 0:-1, 0:-1] = ground_truth_arr[bbox_min[0]:bbox_max[0] + 1,
-                                        bbox_min[1]:bbox_max[1] + 1,
-                                        bbox_min[2]:bbox_max[2] + 1]
+                                                         bbox_min[1]:bbox_max[1] + 1,
+                                                         bbox_min[2]:bbox_max[2] + 1]
 
         cropmask_pred[0:-1, 0:-1, 0:-1] = segmentation_arr[bbox_min[0]:bbox_max[0] + 1,
-                                          bbox_min[1]:bbox_max[1] + 1,
-                                          bbox_min[2]:bbox_max[2] + 1]
+                                                           bbox_min[1]:bbox_max[1] + 1,
+                                                           bbox_min[2]:bbox_max[2] + 1]
 
         # compute the neighbour code (local binary pattern) for each voxel
         # the resulting arrays are spacially shifted by minus half a voxel in each
