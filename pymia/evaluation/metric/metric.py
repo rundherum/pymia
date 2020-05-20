@@ -29,7 +29,7 @@ def get_all_segmentation_metrics():
     Returns:
         list[IMetric]: A list of metrics.
     """
-    return get_overlap_metrics() + get_distance_metrics() + get_distance_metrics()
+    return get_overlap_metrics() + get_distance_metrics() + get_classical_metrics()
 
 
 def get_all_regression_metrics():
