@@ -577,9 +577,8 @@ class MahalanobisDistance(INumpyArrayMetric):
         common_cov = (gt_n * gt_cov + seg_n * seg_cov) / (gt_n + seg_n)
         common_cov_inv = np.linalg.inv(common_cov)
 
-        mean = np.matrix(np.array(gt_mean) - np.array(seg_mean))
-
-        return math.sqrt(mean * np.matrix(common_cov_inv) * mean.T)
+        mean = gt_mean - seg_mean
+        return math.sqrt(mean.dot(common_cov_inv).dot(mean.T))
 
 
 class MutualInformation(IConfusionMatrixMetric):
