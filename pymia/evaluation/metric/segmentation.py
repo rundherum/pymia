@@ -549,11 +549,21 @@ class MahalanobisDistance(INumpyArrayMetric):
         """Calculates the Mahalanobis distance."""
 
         gt_n = np.count_nonzero(self.ground_truth)
+        seg_n = np.count_nonzero(self.segmentation)
+
+        if gt_n == 0:
+            warnings.warn('Unable to compute Mahalanobis distance due to empty label mask, returning inf',
+                          NotComputableMetricWarning)
+            return float('inf')
+        if seg_n == 0:
+            warnings.warn('Unable to compute Mahalanobis distance due to empty segmentation mask, returning inf',
+                          NotComputableMetricWarning)
+            return float('inf')
+
         gt_indices = np.flip(np.where(self.ground_truth == 1), axis=0)
         gt_mean = gt_indices.mean(axis=1)
         gt_cov = np.cov(gt_indices)
 
-        seg_n = np.count_nonzero(self.segmentation)
         seg_indices = np.flip(np.where(self.segmentation == 1), axis=0)
         seg_mean = seg_indices.mean(axis=1)
         seg_cov = np.cov(seg_indices)
