@@ -15,7 +15,7 @@ class Result:
 
     def __init__(self, id_: str, label: str, metric: str, value: float):
         self.id_ = id_
-        self.label = label  # todo(alainjungo): do we need this for the basic Result class. if we don't, how do we write the writer classes for the evaluator below?
+        self.label = label
         self.metric = metric
         self.value = value
 
@@ -46,26 +46,7 @@ class EvaluatorBase(abc.ABC):
 
 
 class Evaluator(EvaluatorBase):
-    """Represents a metric evaluator.
-
-    Examples:
-
-    >>> evaluator = Evaluator(ConsoleEvaluatorWriter(5))
-    >>> evaluator.add_writer(CSVEvaluatorWriter('/some/path/to/results.csv'))
-    >>> evaluator.add_label(0, 'Background')
-    >>> evaluator.add_label(1, 'Structure')
-    >>> evaluator.add_metric(DiceCoefficient())
-    >>> evaluator.add_metric(VolumeSimilarity())
-    >>> evaluator.evaluate(prediction, ground_truth, 'Patient1')
-    The console output would be:
-              ID       LABEL        DICE     VOLSMTY
-        Patient1  Background     0.99955     0.99976
-        Patient1       Nerve     0.70692     0.84278
-    The results.csv would contain:
-    ID;LABEL;DICE;VOLSMTY
-    Patient1;Background;0.999548418549;0.999757743496
-    Patient1;Nerve;0.70692469107;0.842776093884
-    """
+    """Represents an evaluator, evaluating metrics on predictions against references."""
 
     def __init__(self, metrics: typing.List[pymia_metric.IMetric], labels: dict):
         """Initializes a new instance of the Evaluator class.
@@ -114,8 +95,6 @@ class Evaluator(EvaluatorBase):
         ground_truth_array = sitk.GetArrayFromImage(reference) if isinstance(reference, sitk.Image) else reference
 
         for label, label_str in self.labels.items():
-            label_results = [id_, label_str]
-
             # get only current label
             predictions = np.in1d(image_array.ravel(), label, True).reshape(image_array.shape).astype(np.uint8)
             labels = np.in1d(ground_truth_array.ravel(), label, True).reshape(ground_truth_array.shape).astype(np.uint8)
