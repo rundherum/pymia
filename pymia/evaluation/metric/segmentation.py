@@ -157,6 +157,11 @@ class AreaUnderCurve(IConfusionMatrixMetric):
 
         false_positive_rate = 1 - specificity
 
+        if (self.confusion_matrix.tp + self.confusion_matrix.fn) == 0:
+            warnings.warn('Unable to compute area under the curve due to division by zero, returning -inf',
+                          NotComputableMetricWarning)
+            return float('-inf')
+
         true_positive_rate = self.confusion_matrix.tp / (self.confusion_matrix.tp + self.confusion_matrix.fn)
 
         return (true_positive_rate - false_positive_rate + 1) / 2
