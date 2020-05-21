@@ -789,7 +789,7 @@ class Sensitivity(IConfusionMatrixMetric):
         """Calculates the sensitivity (true positive rate)."""
 
         if (self.confusion_matrix.tp + self.confusion_matrix.fn) == 0:
-            warnings.warn('Unable to sensitivity due to division by zero, returning -inf',
+            warnings.warn('Unable to compute sensitivity due to division by zero, returning -inf',
                           NotComputableMetricWarning)
             return float('-inf')
 
