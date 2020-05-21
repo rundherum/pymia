@@ -2,6 +2,7 @@ import argparse
 import glob
 import os
 
+import numpy as np
 import pymia.evaluation.metric as metric
 import pymia.evaluation.evaluator as eval_
 import pymia.evaluation.writer as writer
@@ -21,7 +22,7 @@ def main(data_dir: str, result_file: str):
 
     for subject_dir in subject_dirs:
         subject_id = os.path.basename(subject_dir)
-        print(f'Evaluating {subject_id}')
+        print(f'Evaluating {subject_id}...')
 
         # load ground truth image and create artificial prediction by erosion
         ground_truth = sitk.ReadImage(os.path.join(subject_dir, f'{subject_id}_GTN.mha'))
@@ -32,7 +33,14 @@ def main(data_dir: str, result_file: str):
 
     # use two writers to report the results
     writer.CSVWriter(result_file).write(evaluator.results)
+    print('\nSubject-wise results...')
     writer.ConsoleWriter().write(evaluator.results)
+
+    # report also mean and standard deviation among all subjects
+    writer.CSVStatisticsWriter(result_file.replace('.csv', '_summary.csv'),
+                               functions={'MEAN': np.mean, 'STD': np.std}).write(evaluator.results)
+    print('\nSummary results...')
+    writer.ConsoleStatisticsWriter(functions={'MEAN': np.mean, 'STD': np.std}).write(evaluator.results)
 
     # clear results such that the evaluator is ready for the next evaluation
     evaluator.clear_results()
