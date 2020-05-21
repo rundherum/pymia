@@ -857,11 +857,23 @@ class SurfaceOverlap(IDistanceMetric):
         """Calculates the surface overlap."""
 
         if self.prediction_to_label:
-            return float(np.sum(self.distances.surfel_areas_pred[self.distances.distances_pred_to_gt <= self.tolerance])
-                         / np.sum(self.distances.surfel_areas_pred))
+            if np.sum(self.distances.surfel_areas_pred) > 0:
+                return float(
+                    np.sum(self.distances.surfel_areas_pred[self.distances.distances_pred_to_gt <= self.tolerance])
+                    / np.sum(self.distances.surfel_areas_pred))
+            else:
+                warnings.warn('Unable to compute surface overlap due to empty segmentation mask, returning -inf',
+                              NotComputableMetricWarning)
+                return float('-inf')
         else:
-            return float(np.sum(self.distances.surfel_areas_gt[self.distances.distances_gt_to_pred <= self.tolerance])
-                         / np.sum(self.distances.surfel_areas_gt))
+            if np.sum(self.distances.surfel_areas_gt) > 0:
+                return float(
+                    np.sum(self.distances.surfel_areas_gt[self.distances.distances_gt_to_pred <= self.tolerance])
+                    / np.sum(self.distances.surfel_areas_gt))
+            else:
+                warnings.warn('Unable to compute surface overlap due to empty label mask, returning -inf',
+                              NotComputableMetricWarning)
+                return float('-inf')
 
 
 class TrueNegative(IConfusionMatrixMetric):
