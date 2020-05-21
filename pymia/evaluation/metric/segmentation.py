@@ -380,6 +380,11 @@ class GlobalConsistencyError(IConfusionMatrixMetric):
         fp = self.confusion_matrix.fp
         fn = self.confusion_matrix.fn
 
+        if (tp + fn) == 0 or (tn + fp) == 0 or (tp + fp) == 0 or (tn + fn) == 0:
+            warnings.warn('Unable to compute global consistency error due to division by zero, returning inf',
+                          NotComputableMetricWarning)
+            return float('inf')
+
         n = tp + tn + fp + fn
         e1 = (fn * (fn + 2 * tp) / (tp + fn) + fp * (fp + 2 * tn) / (tn + fp)) / n
         e2 = (fp * (fp + 2 * tp) / (tp + fp) + fn * (fn + 2 * tn) / (tn + fn)) / n
