@@ -3,6 +3,11 @@
 Change history
 ==============
 
+0.2.4 (2020-05-22)
+------------------
+
+ * Bug fixes in the :py:mod:`evaluation` package
+
 0.2.3 (2019-12-13)
 ------------------
 
