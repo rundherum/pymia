@@ -13,7 +13,7 @@ class WriterBase(abc.ABC):
     """Represents an evaluation results writer interface."""
 
     @abc.abstractmethod
-    def write(self, results: typing.List[eval_.Result]):
+    def write(self, results: typing.List[eval_.Result], **kwargs):
         """Writes the evaluation results.
 
         Args:
@@ -72,7 +72,7 @@ class CSVWriter(WriterBase):
         if not self.path.lower().endswith('.csv'):
             self.path = os.path.join(self.path, '.csv')
 
-    def write(self, results: typing.List[eval_.Result]):
+    def write(self, results: typing.List[eval_.Result], **kwargs):
         """Writes the evaluation results to a CSV file.
 
         Args:
@@ -117,7 +117,7 @@ class ConsoleWriter(WriterBase, ConsoleWriterHelper):
 
         self.precision = precision
 
-    def write(self, results: typing.List[eval_.Result]):
+    def write(self, results: typing.List[eval_.Result], **kwargs):
         """Writes the evaluation results.
 
         Args:
@@ -208,7 +208,7 @@ class CSVStatisticsWriter(StatisticsWriter):
         if not self.path.lower().endswith('.csv'):
             self.path = os.path.join(self.path, '.csv')
 
-    def write(self, results: typing.List[eval_.Result]):
+    def write(self, results: typing.List[eval_.Result], **kwargs):
         """Writes the evaluation results.
 
         Args:
@@ -243,7 +243,7 @@ class ConsoleStatisticsWriter(StatisticsWriter, ConsoleWriterHelper):
 
         self.precision = precision
 
-    def write(self, results: typing.List[eval_.Result]):
+    def write(self, results: typing.List[eval_.Result], **kwargs):
         """Writes the evaluation results.
 
         Args:
