@@ -54,6 +54,45 @@ class ConsoleWriterHelper:
             print('\n'.join(''.join(line) for line in out), sep='', end='\n')
 
 
+class StatisticsAggregator:
+    """Represents a statistics evaluation results aggregator."""
+
+    def __init__(self, functions: dict = None):
+        """Initializes a new instance of the StatisticsAggregator class.
+
+        Args:
+            functions (dict): The function handles to calculate the statistics.
+        """
+        super().__init__()
+
+        if functions is None:
+            functions = {'MEAN': np.mean, 'STD': np.std}
+        self.functions = functions
+
+    def calculate(self, results: typing.List[eval_.Result]) -> typing.List[eval_.Result]:
+
+        # get unique labels and metrics
+        labels = sorted({result.label for result in results})
+        metrics = sorted({result.metric for result in results})
+
+        aggregated_results = []
+
+        for label in labels:
+            for metric in metrics:
+                # search for results
+                values = [r.value for r in results if r.label == label and r.metric == metric]
+
+                for fn_id, fn in self.functions.items():
+                    aggregated_results.append(eval_.Result(
+                        fn_id,
+                        label,
+                        metric,
+                        float(fn(values))
+                    ))
+
+        return aggregated_results
+
+
 class CSVWriter(WriterBase):
     """Represents a CSV file evaluation results writer."""
 
@@ -150,46 +189,7 @@ class ConsoleWriter(WriterBase, ConsoleWriterHelper):
         self._format_and_write(lines)
 
 
-class StatisticsWriter(WriterBase, abc.ABC):
-    """Represents a statistics evaluation results writer."""
-
-    def __init__(self, functions: dict = None):
-        """Initializes a new instance of the StatisticsWriter class.
-
-        Args:
-            functions (dict): The function handles to calculate the statistics.
-        """
-        super().__init__()
-
-        if functions is None:
-            functions = {'MEAN': np.mean, 'STD': np.std}
-        self.functions = functions
-
-    def _calculate(self, results: typing.List[eval_.Result]) -> typing.List[eval_.Result]:
-
-        # get unique labels and metrics
-        labels = sorted({result.label for result in results})
-        metrics = sorted({result.metric for result in results})
-
-        aggregated_results = []
-
-        for label in labels:
-            for metric in metrics:
-                # search for results
-                values = [r.value for r in results if r.label == label and r.metric == metric]
-
-                for fn_id, fn in self.functions.items():
-                    aggregated_results.append(eval_.Result(
-                        fn_id,
-                        label,
-                        metric,
-                        float(fn(values))
-                    ))
-
-        return aggregated_results
-
-
-class CSVStatisticsWriter(StatisticsWriter):
+class CSVStatisticsWriter(WriterBase, StatisticsAggregator):
     """Represents a CSV file evaluation results statistics writer."""
 
     def __init__(self, path: str, delimiter: str = ';', functions: dict = None):
@@ -200,7 +200,8 @@ class CSVStatisticsWriter(StatisticsWriter):
             delimiter (str): The CSV column delimiter.
             functions (dict): The functions to calculate the statistics.
         """
-        super().__init__(functions)
+        WriterBase.__init__(self)
+        StatisticsAggregator.__init__(self, functions)
         self.path = path
         self.delimiter = delimiter
 
@@ -214,7 +215,7 @@ class CSVStatisticsWriter(StatisticsWriter):
         Args:
             results (list of eval_.Result): The evaluation results.
         """
-        aggregated_results = self._calculate(results)
+        aggregated_results = self.calculate(results)
 
         with open(self.path, 'w', newline='') as file:  # creates (and overrides an existing) file
             writer = csv.writer(file, delimiter=self.delimiter)
@@ -226,7 +227,7 @@ class CSVStatisticsWriter(StatisticsWriter):
                 writer.writerow([result.label, result.metric, result.id_, result.value])
 
 
-class ConsoleStatisticsWriter(StatisticsWriter, ConsoleWriterHelper):
+class ConsoleStatisticsWriter(WriterBase, StatisticsAggregator, ConsoleWriterHelper):
     """Represents a console evaluation results statistics writer."""
 
     def __init__(self, precision: int = 3, use_logging: bool = False,
@@ -238,7 +239,8 @@ class ConsoleStatisticsWriter(StatisticsWriter, ConsoleWriterHelper):
             use_logging (bool): Indicates whether to use the Python logging module or not.
             functions (dict): The function handles to calculate the statistics.
         """
-        StatisticsWriter.__init__(self, functions)
+        WriterBase.__init__(self)
+        StatisticsAggregator.__init__(self, functions)
         ConsoleWriterHelper.__init__(self, use_logging)
 
         self.precision = precision
@@ -249,7 +251,7 @@ class ConsoleStatisticsWriter(StatisticsWriter, ConsoleWriterHelper):
         Args:
             results (list of eval_.Result): The evaluation results.
         """
-        aggregated_results = self._calculate(results)
+        aggregated_results = self.calculate(results)
 
         # header
         lines = [['LABEL', 'METRIC', 'STATISTIC', 'VALUE']]
