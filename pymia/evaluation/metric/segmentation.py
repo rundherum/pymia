@@ -231,6 +231,11 @@ class CohenKappaMetric(IConfusionMatrixMetric):
         sum_ = tn + fn + fp + tp
         chance = (chance0 + chance1) / sum_
 
+        if (sum_ - chance) == 0:
+            warnings.warn('Unable to compute Cohen\'s kappa coefficient due to division by zero, returning -inf',
+                          NotComputableMetricWarning)
+            return float('-inf')
+
         return (agreement - chance) / (sum_ - chance)
 
 
