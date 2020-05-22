@@ -520,6 +520,11 @@ class InterclassCorrelation(INumpyArrayMetric):
         ssw /= n
         ssb = ssb / (n - 1) * 2
 
+        if (ssb + ssw) == 0:
+            warnings.warn('Unable to compute interclass correlation due to division by zero, returning -inf',
+                          NotComputableMetricWarning)
+            return float('-inf')
+
         return (ssb - ssw) / (ssb + ssw)
 
 
