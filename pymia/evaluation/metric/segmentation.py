@@ -1014,4 +1014,9 @@ class VolumeSimilarity(IConfusionMatrixMetric):
         fp = self.confusion_matrix.fp
         fn = self.confusion_matrix.fn
 
+        if (tp + fn + fp) == 0:
+            warnings.warn('Unable to compute volume similarity due to division by zero, returning -inf',
+                          NotComputableMetricWarning)
+            return float('-inf')
+
         return 1 - abs(fn - fp) / (2 * tp + fn + fp)
