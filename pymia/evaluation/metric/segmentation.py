@@ -886,7 +886,7 @@ class SurfaceOverlap(IDistanceMetric):
         """Calculates the surface overlap."""
 
         if self.prediction_to_label:
-            if np.sum(self.distances.surfel_areas_pred) > 0:
+            if self.distances.surfel_areas_pred is not None and np.sum(self.distances.surfel_areas_pred) > 0:
                 return float(
                     np.sum(self.distances.surfel_areas_pred[self.distances.distances_pred_to_gt <= self.tolerance])
                     / np.sum(self.distances.surfel_areas_pred))
@@ -895,7 +895,7 @@ class SurfaceOverlap(IDistanceMetric):
                               NotComputableMetricWarning)
                 return float('-inf')
         else:
-            if np.sum(self.distances.surfel_areas_gt) > 0:
+            if self.distances.surfel_areas_gt is not None and np.sum(self.distances.surfel_areas_gt) > 0:
                 return float(
                     np.sum(self.distances.surfel_areas_gt[self.distances.distances_gt_to_pred <= self.tolerance])
                     / np.sum(self.distances.surfel_areas_gt))
