@@ -850,6 +850,16 @@ class SurfaceDiceOverlap(IDistanceMetric):
     def calculate(self):
         """Calculates the surface Dice coefficient overlap."""
 
+        if self.distances.surfel_areas_pred is None:
+            warnings.warn('Unable to compute surface Dice coefficient overlap due to empty segmentation mask, returning -inf',
+                          NotComputableMetricWarning)
+            return float('-inf')
+
+        if self.distances.surfel_areas_gt is None:
+            warnings.warn('Unable to compute surface Dice coefficient overlap due to empty label mask, returning -inf',
+                          NotComputableMetricWarning)
+            return float('-inf')
+
         overlap_gt = np.sum(self.distances.surfel_areas_gt[self.distances.distances_gt_to_pred <= self.tolerance])
         overlap_pred = np.sum(self.distances.surfel_areas_pred[self.distances.distances_pred_to_gt <= self.tolerance])
         surface_dice = (overlap_gt + overlap_pred) / \
