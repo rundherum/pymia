@@ -541,6 +541,11 @@ class JaccardCoefficient(IConfusionMatrixMetric):
         fp = self.confusion_matrix.fp
         fn = self.confusion_matrix.fn
 
+        if (tp + fp + fn) == 0:
+            warnings.warn('Unable to compute Jaccard coefficient due to division by zero, returning -inf',
+                          NotComputableMetricWarning)
+            return float('-inf')
+
         return tp / (tp + fp + fn)
 
 
