@@ -192,17 +192,17 @@ class AverageDistance(ISimpleITKImageMetric):
     def calculate(self):
         """Calculates the average (Hausdorff) distance."""
 
-        if np.count_nonzero(sitk.GetArrayFromImage(self.ground_truth)) == 0:
+        if np.count_nonzero(sitk.GetArrayFromImage(self.reference)) == 0:
             warnings.warn('Unable to compute average distance due to empty label mask, returning inf',
                           NotComputableMetricWarning)
             return float('inf')
-        if np.count_nonzero(sitk.GetArrayFromImage(self.segmentation)) == 0:
+        if np.count_nonzero(sitk.GetArrayFromImage(self.prediction)) == 0:
             warnings.warn('Unable to compute average distance due to empty segmentation mask, returning inf',
                           NotComputableMetricWarning)
             return float('inf')
 
         distance_filter = sitk.HausdorffDistanceImageFilter()
-        distance_filter.Execute(self.ground_truth, self.segmentation)
+        distance_filter.Execute(self.reference, self.prediction)
         return distance_filter.GetAverageHausdorffDistance()
 
 
@@ -419,7 +419,7 @@ class GroundTruthArea(AreaMetric):
     def calculate(self):
         """Calculates the ground truth area on a specified slice in mm2."""
 
-        return self._calculate_area(self.ground_truth, self.slice_number)
+        return self._calculate_area(self.reference, self.slice_number)
 
 
 class GroundTruthVolume(VolumeMetric):
@@ -436,7 +436,7 @@ class GroundTruthVolume(VolumeMetric):
     def calculate(self):
         """Calculates the ground truth volume in mm3."""
 
-        return self._calculate_volume(self.ground_truth)
+        return self._calculate_volume(self.reference)
 
 
 class HausdorffDistance(IDistanceMetric):
@@ -510,8 +510,8 @@ class InterclassCorrelation(INumpyArrayMetric):
     def calculate(self):
         """Calculates the interclass correlation."""
 
-        gt = self.ground_truth.flatten()
-        seg = self.segmentation.flatten()
+        gt = self.reference.flatten()
+        seg = self.prediction.flatten()
 
         n = gt.size
         mean_gt = gt.mean()
@@ -573,8 +573,8 @@ class MahalanobisDistance(INumpyArrayMetric):
     def calculate(self):
         """Calculates the Mahalanobis distance."""
 
-        gt_n = np.count_nonzero(self.ground_truth)
-        seg_n = np.count_nonzero(self.segmentation)
+        gt_n = np.count_nonzero(self.reference)
+        seg_n = np.count_nonzero(self.prediction)
 
         if gt_n == 0:
             warnings.warn('Unable to compute Mahalanobis distance due to empty label mask, returning inf',
@@ -585,11 +585,11 @@ class MahalanobisDistance(INumpyArrayMetric):
                           NotComputableMetricWarning)
             return float('inf')
 
-        gt_indices = np.flip(np.where(self.ground_truth == 1), axis=0)
+        gt_indices = np.flip(np.where(self.reference == 1), axis=0)
         gt_mean = gt_indices.mean(axis=1)
         gt_cov = np.cov(gt_indices)
 
-        seg_indices = np.flip(np.where(self.segmentation == 1), axis=0)
+        seg_indices = np.flip(np.where(self.prediction == 1), axis=0)
         seg_mean = seg_indices.mean(axis=1)
         seg_cov = np.cov(seg_indices)
 
@@ -682,8 +682,8 @@ class ProbabilisticDistance(INumpyArrayMetric):
     def calculate(self):
         """Calculates the probabilistic distance."""
 
-        gt = self.ground_truth.flatten().astype(np.int8)
-        seg = self.segmentation.flatten().astype(np.int8)
+        gt = self.reference.flatten().astype(np.int8)
+        seg = self.prediction.flatten().astype(np.int8)
 
         probability_difference = np.absolute(gt - seg).sum()
         probability_joint = (gt * seg).sum()
@@ -769,7 +769,7 @@ class SegmentationArea(AreaMetric):
     def calculate(self):
         """Calculates the segmentation area on a specified slice in mm2."""
 
-        return self._calculate_area(self.segmentation, self.slice_number)
+        return self._calculate_area(self.prediction, self.slice_number)
 
 
 class SegmentationVolume(VolumeMetric):
@@ -786,7 +786,7 @@ class SegmentationVolume(VolumeMetric):
     def calculate(self):
         """Calculates the segmented volume in mm3."""
 
-        return self._calculate_volume(self.segmentation)
+        return self._calculate_volume(self.prediction)
 
 
 class Sensitivity(IConfusionMatrixMetric):

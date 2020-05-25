@@ -507,8 +507,8 @@ class ISimpleITKImageMetric(IMetric):
             metric (str): The identification string of the metric.
         """
         super().__init__(metric)
-        self.ground_truth = None  # SimpleITK.Image
-        self.segmentation = None  # SimpleITK.Image
+        self.reference = None  # SimpleITK.Image
+        self.prediction = None  # SimpleITK.Image
 
     @abc.abstractmethod
     def calculate(self):
@@ -527,8 +527,8 @@ class INumpyArrayMetric(IMetric):
             metric (str): The identification string of the metric.
         """
         super().__init__(metric)
-        self.ground_truth = None  # np.ndarray
-        self.segmentation = None  # np.ndarray
+        self.reference = None  # np.ndarray
+        self.prediction = None  # np.ndarray
 
     @abc.abstractmethod
     def calculate(self):

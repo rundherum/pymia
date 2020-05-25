@@ -19,7 +19,7 @@ class MeanAbsoluteError(INumpyArrayMetric):
     def calculate(self):
         """Calculates the mean absolute error."""
 
-        return np.mean(np.abs(self.ground_truth - self.segmentation))
+        return np.mean(np.abs(self.reference - self.prediction))
 
 
 class MeanSquaredError(INumpyArrayMetric):
@@ -36,7 +36,7 @@ class MeanSquaredError(INumpyArrayMetric):
     def calculate(self):
         """Calculates the mean squared error."""
 
-        return np.mean(np.square(self.ground_truth - self.segmentation))
+        return np.mean(np.square(self.reference - self.prediction))
 
 
 class RootMeanSquaredError(INumpyArrayMetric):
@@ -53,7 +53,7 @@ class RootMeanSquaredError(INumpyArrayMetric):
     def calculate(self):
         """Calculates the root mean squared error."""
 
-        return np.sqrt(np.mean(np.square(self.ground_truth - self.segmentation)))
+        return np.sqrt(np.mean(np.square(self.reference - self.prediction)))
 
 
 class NormalizedRootMeanSquaredError(INumpyArrayMetric):
@@ -70,8 +70,8 @@ class NormalizedRootMeanSquaredError(INumpyArrayMetric):
     def calculate(self):
         """Calculates the normalized root mean squared error."""
 
-        rmse = np.sqrt(np.mean(np.square(self.ground_truth - self.segmentation)))
-        return rmse / (self.ground_truth.max() - self.ground_truth.min())
+        rmse = np.sqrt(np.mean(np.square(self.reference - self.prediction)))
+        return rmse / (self.reference.max() - self.reference.min())
 
 
 class CoefficientOfDetermination(INumpyArrayMetric):
@@ -91,8 +91,8 @@ class CoefficientOfDetermination(INumpyArrayMetric):
         See Also:
             https://stackoverflow.com/a/45538060
         """
-        y_true = self.ground_truth.flatten()
-        y_predicted = self.segmentation.flatten()
+        y_true = self.reference.flatten()
+        y_predicted = self.prediction.flatten()
 
         sse = sum((y_true - y_predicted) ** 2)
         tse = (len(y_true) - 1) * np.var(y_true, ddof=1)

@@ -83,21 +83,21 @@ class Evaluator(EvaluatorBase):
         if isinstance(reference, sitk.Image) and reference.GetNumberOfComponentsPerPixel() > 1:
             raise ValueError('Image has more than one component per pixel')
 
-        image_array = sitk.GetArrayFromImage(prediction) if isinstance(prediction, sitk.Image) else prediction
-        ground_truth_array = sitk.GetArrayFromImage(reference) if isinstance(reference, sitk.Image) else reference
+        prediction_array = sitk.GetArrayFromImage(prediction) if isinstance(prediction, sitk.Image) else prediction
+        reference_array = sitk.GetArrayFromImage(reference) if isinstance(reference, sitk.Image) else reference
 
         for label, label_str in self.labels.items():
             # get only current label
-            predictions = np.in1d(image_array.ravel(), label, True).reshape(image_array.shape).astype(np.uint8)
-            labels = np.in1d(ground_truth_array.ravel(), label, True).reshape(ground_truth_array.shape).astype(np.uint8)
+            prediction_of_label = np.in1d(prediction_array.ravel(), label, True).reshape(prediction_array.shape).astype(np.uint8)
+            reference_of_label = np.in1d(reference_array.ravel(), label, True).reshape(reference_array.shape).astype(np.uint8)
 
             # calculate the confusion matrix for IConfusionMatrixMetric
-            confusion_matrix = pymia_metric.ConfusionMatrix(predictions, labels)
+            confusion_matrix = pymia_metric.ConfusionMatrix(prediction_of_label, reference_of_label)
 
             # flag indicating whether the images have been converted for ISimpleITKImageMetric
             converted_to_image = False
-            predictions_as_image = None
-            labels_as_image = None
+            prediction_of_label_as_image = None
+            reference_of_label_as_image = None
 
             # for distance metrics
             distances = None
@@ -107,28 +107,28 @@ class Evaluator(EvaluatorBase):
                 if isinstance(metric, pymia_metric.IConfusionMatrixMetric):
                     metric.confusion_matrix = confusion_matrix
                 elif isinstance(metric, pymia_metric.INumpyArrayMetric):
-                    metric.ground_truth = labels
-                    metric.segmentation = predictions
+                    metric.reference = reference_of_label
+                    metric.prediction = prediction_of_label
                 elif isinstance(metric, pymia_metric.ISimpleITKImageMetric):
                     if not converted_to_image:
                         if not isinstance(prediction, sitk.Image):
                             raise ValueError('SimpleITK image is required for SimpleITK-based metrics')
-                        predictions_as_image = sitk.GetImageFromArray(predictions)
-                        predictions_as_image.CopyInformation(prediction)
-                        labels_as_image = sitk.GetImageFromArray(labels)
-                        labels_as_image.CopyInformation(reference)
+                        prediction_of_label_as_image = sitk.GetImageFromArray(prediction_of_label)
+                        prediction_of_label_as_image.CopyInformation(prediction)
+                        reference_of_label_as_image = sitk.GetImageFromArray(reference_of_label)
+                        reference_of_label_as_image.CopyInformation(reference)
                         converted_to_image = True
 
-                    metric.ground_truth = labels_as_image
-                    metric.segmentation = predictions_as_image
+                    metric.reference = reference_of_label_as_image
+                    metric.prediction = prediction_of_label_as_image
                 elif isinstance(metric, pymia_metric.IDistanceMetric):
                     if distances is None:
                         if isinstance(prediction, sitk.Image):
                             spacing = prediction.GetSpacing()[::-1]
                         else:
-                            spacing = (1.0,) * labels.ndim  # use isotropic spacing of 1 mm
+                            spacing = (1.0,) * reference_of_label.ndim  # use isotropic spacing of 1 mm
 
-                        distances = pymia_metric.Distances(predictions, labels, spacing)
+                        distances = pymia_metric.Distances(prediction_of_label, reference_of_label, spacing)
 
                     metric.distances = distances
 
