@@ -283,7 +283,7 @@ class RandomShift(tfm.Transform):
                 raise ValueError(tfm.ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
 
         shifts_maximums = [int(s * sample[self.entries[0]].shape[a]) for a, s in zip(self.axis, self.shift)]
-        shifts = [np.random.randint(-s_max, s_max) if s_max is not 0 else 0 for s_max in shifts_maximums]
+        shifts = [np.random.randint(-s_max, s_max) if s_max != 0 else 0 for s_max in shifts_maximums]
 
         for entry in self.entries:
             for axis, shift in zip(self.axis, shifts):

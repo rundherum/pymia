@@ -157,6 +157,11 @@ class AreaUnderCurve(IConfusionMatrixMetric):
 
         false_positive_rate = 1 - specificity
 
+        if (self.confusion_matrix.tp + self.confusion_matrix.fn) == 0:
+            warnings.warn('Unable to compute area under the curve due to division by zero, returning -inf',
+                          NotComputableMetricWarning)
+            return float('-inf')
+
         true_positive_rate = self.confusion_matrix.tp / (self.confusion_matrix.tp + self.confusion_matrix.fn)
 
         return (true_positive_rate - false_positive_rate + 1) / 2
@@ -225,6 +230,11 @@ class CohenKappaMetric(IConfusionMatrixMetric):
         chance1 = (fp + tp) * (fn + tp)
         sum_ = tn + fn + fp + tp
         chance = (chance0 + chance1) / sum_
+
+        if (sum_ - chance) == 0:
+            warnings.warn('Unable to compute Cohen\'s kappa coefficient due to division by zero, returning -inf',
+                          NotComputableMetricWarning)
+            return float('-inf')
 
         return (agreement - chance) / (sum_ - chance)
 
@@ -380,6 +390,11 @@ class GlobalConsistencyError(IConfusionMatrixMetric):
         fp = self.confusion_matrix.fp
         fn = self.confusion_matrix.fn
 
+        if (tp + fn) == 0 or (tn + fp) == 0 or (tp + fp) == 0 or (tn + fn) == 0:
+            warnings.warn('Unable to compute global consistency error due to division by zero, returning inf',
+                          NotComputableMetricWarning)
+            return float('inf')
+
         n = tp + tn + fp + fn
         e1 = (fn * (fn + 2 * tp) / (tp + fn) + fp * (fp + 2 * tn) / (tn + fp)) / n
         e2 = (fp * (fp + 2 * tp) / (tp + fp) + fn * (fn + 2 * tn) / (tn + fn)) / n
@@ -510,6 +525,11 @@ class InterclassCorrelation(INumpyArrayMetric):
         ssw /= n
         ssb = ssb / (n - 1) * 2
 
+        if (ssb + ssw) == 0:
+            warnings.warn('Unable to compute interclass correlation due to division by zero, returning -inf',
+                          NotComputableMetricWarning)
+            return float('-inf')
+
         return (ssb - ssw) / (ssb + ssw)
 
 
@@ -531,6 +551,11 @@ class JaccardCoefficient(IConfusionMatrixMetric):
         fp = self.confusion_matrix.fp
         fn = self.confusion_matrix.fn
 
+        if (tp + fp + fn) == 0:
+            warnings.warn('Unable to compute Jaccard coefficient due to division by zero, returning -inf',
+                          NotComputableMetricWarning)
+            return float('-inf')
+
         return tp / (tp + fp + fn)
 
 
@@ -549,11 +574,21 @@ class MahalanobisDistance(INumpyArrayMetric):
         """Calculates the Mahalanobis distance."""
 
         gt_n = np.count_nonzero(self.ground_truth)
+        seg_n = np.count_nonzero(self.segmentation)
+
+        if gt_n == 0:
+            warnings.warn('Unable to compute Mahalanobis distance due to empty label mask, returning inf',
+                          NotComputableMetricWarning)
+            return float('inf')
+        if seg_n == 0:
+            warnings.warn('Unable to compute Mahalanobis distance due to empty segmentation mask, returning inf',
+                          NotComputableMetricWarning)
+            return float('inf')
+
         gt_indices = np.flip(np.where(self.ground_truth == 1), axis=0)
         gt_mean = gt_indices.mean(axis=1)
         gt_cov = np.cov(gt_indices)
 
-        seg_n = np.count_nonzero(self.segmentation)
         seg_indices = np.flip(np.where(self.segmentation == 1), axis=0)
         seg_mean = seg_indices.mean(axis=1)
         seg_cov = np.cov(seg_indices)
@@ -562,9 +597,8 @@ class MahalanobisDistance(INumpyArrayMetric):
         common_cov = (gt_n * gt_cov + seg_n * seg_cov) / (gt_n + seg_n)
         common_cov_inv = np.linalg.inv(common_cov)
 
-        mean = np.matrix(np.array(gt_mean) - np.array(seg_mean))
-
-        return math.sqrt(mean * np.matrix(common_cov_inv) * mean.T)
+        mean = gt_mean - seg_mean
+        return math.sqrt(mean.dot(common_cov_inv).dot(mean.T))
 
 
 class MutualInformation(IConfusionMatrixMetric):
@@ -769,6 +803,11 @@ class Sensitivity(IConfusionMatrixMetric):
     def calculate(self):
         """Calculates the sensitivity (true positive rate)."""
 
+        if (self.confusion_matrix.tp + self.confusion_matrix.fn) == 0:
+            warnings.warn('Unable to compute sensitivity due to division by zero, returning -inf',
+                          NotComputableMetricWarning)
+            return float('-inf')
+
         return self.confusion_matrix.tp / (self.confusion_matrix.tp + self.confusion_matrix.fn)
 
 
@@ -811,6 +850,16 @@ class SurfaceDiceOverlap(IDistanceMetric):
     def calculate(self):
         """Calculates the surface Dice coefficient overlap."""
 
+        if self.distances.surfel_areas_pred is None:
+            warnings.warn('Unable to compute surface Dice coefficient overlap due to empty segmentation mask, returning -inf',
+                          NotComputableMetricWarning)
+            return float('-inf')
+
+        if self.distances.surfel_areas_gt is None:
+            warnings.warn('Unable to compute surface Dice coefficient overlap due to empty label mask, returning -inf',
+                          NotComputableMetricWarning)
+            return float('-inf')
+
         overlap_gt = np.sum(self.distances.surfel_areas_gt[self.distances.distances_gt_to_pred <= self.tolerance])
         overlap_pred = np.sum(self.distances.surfel_areas_pred[self.distances.distances_pred_to_gt <= self.tolerance])
         surface_dice = (overlap_gt + overlap_pred) / \
@@ -847,11 +896,23 @@ class SurfaceOverlap(IDistanceMetric):
         """Calculates the surface overlap."""
 
         if self.prediction_to_label:
-            return float(np.sum(self.distances.surfel_areas_pred[self.distances.distances_pred_to_gt <= self.tolerance])
-                         / np.sum(self.distances.surfel_areas_pred))
+            if self.distances.surfel_areas_pred is not None and np.sum(self.distances.surfel_areas_pred) > 0:
+                return float(
+                    np.sum(self.distances.surfel_areas_pred[self.distances.distances_pred_to_gt <= self.tolerance])
+                    / np.sum(self.distances.surfel_areas_pred))
+            else:
+                warnings.warn('Unable to compute surface overlap due to empty segmentation mask, returning -inf',
+                              NotComputableMetricWarning)
+                return float('-inf')
         else:
-            return float(np.sum(self.distances.surfel_areas_gt[self.distances.distances_gt_to_pred <= self.tolerance])
-                         / np.sum(self.distances.surfel_areas_gt))
+            if self.distances.surfel_areas_gt is not None and np.sum(self.distances.surfel_areas_gt) > 0:
+                return float(
+                    np.sum(self.distances.surfel_areas_gt[self.distances.distances_gt_to_pred <= self.tolerance])
+                    / np.sum(self.distances.surfel_areas_gt))
+            else:
+                warnings.warn('Unable to compute surface overlap due to empty label mask, returning -inf',
+                              NotComputableMetricWarning)
+                return float('-inf')
 
 
 class TrueNegative(IConfusionMatrixMetric):
@@ -952,5 +1013,10 @@ class VolumeSimilarity(IConfusionMatrixMetric):
         tp = self.confusion_matrix.tp
         fp = self.confusion_matrix.fp
         fn = self.confusion_matrix.fn
+
+        if (tp + fn + fp) == 0:
+            warnings.warn('Unable to compute volume similarity due to division by zero, returning -inf',
+                          NotComputableMetricWarning)
+            return float('-inf')
 
         return 1 - abs(fn - fp) / (2 * tp + fn + fp)
