@@ -25,7 +25,7 @@ def main(data_dir: str, result_file: str):
         print(f'Evaluating {subject_id}...')
 
         # load ground truth image and create artificial prediction by erosion
-        ground_truth = sitk.ReadImage(os.path.join(subject_dir, f'{subject_id}_GTN.mha'))
+        ground_truth = sitk.ReadImage(os.path.join(subject_dir, f'{subject_id}_GT.mha'))
         prediction = sitk.BinaryErode(ground_truth)  # todo(fabianbalsiger): handle multi label dummy data (BRATS)
 
         # evaluate the "prediction" against the ground truth
@@ -43,7 +43,7 @@ def main(data_dir: str, result_file: str):
     writer.ConsoleStatisticsWriter(functions={'MEAN': np.mean, 'STD': np.std}).write(evaluator.results)
 
     # clear results such that the evaluator is ready for the next evaluation
-    evaluator.clear_results()
+    evaluator.clear()
 
 
 if __name__ == '__main__':

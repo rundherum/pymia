@@ -33,7 +33,7 @@ class ConsoleWriterHelper:
         """
         self.use_logging = use_logging
 
-    def _format_and_write(self, lines: list):
+    def format_and_write(self, lines: list):
         """Formats and writes the results.
 
         Args:
@@ -141,7 +141,7 @@ class CSVWriter(WriterBase):
                     writer.writerow(row)
 
 
-class ConsoleWriter(WriterBase, ConsoleWriterHelper):
+class ConsoleWriter(WriterBase):
     """Represents a console evaluation results writer."""
 
     def __init__(self, precision: int = 3, use_logging: bool = False):
@@ -151,9 +151,9 @@ class ConsoleWriter(WriterBase, ConsoleWriterHelper):
             precision (int): The float precision.
             use_logging (bool): Indicates whether to use the Python logging module or not.
         """
-        WriterBase.__init__(self)
-        ConsoleWriterHelper.__init__(self, use_logging)
+        super().__init__()
 
+        self.write_helper = ConsoleWriterHelper(use_logging)
         self.precision = precision
 
     def write(self, results: typing.List[eval_.Result], **kwargs):
@@ -186,10 +186,10 @@ class ConsoleWriter(WriterBase, ConsoleWriterHelper):
                         row.append('n/a')
                 lines.append(row)
 
-        self._format_and_write(lines)
+        self.write_helper.format_and_write(lines)
 
 
-class CSVStatisticsWriter(WriterBase, StatisticsAggregator):
+class CSVStatisticsWriter(WriterBase):
     """Represents a CSV file evaluation results statistics writer."""
 
     def __init__(self, path: str, delimiter: str = ';', functions: dict = None):
@@ -200,8 +200,8 @@ class CSVStatisticsWriter(WriterBase, StatisticsAggregator):
             delimiter (str): The CSV column delimiter.
             functions (dict): The functions to calculate the statistics.
         """
-        WriterBase.__init__(self)
-        StatisticsAggregator.__init__(self, functions)
+        super().__init__()
+        self.aggregator = StatisticsAggregator(functions)
         self.path = path
         self.delimiter = delimiter
 
@@ -215,7 +215,7 @@ class CSVStatisticsWriter(WriterBase, StatisticsAggregator):
         Args:
             results (list of eval_.Result): The evaluation results.
         """
-        aggregated_results = self.calculate(results)
+        aggregated_results = self.aggregator.calculate(results)
 
         with open(self.path, 'w', newline='') as file:  # creates (and overrides an existing) file
             writer = csv.writer(file, delimiter=self.delimiter)
@@ -227,7 +227,7 @@ class CSVStatisticsWriter(WriterBase, StatisticsAggregator):
                 writer.writerow([result.label, result.metric, result.id_, result.value])
 
 
-class ConsoleStatisticsWriter(WriterBase, StatisticsAggregator, ConsoleWriterHelper):
+class ConsoleStatisticsWriter(WriterBase):
     """Represents a console evaluation results statistics writer."""
 
     def __init__(self, precision: int = 3, use_logging: bool = False,
@@ -239,10 +239,9 @@ class ConsoleStatisticsWriter(WriterBase, StatisticsAggregator, ConsoleWriterHel
             use_logging (bool): Indicates whether to use the Python logging module or not.
             functions (dict): The function handles to calculate the statistics.
         """
-        WriterBase.__init__(self)
-        StatisticsAggregator.__init__(self, functions)
-        ConsoleWriterHelper.__init__(self, use_logging)
-
+        super().__init__()
+        self.aggregator = StatisticsAggregator(functions)
+        self.write_helper = ConsoleWriterHelper(use_logging)
         self.precision = precision
 
     def write(self, results: typing.List[eval_.Result], **kwargs):
@@ -251,7 +250,7 @@ class ConsoleStatisticsWriter(WriterBase, StatisticsAggregator, ConsoleWriterHel
         Args:
             results (list of eval_.Result): The evaluation results.
         """
-        aggregated_results = self.calculate(results)
+        aggregated_results = self.aggregator.calculate(results)
 
         # header
         lines = [['LABEL', 'METRIC', 'STATISTIC', 'VALUE']]
@@ -260,4 +259,4 @@ class ConsoleStatisticsWriter(WriterBase, StatisticsAggregator, ConsoleWriterHel
             lines.append([result.label, result.metric, result.id_,
                           result.value if isinstance(result.value, str) else f'{result.value:.{self.precision}f}'])
 
-        self._format_and_write(lines)
+        self.write_helper.format_and_write(lines)

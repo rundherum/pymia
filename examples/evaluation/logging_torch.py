@@ -44,7 +44,7 @@ def main(hdf_file: str):
             tb.add_scalar(f'valid/{result.metric}-{result.id_}', result.value, epoch)
 
         # clear results such that the evaluator is ready for the next evaluation
-        evaluator.clear_results()
+        evaluator.clear()
 
 
 if __name__ == '__main__':

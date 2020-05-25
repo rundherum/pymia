@@ -13,7 +13,7 @@ import pymia.evaluation.metric as pymia_metric
 
 class Result:
 
-    def __init__(self, id_: str, label: str, metric: str, value: float):
+    def __init__(self, id_: str, label: str, metric: str, value):
         self.id_ = id_
         self.label = label
         self.metric = metric
@@ -23,7 +23,7 @@ class Result:
 class EvaluatorBase(abc.ABC):
 
     def __init__(self, metrics: typing.List[pymia_metric.IMetric]):
-        self.metrics = metrics if metrics else []
+        self.metrics = metrics
         self.results = []
 
     @abc.abstractmethod
@@ -33,15 +33,7 @@ class EvaluatorBase(abc.ABC):
                  id_: str, **kwargs):
         raise NotImplementedError
 
-    def add_metric(self, metric: pymia_metric.IMetric):
-        """Adds a metric to the evaluation.
-
-        Args:
-            metric (pymia_metric.IMetric): The metric.
-        """
-        self.metrics.append(metric)
-
-    def clear_results(self):
+    def clear(self):
         self.results = []
 
 
@@ -56,7 +48,7 @@ class Evaluator(EvaluatorBase):
             labels (dict): A dictionary with labels (key of type int) and label descriptions (value of type string).
         """
         super().__init__(metrics)
-        self.labels = labels if labels else {}
+        self.labels = labels
 
     def add_label(self, label: typing.Union[tuple, int], description: str):
         """Adds a label with its description to the evaluation.
