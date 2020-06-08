@@ -63,39 +63,36 @@ class Subject(data.SubjectFile):
         self.subject_path = files.get(subject, '')
 
 
-def get_full_file_path(id_: str, root_dir: str, file_key, file_extension: str) -> str:
-    """Gets the full file path for an image.
-    Args:
-        id_ (str): The image identification.
-        root_dir (str): The image' root directory.
-        file_key (object): A human readable identifier used to identify the image.
-        file_extension (str): The image' file extension.
-    Returns:
-        str: The images' full file path.
-    """
-    add_file_extension = True
-
-    if file_key == FileTypes.T1:
-        file_name = '{}_T1'.format(id_)
-    elif file_key == FileTypes.T2:
-        file_name = '{}_T2'.format(id_)
-    elif file_key == FileTypes.GT:
-        file_name = '{}_GT'.format(id_)
-    elif file_key == FileTypes.MASK:
-        file_name = '{}_MASK.nii.gz'.format(id_)
-        add_file_extension = False
-    elif file_key == FileTypes.AGE or file_key == FileTypes.GPA or file_key == FileTypes.SEX:
-        file_name = 'demographic.txt'
-        add_file_extension = False
-    else:
-        raise ValueError('Unknown key')
-
-    file_name = file_name + file_extension if add_file_extension else file_name
-    return os.path.join(root_dir, file_name)
-
-
 def main(hdf_file: str, data_dir: str):
-    # get subjects
+
+    # collect the files for each subject
+    subjects = get_subject_files(data_dir)
+
+    if os.path.exists(hdf_file):
+        os.remove(hdf_file)
+
+    with crt.get_writer(hdf_file) as writer:
+        # initialize the callbacks that will actually write the data to the dataset file
+        callbacks = crt.get_default_callbacks(writer)
+
+        # add a transform to normalize the images
+        transform = tfm.IntensityNormalization(loop_axis=3, entries=(defs.KEY_IMAGES, ))
+
+        # run through the subject files (loads them, applies transformations, and calls the callback for writing them)
+        traverser = crt.SubjectFileTraverser()
+        traverser.traverse(subjects, callback=callbacks, load=LoadData(), transform=transform)
+
+
+def get_subject_files(data_dir: str) -> typing.List[Subject]:
+    """Collects the files for all the subjects in the data directory.
+
+    Args:
+        data_dir (str): The data directory.
+
+    Returns:
+        typing.List[data.SubjectFile]: The list of the collected subject files.
+
+    """
     subject_dirs = [subject_dir for subject_dir in glob.glob(os.path.join(data_dir, '*')) if os.path.isdir(subject_dir)]
     sorted(subject_dirs)
 
@@ -107,22 +104,37 @@ def main(hdf_file: str, data_dir: str):
 
         file_dict = {id_: subject_dir}  # init dict with id_ pointing to path
         for key in keys:
-            file_path = get_full_file_path(id_, subject_dir, key, '.mha')
+            file_path = get_full_file_path(id_, subject_dir, key)
             file_dict[key] = file_path
 
         subjects.append(Subject(id_, file_dict))
+    return subjects
 
-    if os.path.exists(hdf_file):
-        os.remove(hdf_file)
 
-    with crt.get_writer(hdf_file) as writer:
-        callbacks = crt.get_default_callbacks(writer)
+def get_full_file_path(id_: str, root_dir: str, file_key) -> str:
+    """Gets the full file path for an image.
+    Args:
+        id_ (str): The image identification.
+        root_dir (str): The image' root directory.
+        file_key (object): A human readable identifier used to identify the image.
+    Returns:
+        str: The images' full file path.
+    """
 
-        # add a transform to normalize the images
-        transform = tfm.IntensityNormalization(loop_axis=3, entries=(defs.KEY_IMAGES, ))
+    if file_key == FileTypes.T1:
+        file_name = f'{id_}_T1.mha'
+    elif file_key == FileTypes.T2:
+        file_name = f'{id_}_T2.mha'
+    elif file_key == FileTypes.GT:
+        file_name = f'{id_}_GT.mha'
+    elif file_key == FileTypes.MASK:
+        file_name = f'{id_}_MASK.nii.gz'
+    elif file_key == FileTypes.AGE or file_key == FileTypes.GPA or file_key == FileTypes.SEX:
+        file_name = f'{id_}_demographic.txt'
+    else:
+        raise ValueError('Unknown key')
 
-        traverser = crt.SubjectFileTraverser()
-        traverser.traverse(subjects, callback=callbacks, load=LoadData(), transform=transform)
+    return os.path.join(root_dir, file_name)
 
 
 if __name__ == '__main__':
@@ -136,14 +148,14 @@ if __name__ == '__main__':
     parser.add_argument(
         '--hdf_file',
         type=str,
-        default='../dummy-data/dummy.h5',
+        default='../example-data/dummy.h5',
         help='Path to the dataset file.'
     )
 
     parser.add_argument(
         '--data_dir',
         type=str,
-        default='../dummy-data',
+        default='../example-data',
         help='Path to the data directory.'
     )
 

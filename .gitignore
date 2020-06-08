@@ -1,7 +1,7 @@
 # Created by .ignore support plugin (hsz.mobi)
 
 ### Project specific
-examples/dummy-data/*
+examples/example-data/*
 
 ### Python template
 # Byte-compiled / optimized / DLL files
