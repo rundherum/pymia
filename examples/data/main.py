@@ -1,35 +1,27 @@
 import argparse
 
 import numpy as np
+import torch.utils.data as torch_data
 
 import pymia.data.conversion as pymia_conv
 import pymia.data.extraction as pymia_extr
 import pymia.data.assembler as pymia_asmbl
+import pymia.data.backends.pytorch as pymia_torch
 import pymia.evaluation.evaluator as pymia_eval
 import pymia.evaluation.metric as pymia_metric
-
-
-def batch_to_feed_dict(x_placeholder, y_placeholder, batch, is_train: bool = True) -> dict:
-    feed_dict = {x_placeholder: np.stack(batch['images'], axis=0).astype(np.float32)}
-    if is_train:
-        feed_dict[y_placeholder] = np.stack(batch['labels'], axis=0).astype(np.int16)
-
-    return feed_dict
-
-
-def collate_batch(batch) -> dict:
-    # batch is a list of dicts -> change to dict of lists
-    return dict(zip(batch[0], zip(*[d.values() for d in batch])))
+import pymia.evaluation.writer as writer
 
 
 def init_evaluator() -> pymia_eval.Evaluator:
-    evaluator = pymia_eval.Evaluator(pymia_eval.ConsoleEvaluatorWriter(5))
-    evaluator.add_label(1, 'Structure 1')
-    evaluator.add_label(2, 'Structure 2')
-    evaluator.add_label(3, 'Structure 3')
-    evaluator.add_label(4, 'Structure 4')
-    evaluator.metrics = [pymia_metric.DiceCoefficient()]
-    return evaluator
+    labels = {
+        1: 'WhiteMatter',
+        2: 'GreyMatter',
+        3: 'Hippocampus',
+        4: 'Amygdala',
+        5: 'Thalamus'
+    }
+    metrics = [pymia_metric.DiceCoefficient()]
+    return pymia_eval.Evaluator(metrics, labels)
 
 
 def main(hdf_file: str):
@@ -47,7 +39,7 @@ def main(hdf_file: str):
     # define an extractor for testing, i.e. what information we would like to extract per sample
     # not that usually we don't use labels for testing, i.e. the SelectiveDataExtractor is only used for this example
     test_extractor = pymia_extr.ComposeExtractor([pymia_extr.NamesExtractor(),
-                                                  pymia_extr.IndexingExtractor(),
+                                                  pymia_extr.IndexingExtractor(do_pickle=True),
                                                   pymia_extr.DataExtractor(),
                                                   pymia_extr.SelectiveDataExtractor(),
                                                   pymia_extr.ImageShapeExtractor()])
@@ -59,26 +51,24 @@ def main(hdf_file: str):
                                                   pymia_extr.ImagePropertiesExtractor()])
 
     # define the data set
-    dataset = pymia_extr.PymiaDatasource(hdf_file,
-                                         indexing_strategy,
-                                         pymia_extr.SubjectExtractor())  # for select_indices() below
+    dataset = pymia_torch.PymiaTorchDataset(hdf_file,
+                                            indexing_strategy,
+                                            pymia_extr.SubjectExtractor())  # for select_indices() below
 
     # generate train / test split for data set
     # we use Subject_0, Subject_1 and Subject_2 for training and Subject_3 for testing
     sampler_ids_train = pymia_extr.select_indices(dataset,
                                                   pymia_extr.SubjectSelection(('Subject_1', 'Subject_2', 'Subject_3')))
     sampler_ids_test = pymia_extr.select_indices(dataset,
-                                                 pymia_extr.SubjectSelection(('Subject_4')))
+                                                 pymia_extr.SubjectSelection(('Subject_4',)))
 
     # set up training data loader
-    training_sampler = pymia_extr.SubsetRandomSampler(sampler_ids_train)
-    training_loader = pymia_extr.DataLoader(dataset, batch_size_training, sampler=training_sampler,
-                                            collate_fn=collate_batch, num_workers=1)
+    training_sampler = torch_data.SubsetRandomSampler(sampler_ids_train)
+    training_loader = torch_data.DataLoader(dataset, batch_size_training, sampler=training_sampler, num_workers=1)
 
     # set up testing data loader
-    testing_sampler = pymia_extr.SubsetSequentialSampler(sampler_ids_test)
-    testing_loader = pymia_extr.DataLoader(dataset, batch_size_testing, sampler=testing_sampler,
-                                           collate_fn=collate_batch, num_workers=1)
+    testing_sampler = pymia_torch.SubsetSequentialSampler(sampler_ids_test)
+    testing_loader = torch_data.DataLoader(dataset, batch_size_testing, sampler=testing_sampler, num_workers=1)
 
     sample = dataset.direct_extract(train_extractor, 0)  # extract a subject
 
@@ -126,7 +116,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--hdf_file',
         type=str,
-        default='../dummy-data/dummy.h5',
+        default='../example-data/dummy.h5',
         help='Path to the dataset file.'
     )
 

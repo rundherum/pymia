@@ -1,9 +1,8 @@
 import abc
-import typing as t
 
 import numpy as np
-import torch.utils.data as data
-import torch.utils.data.sampler as smplr
+
+from . import dataset as ds
 
 
 class SelectionStrategy(metaclass=abc.ABCMeta):
@@ -108,23 +107,10 @@ class ComposeSelection(SelectionStrategy):
         return '|'.join(repr(s) for s in self.strategies)
 
 
-def select_indices(data_source: data.Dataset, selection_strategy: SelectionStrategy):
+def select_indices(data_source: ds.PymiaDatasource, selection_strategy: SelectionStrategy):
     selected_indices = []
     for i, sample in enumerate(data_source):
         if selection_strategy(sample):
             selected_indices.append(i)
     return selected_indices
 
-
-class SubsetSequentialSampler(smplr.Sampler):
-    """Samples elements sequential from a given list of indices, without replacement."""
-
-    def __init__(self, indices):
-        super().__init__(None)
-        self.indices = indices
-
-    def __iter__(self):
-        return (idx for idx in self.indices)
-
-    def __len__(self):
-        return len(self.indices)
