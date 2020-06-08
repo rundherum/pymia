@@ -7,7 +7,7 @@ from . import indexing as idx
 from . import extractor as extr
 
 
-class ParameterizableDataset(data.Dataset):
+class PymiaDatasource(data.Dataset):
 
     def __init__(self, dataset_path: str, indexing_strategy: idx.IndexingStrategy=None, extractor: extr.Extractor=None,
                  transform: tfm.Transform=None, subject_subset: list=None, init_reader_once=True) -> None:

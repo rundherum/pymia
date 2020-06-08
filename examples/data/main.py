@@ -59,9 +59,9 @@ def main(hdf_file: str):
                                                   pymia_extr.ImagePropertiesExtractor()])
 
     # define the data set
-    dataset = pymia_extr.ParameterizableDataset(hdf_file,
-                                                indexing_strategy,
-                                                pymia_extr.SubjectExtractor())  # for select_indices() below
+    dataset = pymia_extr.PymiaDatasource(hdf_file,
+                                         indexing_strategy,
+                                         pymia_extr.SubjectExtractor())  # for select_indices() below
 
     # generate train / test split for data set
     # we use Subject_0, Subject_1 and Subject_2 for training and Subject_3 for testing

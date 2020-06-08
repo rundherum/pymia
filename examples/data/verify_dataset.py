@@ -20,7 +20,7 @@ def main(hdf_file: str):
                                        extr.FilesExtractor(categories=('images', 'labels', 'mask', 'numerical', 'sex')),
                                        extr.IndexingExtractor(),
                                        extr.ImagePropertiesExtractor()])
-    dataset = extr.ParameterizableDataset(hdf_file, extr.SliceIndexing(), extractor)
+    dataset = extr.PymiaDatasource(hdf_file, extr.SliceIndexing(), extractor)
 
     for i in range(len(dataset)):
         item = dataset[i]
