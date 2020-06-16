@@ -1,13 +1,14 @@
 Data (:mod:`pymia.data` package)
 ================================
 
-Provides data loading and handling functionality for machine learning (especially deep learning) projects.
+This package provides data handling functionality for machine learning (especially deep learning) projects.
 
 Subpackages
 -----------
 
 .. toctree::
 
+    pymia.data.backends
     pymia.data.creation
     pymia.data.extraction
 
