@@ -6,7 +6,7 @@ import pymia.data.definition as defs
 from . import dataset as ds
 
 
-class SelectionStrategy(metaclass=abc.ABCMeta):
+class SelectionStrategy(abc.ABC):
 
     @abc.abstractmethod
     def __call__(self, sample) -> bool:

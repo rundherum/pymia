@@ -11,7 +11,7 @@ from . import callback as cb
 from . import fileloader as load
 
 
-class Traverser(metaclass=abc.ABCMeta):
+class Traverser(abc.ABC):
 
     @abc.abstractmethod
     def traverse(self, files: list, loader: load.Load, callbacks: t.List[cb.Callback] = None,

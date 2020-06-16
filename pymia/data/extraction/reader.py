@@ -8,7 +8,7 @@ import pymia.data.definition as defs
 import pymia.data.indexexpression as expr
 
 
-class Reader(metaclass=abc.ABCMeta):
+class Reader(abc.ABC):
     """Represents the abstract dataset reader."""
 
     def __init__(self, file_path: str) -> None:

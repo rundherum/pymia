@@ -7,7 +7,7 @@ import h5py
 import pymia.data.indexexpression as expr
 
 
-class Writer(metaclass=abc.ABCMeta):
+class Writer(abc.ABC):
     """Represents the abstract dataset writer."""
 
     def __enter__(self):
@@ -42,7 +42,7 @@ class Writer(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def fill(self, entry: str, data, index: expr.IndexExpression=None):
+    def fill(self, entry: str, data, index: expr.IndexExpression = None):
         """Fill parts of a reserved dataset entry.
 
         Args:

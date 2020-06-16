@@ -11,7 +11,7 @@ import pymia.data.indexexpression as expr
 from . import reader as rd
 
 
-class Extractor(metaclass=abc.ABCMeta):
+class Extractor(abc.ABC):
     """Represents an extractor that extracts data from a dataset."""
 
     @abc.abstractmethod

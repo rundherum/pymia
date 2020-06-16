@@ -6,7 +6,7 @@ import numpy as np
 import pymia.data.indexexpression as expr
 
 
-class IndexingStrategy(metaclass=abc.ABCMeta):
+class IndexingStrategy(abc.ABC):
 
     @abc.abstractmethod
     def __call__(self, shape) -> t.List[expr.IndexExpression]:

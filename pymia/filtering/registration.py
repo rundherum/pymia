@@ -27,7 +27,7 @@ class RegistrationType(enum.Enum):
     BSPLINE = 4
 
 
-class RegistrationCallback(metaclass=abc.ABCMeta):
+class RegistrationCallback(abc.ABC):
     """Represents the abstract handler for the registration callbacks."""
 
     def __init__(self) -> None:

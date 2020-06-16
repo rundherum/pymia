@@ -8,11 +8,11 @@ import typing as t
 import SimpleITK as sitk
 
 
-class IFilterParams(metaclass=abc.ABCMeta):
+class IFilterParams(abc.ABC):
     """Represents a filter parameters interface."""
 
 
-class IFilter(metaclass=abc.ABCMeta):
+class IFilter(abc.ABC):
     """Filter base class."""
 
     def __init__(self):
@@ -20,7 +20,7 @@ class IFilter(metaclass=abc.ABCMeta):
         self.verbose = False
 
     @abc.abstractmethod
-    def execute(self, image: sitk.Image, params: IFilterParams=None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: IFilterParams = None) -> sitk.Image:
         """Executes a filter on an image.
 
         Args:
@@ -36,7 +36,7 @@ class IFilter(metaclass=abc.ABCMeta):
 class FilterPipeline:
     """Represents a filter pipeline, which sequentially executes filters on images."""
 
-    def __init__(self, filters: t.List[IFilter]=None):
+    def __init__(self, filters: t.List[IFilter] = None):
         """Initializes a new instance of the `FilterPipeline` class.
 
         Args:

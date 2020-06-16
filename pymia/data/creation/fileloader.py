@@ -7,7 +7,7 @@ import SimpleITK as sitk
 import pymia.data.conversion as conv
 
 
-class Load(metaclass=abc.ABCMeta):
+class Load(abc.ABC):
 
     @abc.abstractmethod
     def __call__(self, file_name: str, id_: str, category: str, subject_id: str) \
