@@ -1,5 +1,5 @@
 import abc
-import typing as t
+import typing
 
 import numpy as np
 
@@ -9,7 +9,7 @@ import pymia.data.indexexpression as expr
 class IndexingStrategy(abc.ABC):
 
     @abc.abstractmethod
-    def __call__(self, shape) -> t.List[expr.IndexExpression]:
+    def __call__(self, shape) -> typing.List[expr.IndexExpression]:
         # return list of indexes by giving shape
         pass
 
@@ -19,18 +19,18 @@ class IndexingStrategy(abc.ABC):
 
 class EmptyIndexing(IndexingStrategy):
 
-    def __call__(self, shape) -> t.List[expr.IndexExpression]:
+    def __call__(self, shape) -> typing.List[expr.IndexExpression]:
         return [expr.IndexExpression()]
 
 
 class SliceIndexing(IndexingStrategy):
 
-    def __init__(self, slice_axis: t.Union[int, tuple]=0) -> None:
+    def __init__(self, slice_axis: typing.Union[int, tuple] = 0) -> None:
         if isinstance(slice_axis, int):
             slice_axis = (slice_axis, )
         self.slice_axis = slice_axis
 
-    def __call__(self, shape) -> t.List[expr.IndexExpression]:
+    def __call__(self, shape) -> typing.List[expr.IndexExpression]:
         indexing = []
         for axis in self.slice_axis:
             indexing.extend(expr.IndexExpression(i, axis) for i in range(shape[axis]))
@@ -42,7 +42,7 @@ class SliceIndexing(IndexingStrategy):
 
 class VoxelWiseIndexing(IndexingStrategy):
 
-    def __init__(self, image_dimension: int=3):
+    def __init__(self, image_dimension: int = 3):
         """Initializes a new instance of the VoxelWiseIndexing class.
 
         Args:
@@ -52,7 +52,7 @@ class VoxelWiseIndexing(IndexingStrategy):
         self.indexing = None
         self.image_dimension = image_dimension
 
-    def __call__(self, shape) -> t.List[expr.IndexExpression]:
+    def __call__(self, shape) -> typing.List[expr.IndexExpression]:
         if self.shape == shape:
             return self.indexing
 
@@ -82,7 +82,7 @@ class PatchWiseIndexing(IndexingStrategy):
         self.prev_shape = None
         self.prev_indexing = None
 
-    def __call__(self, shape) -> t.List[expr.IndexExpression]:
+    def __call__(self, shape) -> typing.List[expr.IndexExpression]:
         if shape == self.prev_shape:
             return self.prev_indexing
 

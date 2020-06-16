@@ -1,7 +1,7 @@
 from .base import (ConfusionMatrix, Distances, IMetric, IConfusionMatrixMetric, IDistanceMetric, ISimpleITKImageMetric,
                    INumpyArrayMetric, Information, NotComputableMetricWarning)
-from .metric import (get_all_segmentation_metrics, get_all_regression_metrics, get_overlap_metrics, get_distance_metrics,
-                     get_classical_metrics)
+from .metric import (get_all_segmentation_metrics, get_all_regression_metrics, get_overlap_metrics,
+                     get_distance_metrics, get_classical_metrics)
 
 from .regression import (CoefficientOfDetermination, MeanAbsoluteError, MeanSquaredError, RootMeanSquaredError,
                          NormalizedRootMeanSquaredError)

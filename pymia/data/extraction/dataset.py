@@ -1,11 +1,9 @@
-import torch.utils.data.dataset as data
-
 import pymia.data.definition as defs
-import pymia.data.transformation as tfm
 import pymia.data.indexexpression as expr
-from . import reader as rd
-from . import indexing as idx
+import pymia.data.transformation as tfm
 from . import extractor as extr
+from . import indexing as idx
+from . import reader as rd
 
 
 class PymiaDatasource:

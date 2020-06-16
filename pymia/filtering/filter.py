@@ -3,7 +3,7 @@
 All modules in the filter package implement the basic IFilter interface and can be used to set up a pipeline.
 """
 import abc
-import typing as t
+import typing
 
 import SimpleITK as sitk
 
@@ -36,7 +36,7 @@ class IFilter(abc.ABC):
 class FilterPipeline:
     """Represents a filter pipeline, which sequentially executes filters on images."""
 
-    def __init__(self, filters: t.List[IFilter] = None):
+    def __init__(self, filters: typing.List[IFilter] = None):
         """Initializes a new instance of the `FilterPipeline` class.
 
         Args:

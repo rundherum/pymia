@@ -13,4 +13,3 @@ class SubsetSequentialSampler(smplr.Sampler):
 
     def __len__(self):
         return len(self.indices)
-

@@ -114,4 +114,3 @@ def select_indices(data_source: ds.PymiaDatasource, selection_strategy: Selectio
         if selection_strategy(sample):
             selected_indices.append(i)
     return selected_indices
-

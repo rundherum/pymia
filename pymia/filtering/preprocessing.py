@@ -49,7 +49,7 @@ class BiasFieldCorrector(pymia_fltr.IFilter):
         self.control_points = control_points
         self.spline_order = spline_order
 
-    def execute(self, image: sitk.Image, params: BiasFieldCorrectorParams=None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: BiasFieldCorrectorParams = None) -> sitk.Image:
         """Executes a bias field correction on an image.
 
         Args:
@@ -89,10 +89,10 @@ class GradientAnisotropicDiffusion(pymia_fltr.IFilter):
     """Represents a gradient anisotropic diffusion filter."""
 
     def __init__(self,
-                 time_step: float=0.125,
-                 conductance: int=3,
-                 conductance_scaling_update_interval: int=1,
-                 no_iterations: int=5):
+                 time_step: float = 0.125,
+                 conductance: int = 3,
+                 conductance_scaling_update_interval: int = 1,
+                 no_iterations: int = 5):
         """Initializes a new instance of the GradientAnisotropicDiffusion class.
 
         Args:
@@ -107,7 +107,7 @@ class GradientAnisotropicDiffusion(pymia_fltr.IFilter):
         self.conductance_scaling_update_interval = conductance_scaling_update_interval
         self.no_iterations = no_iterations
 
-    def execute(self, image: sitk.Image, params: pymia_fltr.IFilterParams=None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: pymia_fltr.IFilterParams = None) -> sitk.Image:
         """Executes a gradient anisotropic diffusion on an image.
 
         Args:
@@ -144,7 +144,7 @@ class NormalizeZScore(pymia_fltr.IFilter):
         """Initializes a new instance of the NormalizeZScore class."""
         super().__init__()
 
-    def execute(self, image: sitk.Image, params: pymia_fltr.IFilterParams=None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: pymia_fltr.IFilterParams = None) -> sitk.Image:
         """Executes a z-score normalization on an image.
 
         Args:
@@ -190,7 +190,7 @@ class RescaleIntensity(pymia_fltr.IFilter):
         self.min_intensity = min_intensity
         self.max_intensity = max_intensity
 
-    def execute(self, image: sitk.Image, params: pymia_fltr.IFilterParams=None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: pymia_fltr.IFilterParams = None) -> sitk.Image:
         """Executes an intensity rescaling on an image.
 
         Args:

@@ -1,8 +1,8 @@
 """The misc (miscellaneous) module contains filters, which don't have a classical purpose."""
-import subprocess
 import os
+import subprocess
 import tempfile
-import typing as t
+import typing
 
 import numpy as np
 import SimpleITK as sitk
@@ -13,7 +13,7 @@ import pymia.filtering.filter as pymia_fltr
 class Relabel(pymia_fltr.IFilter):
     """Relabels the labels in the file by the provided rule"""
 
-    def __init__(self, label_changes: t.Dict[int, t.Union[int, tuple]]) -> None:
+    def __init__(self, label_changes: typing.Dict[int, typing.Union[int, tuple]]) -> None:
         """Initializes a new instance of the LargestNComponents class.
 
         Args:
@@ -142,7 +142,7 @@ class SizeCorrectionFilter(pymia_fltr.IFilter):
 class CmdlineExecutorParams(pymia_fltr.IFilterParams):
     """Command line executor filter parameters."""
 
-    def __init__(self, arguments: t.List[str]) -> None:
+    def __init__(self, arguments: typing.List[str]) -> None:
         """Initializes a new instance of the CmdlineExecutorParams class.
 
         Args:
@@ -163,7 +163,7 @@ class CmdlineExecutor(pymia_fltr.IFilter):
         super().__init__()
         self.executable_path = executable_path
 
-    def execute(self, image: sitk.Image, params: CmdlineExecutorParams=None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: CmdlineExecutorParams = None) -> sitk.Image:
         """Executes a command line program.
 
         Args:

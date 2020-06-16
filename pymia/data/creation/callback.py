@@ -47,7 +47,7 @@ class MonitoringCallback(Callback):
 
     def on_subject(self, params: dict):
         index = params[defs.KEY_SUBJECT_INDEX]
-        subject_files = params['subject_files']
+        subject_files = params[defs.KEY_SUBJECT_FILES]
         print('[{}/{}] {}'.format(index + 1, len(subject_files), subject_files[index].subject))
 
     def on_end(self, params: dict):
@@ -60,7 +60,7 @@ class WriteDataCallback(Callback):
         self.writer = writer
 
     def on_subject(self, params: dict):
-        subject_files = params['subject_files']
+        subject_files = params[defs.KEY_SUBJECT_FILES]
         subject_index = params[defs.KEY_SUBJECT_INDEX]
 
         max_digits = len(str(len(subject_files)))
@@ -77,11 +77,11 @@ class WriteSubjectCallback(Callback):
         self.writer = writer
 
     def on_start(self, params: dict):
-        subject_count = len(params['subject_files'])
+        subject_count = len(params[defs.KEY_SUBJECT_FILES])
         self.writer.reserve(defs.SUBJECT, (subject_count,), str)
 
     def on_subject(self, params: dict):
-        subject_files = params['subject_files']
+        subject_files = params[defs.KEY_SUBJECT_FILES]
         subject_index = params[defs.KEY_SUBJECT_INDEX]
 
         subject = subject_files[subject_index].subject
@@ -96,7 +96,7 @@ class WriteImageInformationCallback(Callback):
         self.new_subject = False
 
     def on_start(self, params: dict):
-        subject_count = len(params['subject_files'])
+        subject_count = len(params[defs.KEY_SUBJECT_FILES])
         self.writer.reserve(defs.INFO_SHAPE, (subject_count, 3), dtype=np.uint16)
         self.writer.reserve(defs.INFO_ORIGIN, (subject_count, 3), dtype=np.float)
         self.writer.reserve(defs.INFO_DIRECTION, (subject_count, 9), dtype=np.float)
@@ -135,7 +135,7 @@ class WriteFilesCallback(Callback):
         return os.path.commonpath([get_subject_common(sf) for sf in subject_files])
 
     def on_start(self, params: dict):
-        subject_files = params['subject_files']
+        subject_files = params[defs.KEY_SUBJECT_FILES]
         self.file_root = self._get_common_path(subject_files)
         self.writer.write(defs.FILES_ROOT, self.file_root, dtype='str')
 
@@ -145,7 +145,7 @@ class WriteFilesCallback(Callback):
 
     def on_subject(self, params: dict):
         subject_index = params[defs.KEY_SUBJECT_INDEX]
-        subject_files = params['subject_files']
+        subject_files = params[defs.KEY_SUBJECT_FILES]
 
         subject_file = subject_files[subject_index]  # type: subj.SubjectFile
 

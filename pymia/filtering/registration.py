@@ -11,9 +11,8 @@ See Also:
 import abc
 import enum
 import os
-import typing as t
+import typing
 
-import numpy as np
 import SimpleITK as sitk
 
 import pymia.filtering.filter as pymia_fltr
@@ -80,8 +79,8 @@ class RegistrationCallback(abc.ABC):
 class MultiModalRegistrationParams(pymia_fltr.IFilterParams):
     """Represents parameters for the multi-modal rigid registration."""
 
-    def __init__(self, fixed_image: sitk.Image, fixed_image_mask: sitk.Image=None,
-                 callbacks: t.List[RegistrationCallback]=None):
+    def __init__(self, fixed_image: sitk.Image, fixed_image_mask: sitk.Image = None,
+                 callbacks: typing.List[RegistrationCallback] = None):
         """Initializes a new instance of the MultiModalRegistrationParams class.
 
         Args:
@@ -116,16 +115,16 @@ class MultiModalRegistration(pymia_fltr.IFilter):
     """
 
     def __init__(self,
-                 registration_type: RegistrationType=RegistrationType.RIGID,
-                 number_of_histogram_bins: int=200,
-                 learning_rate: float=1.0,
-                 step_size: float=0.001,
-                 number_of_iterations: int=200,
-                 relaxation_factor: float=0.5,
-                 shrink_factors: [int]=(2, 1, 1),
-                 smoothing_sigmas: [float]=(2, 1, 0),
-                 sampling_percentage: float=0.2,
-                 sampling_seed: int=sitk.sitkWallClock,
+                 registration_type: RegistrationType = RegistrationType.RIGID,
+                 number_of_histogram_bins: int = 200,
+                 learning_rate: float = 1.0,
+                 step_size: float = 0.001,
+                 number_of_iterations: int = 200,
+                 relaxation_factor: float = 0.5,
+                 shrink_factors: [int] = (2, 1, 1),
+                 smoothing_sigmas: [float] = (2, 1, 0),
+                 sampling_percentage: float = 0.2,
+                 sampling_seed: int = sitk.sitkWallClock,
                  resampling_interpolator=sitk.sitkBSpline):
         """Initializes a new instance of the MultiModalRegistration class.
 
@@ -204,7 +203,7 @@ class MultiModalRegistration(pymia_fltr.IFilter):
         self.registration = registration
         self.transform = None
 
-    def execute(self, image: sitk.Image, params: MultiModalRegistrationParams=None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: MultiModalRegistrationParams = None) -> sitk.Image:
         """Executes a multi-modal rigid registration.
 
         Args:
@@ -290,7 +289,7 @@ class PlotOnResolutionChangeCallback(RegistrationCallback):
     Saves the moving image on each resolution change and the registration end.
     """
 
-    def __init__(self, plot_dir: str, file_name_prefix: str='') -> None:
+    def __init__(self, plot_dir: str, file_name_prefix: str = '') -> None:
         """
         Args:
             plot_dir (str): Path to the directory where to save the plots.

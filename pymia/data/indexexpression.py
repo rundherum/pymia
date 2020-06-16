@@ -1,16 +1,16 @@
 import typing as t
 
 
-# todo: could maybe be replaced or wrapper with numpy.s_
+# todo(alainjungo): could maybe be replaced or wrapper with numpy.s_
 class IndexExpression:
 
-    def __init__(self, indexing: t.Union[int, tuple, t.List[int], t.List[tuple], t.List[list]]=None,
-                 axis: t.Union[int, tuple]=None) -> None:
+    def __init__(self, indexing: t.Union[int, tuple, t.List[int], t.List[tuple], t.List[list]] = None,
+                 axis: t.Union[int, tuple] = None) -> None:
         self.expression = None
         self.set_indexing(indexing, axis)
 
     def set_indexing(self, indexing: t.Union[int, tuple, slice, t.List[int], t.List[tuple], t.List[list]],
-                     axis: t.Union[int, tuple]=None):
+                     axis: t.Union[int, tuple] = None):
         if indexing is None:
             self.expression = slice(None)
             return

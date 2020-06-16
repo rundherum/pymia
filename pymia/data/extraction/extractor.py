@@ -1,6 +1,6 @@
 import abc
 import pickle
-import typing as t
+import typing
 
 import numpy as np
 import SimpleITK as sitk
@@ -37,7 +37,7 @@ class NamesExtractor(Extractor):
     The names are of type str.
     """
 
-    def __init__(self, cache: bool=True, categories=(defs.KEY_IMAGES, defs.KEY_LABELS)) -> None:
+    def __init__(self, cache: bool = True, categories=(defs.KEY_IMAGES, defs.KEY_LABELS)) -> None:
         super().__init__()
         self.cache = cache
         self.cached_result = None
@@ -78,7 +78,7 @@ class IndexingExtractor(Extractor):
     The index expression is of type IndexExpression.
     """
 
-    def __init__(self, do_pickle: bool=False) -> None:
+    def __init__(self, do_pickle: bool = False) -> None:
         super().__init__()
         self.do_pickle = do_pickle
 
@@ -97,7 +97,7 @@ class ImagePropertiesExtractor(Extractor):
     The image properties are of type ImageProperties.
     """
 
-    def __init__(self, do_pickle: bool=False) -> None:
+    def __init__(self, do_pickle: bool = False) -> None:
         super().__init__()
         self.do_pickle = do_pickle
 
@@ -287,7 +287,7 @@ class DataExtractor(Extractor):
 
 class PadDataExtractor(Extractor):
 
-    def __init__(self, padding: t.Union[tuple, t.List[tuple]], extractor: Extractor, pad_fn=None):
+    def __init__(self, padding: typing.Union[tuple, typing.List[tuple]], extractor: Extractor, pad_fn=None):
         super().__init__()
         if not (hasattr(extractor, 'categories') or hasattr(extractor, 'category')):
             raise ValueError('argument extractor needs to have the property "categories" or "category"')

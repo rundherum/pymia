@@ -1,5 +1,5 @@
 import abc
-import typing as t
+import typing
 
 import numpy as np
 
@@ -14,18 +14,18 @@ from . import fileloader as load
 class Traverser(abc.ABC):
 
     @abc.abstractmethod
-    def traverse(self, files: list, loader: load.Load, callbacks: t.List[cb.Callback] = None,
+    def traverse(self, files: list, loader: load.Load, callbacks: typing.List[cb.Callback] = None,
                  transform: tfm.Transform = None):
         pass
 
 
-def default_concat(data: t.List[np.ndarray]) -> np.ndarray:
+def default_concat(data: typing.List[np.ndarray]) -> np.ndarray:
     return np.stack(data, axis=-1)
 
 
 class SubjectFileTraverser(Traverser):
 
-    def __init__(self, categories: t.Union[str, t.Tuple[str, ...]] = None):
+    def __init__(self, categories: typing.Union[str, typing.Tuple[str, ...]] = None):
         """Initializes a new instance of the SubjectFileTraverser class.
 
         Args:
@@ -36,7 +36,8 @@ class SubjectFileTraverser(Traverser):
             categories = (categories, )
         self.categories = categories
 
-    def traverse(self, subject_files: t.List[subj.SubjectFile], load=load.LoadDefault(), callback: cb.Callback = None,
+    def traverse(self, subject_files: typing.List[subj.SubjectFile], load=load.LoadDefault(),
+                 callback: cb.Callback = None,
                  transform: tfm.Transform = None, concat_fn=default_concat):
         if len(subject_files) == 0:
             raise ValueError('No files')
@@ -48,7 +49,7 @@ class SubjectFileTraverser(Traverser):
         if self.categories is None:
             self.categories = subject_files[0].categories
 
-        callback_params = {'subject_files': subject_files}
+        callback_params = {defs.KEY_SUBJECT_FILES: subject_files}
         for category in self.categories:
             callback_params.setdefault('categories', []).append(category)
             callback_params['{}_names'.format(category)] = self._get_names(subject_files, category)
@@ -79,7 +80,7 @@ class SubjectFileTraverser(Traverser):
         callback.on_end(callback_params)
 
     @staticmethod
-    def _get_names(subject_files: t.List[subj.SubjectFile], category: str) -> list:
+    def _get_names(subject_files: typing.List[subj.SubjectFile], category: str) -> list:
         names = subject_files[0].categories[category].entries.keys()
         if not all(s.categories[category].entries.keys() == names for s in subject_files):
             raise ValueError('Inconsistent {} identifiers in the subject list'.format(category))

@@ -91,7 +91,7 @@ class Hdf5Writer(Writer):
             dtype = self.str_type
         self.h5.create_dataset(entry, shape, dtype=dtype)
 
-    def fill(self, entry: str, data, index: expr.IndexExpression=None):
+    def fill(self, entry: str, data, index: expr.IndexExpression = None):
         # special string handling (in order not to use length limited strings)
         if self.h5[entry].dtype is self.str_type:
             data = np.asarray(data, dtype=object)

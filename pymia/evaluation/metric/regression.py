@@ -1,5 +1,4 @@
 """The pymia.evaluation.metric.regression module provides several metrics to measure regression performance."""
-
 import numpy as np
 
 from .base import INumpyArrayMetric

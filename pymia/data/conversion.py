@@ -4,8 +4,8 @@ The main purpose of this module is the conversion between SimpleITK images and n
 """
 import typing
 
-import SimpleITK as sitk
 import numpy as np
+import SimpleITK as sitk
 
 
 class ImageProperties:

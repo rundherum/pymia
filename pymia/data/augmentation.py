@@ -193,7 +193,7 @@ class RandomMirror(tfm.Transform):
 
 class RandomRotation90(tfm.Transform):
 
-    def __init__(self, axes: typing.Tuple[int]=(-3, -2), p: float = 1.0, entries=(defs.KEY_IMAGES, defs.KEY_LABELS)):
+    def __init__(self, axes: typing.Tuple[int] = (-3, -2), p: float = 1.0, entries=(defs.KEY_IMAGES, defs.KEY_LABELS)):
         """Randomly rotates the sample 90, 180, or 270 degrees in the plane specified by axes.
 
         Raises:
@@ -206,7 +206,7 @@ class RandomRotation90(tfm.Transform):
             entries (tuple): The sample's entries to apply the rotation to.
         """
         super().__init__()
-        if len(axes) !=2:
+        if len(axes) != 2:
             raise ValueError('axes must be of length two')
 
         self.axes = axes
@@ -236,7 +236,6 @@ class RandomRotation90(tfm.Transform):
 class RandomShift(tfm.Transform):
 
     def __init__(self, shift: typing.Union[int, tuple], axis: typing.Union[int, tuple] = None,
-                 mode: str = 'mirror', fill: float = 0.0,
                  p: float = 1.0, entries=(defs.KEY_IMAGES, defs.KEY_LABELS)):
         """Randomly shifts the sample along axes by a value from the interval [-p * size(axis), +p * size(axis)],
         where p is the percentage of shifting and size(axis) is the size along an axis.
@@ -258,7 +257,7 @@ class RandomShift(tfm.Transform):
         """
         super().__init__()
         if isinstance(shift, int):
-            shape = (shift, )
+            shift = (shift, )
 
         if axis is None:
             axis = tuple(range(len(shift)))

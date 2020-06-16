@@ -1,2 +1,2 @@
 from .indexexpression import IndexExpression
-from .subjectfile import (SubjectFile)
+from .subjectfile import SubjectFile
