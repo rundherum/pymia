@@ -34,7 +34,7 @@ class Distances:
         radiotherapy. `arXiv <https://arxiv.org/abs/1809.04430>`_
         - `Original implementation <https://github.com/deepmind/surface-distance>`_
     """
-    
+
     def __init__(self, prediction, label, spacing):
         """Initializes a new instance of the Distances class."""
 

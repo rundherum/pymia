@@ -483,7 +483,7 @@ class HausdorffDistance(IDistanceMetric):
             return float('inf')
 
         if self.distances.distances_pred_to_gt is not None and len(self.distances.distances_pred_to_gt) > 0:
-            surfel_areas_cum_pred = (np.cumsum(self.distances.surfel_areas_pred) / 
+            surfel_areas_cum_pred = (np.cumsum(self.distances.surfel_areas_pred) /
                                      np.sum(self.distances.surfel_areas_pred))
             idx = np.searchsorted(surfel_areas_cum_pred, self.percentile / 100.0)
             perc_distance_pred_to_gt = self.distances.distances_pred_to_gt[
@@ -623,7 +623,7 @@ class MutualInformation(IConfusionMatrixMetric):
 
         fn_tp = fn + tp
         fp_tp = fp + tp
-        
+
         if fn_tp == 0 or fn_tp / n == 1 or fp_tp == 0 or fp_tp / n == 1:
             warnings.warn('Unable to compute mutual information due to log2 of 0, returning -inf',
                           NotComputableMetricWarning)

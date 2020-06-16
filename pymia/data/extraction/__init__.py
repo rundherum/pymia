@@ -6,4 +6,3 @@ from .extractor import (Extractor, DataExtractor, FilesExtractor, NamesExtractor
                         ImagePropertiesExtractor, PadDataExtractor, ImageShapeExtractor)
 from .selection import (select_indices, NonBlackSelection, SelectionStrategy, ComposeSelection,
                         SubjectSelection, WithForegroundSelection, PercentileSelection, NonConstantSelection)
-

@@ -307,4 +307,3 @@ class Subject2dAssembler(Assembler):
         if '__prediction' in assembled:
             return assembled['__prediction']
         return assembled
-

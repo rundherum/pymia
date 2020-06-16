@@ -177,11 +177,11 @@ class CmdlineExecutor(pymia_fltr.IFilter):
         temp_in = os.path.join(temp_dir, 'in.nii')
         sitk.WriteImage(image, temp_in)
         temp_out = os.path.join(temp_dir, 'out.nii')
-        
+
         cmd = [self.executable_path, temp_in, temp_out]
         if params is not None:
             cmd = cmd + params.arguments
-        
+
         subprocess.run(cmd, check=True)
         out_image = sitk.ReadImage(temp_out, image.GetPixelID())
 
