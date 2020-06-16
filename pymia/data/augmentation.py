@@ -17,15 +17,16 @@ See Also:
 import typing
 
 import numpy as np
-
-import pymia.data.transformation as tfm
 import SimpleITK as sitk
+
+import pymia.data.definition as defs
+import pymia.data.transformation as tfm
 
 
 class RandomCrop(tfm.Transform):
 
-    def __init__(self, shape: typing.Union[int, tuple], axis: typing.Union[int, tuple]=None,
-                 p: float=1.0, entries=('images', 'labels')):
+    def __init__(self, shape: typing.Union[int, tuple], axis: typing.Union[int, tuple] = None,
+                 p: float = 1.0, entries=(defs.KEY_IMAGES, defs.KEY_LABELS)):
         """Randomly crops the sample to the specified shape.
 
         The sample shape must be bigger than the crop shape.
@@ -87,10 +88,10 @@ class RandomCrop(tfm.Transform):
 
 class RandomElasticDeformation(tfm.Transform):
 
-    def __init__(self, num_control_points: int=4, deformation_sigma=15,
-                 interpolators: tuple=(sitk.sitkBSpline, sitk.sitkNearestNeighbor),
-                 spatial_rank: int=2, fill_value: float=0.0,
-                 p: float=0.5, entries=('images', 'labels')):
+    def __init__(self, num_control_points: int = 4, deformation_sigma=15,
+                 interpolators: tuple = (sitk.sitkBSpline, sitk.sitkNearestNeighbor),
+                 spatial_rank: int = 2, fill_value: float = 0.0,
+                 p: float = 0.5, entries=(defs.KEY_IMAGES, defs.KEY_LABELS)):
         """Randomly transforms the sample elastically.
 
         Notes:
@@ -164,7 +165,7 @@ class RandomElasticDeformation(tfm.Transform):
 
 class RandomMirror(tfm.Transform):
 
-    def __init__(self, axis: int=-2, p: float=1.0, entries=('images', 'labels')):
+    def __init__(self, axis: int = -2, p: float = 1.0, entries=(defs.KEY_IMAGES, defs.KEY_LABELS)):
         """Randomly mirrors the sample along a given axis.
 
         Args:
@@ -192,7 +193,7 @@ class RandomMirror(tfm.Transform):
 
 class RandomRotation90(tfm.Transform):
 
-    def __init__(self, axes: typing.Tuple[int]=(-3, -2), p: float=1.0, entries=('images', 'labels')):
+    def __init__(self, axes: typing.Tuple[int]=(-3, -2), p: float = 1.0, entries=(defs.KEY_IMAGES, defs.KEY_LABELS)):
         """Randomly rotates the sample 90, 180, or 270 degrees in the plane specified by axes.
 
         Raises:
@@ -234,9 +235,9 @@ class RandomRotation90(tfm.Transform):
 
 class RandomShift(tfm.Transform):
 
-    def __init__(self, shift: typing.Union[int, tuple], axis: typing.Union[int, tuple]=None,
-                 mode: str='mirror', fill: float=0.0,
-                 p: float=1.0, entries=('images', 'labels')):
+    def __init__(self, shift: typing.Union[int, tuple], axis: typing.Union[int, tuple] = None,
+                 mode: str = 'mirror', fill: float = 0.0,
+                 p: float = 1.0, entries=(defs.KEY_IMAGES, defs.KEY_LABELS)):
         """Randomly shifts the sample along axes by a value from the interval [-p * size(axis), +p * size(axis)],
         where p is the percentage of shifting and size(axis) is the size along an axis.
 

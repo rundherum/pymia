@@ -7,6 +7,7 @@ except ImportError:
 
 
 import numpy as np
+import pymia.data.definition as defs
 import pymia.evaluation.metric as metric
 import pymia.evaluation.evaluator as eval_
 import pymia.evaluation.writer as writer
@@ -31,11 +32,11 @@ def main(hdf_file: str):
         pass
 
         for validation_batch in validation_dataset:
-            assembled = subject_assembler.get_assembled_subject(sample['subject_index'])
-            prediction_image = pymia_conv.NumpySimpleITKImageBridge.convert(assembled, sample['properties'])
+            assembled = subject_assembler.get_assembled_subject(sample[defs.KEY_SUBJECT_INDEX])
+            prediction_image = pymia_conv.NumpySimpleITKImageBridge.convert(assembled, sample[defs.KEY_PROPERTIES])
 
             # evaluate the "prediction" against the ground truth
-            evaluator.evaluate(prediction_image, label_image, sample['subject'])
+            evaluator.evaluate(prediction_image, label_image, sample[defs.KEY_SUBJECT])
 
         # calculate mean and standard deviation of each metric on the validation dataset
         results = writer.StatisticsAggregator(functions={'MEAN': np.mean, 'STD': np.std}).calculate(evaluator.results)

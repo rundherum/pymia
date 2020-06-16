@@ -4,8 +4,8 @@ import os
 import h5py
 import numpy as np
 
+import pymia.data.definition as defs
 import pymia.data.indexexpression as expr
-import pymia.data.definition as df
 
 
 class Reader(metaclass=abc.ABCMeta):
@@ -61,7 +61,7 @@ class Reader(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def read(self, entry: str, index: expr.IndexExpression=None):
+    def read(self, entry: str, index: expr.IndexExpression = None):
         """Read a dataset entry.
 
         Args:
@@ -99,7 +99,7 @@ class Reader(metaclass=abc.ABCMeta):
 class Hdf5Reader(Reader):
     """Represents the dataset reader for HDF5 files."""
 
-    def __init__(self, file_path: str, category='images') -> None:
+    def __init__(self, file_path: str, category=defs.KEY_IMAGES) -> None:
         """Initializes a new instance.
 
         Args:
@@ -111,16 +111,16 @@ class Hdf5Reader(Reader):
         self.category = category
 
     def get_subject_entries(self) -> list:
-        group = df.DATA_PLACEHOLDER.format(self.category)
+        group = defs.DATA_PLACEHOLDER.format(self.category)
         return ['{}/{}'.format(group, k) for k in sorted(self.h5[group].keys())]
 
     def get_shape(self, entry: str) -> list:
         return self.h5[entry].shape
 
     def get_subjects(self) -> list:
-        return self.read(df.SUBJECT)
+        return self.read(defs.SUBJECT)
 
-    def read(self, entry: str, index: expr.IndexExpression=None):
+    def read(self, entry: str, index: expr.IndexExpression = None):
         if index is None:
             data = self.h5[entry][()]  # need () instead of util.IndexExpression(None) [which is equal to slice(None)]
         else:
@@ -144,7 +144,7 @@ class Hdf5Reader(Reader):
             self.h5 = None
 
 
-def get_reader(file_path: str, direct_open: bool=False) -> Reader:
+def get_reader(file_path: str, direct_open: bool = False) -> Reader:
     """ Get the dataset reader corresponding to the file extension.
 
     Args:

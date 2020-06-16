@@ -2,6 +2,7 @@ import argparse
 
 import torch.utils.data as torch_data
 
+import pymia.data.definition as defs
 import pymia.data.extraction as extr
 import pymia.data.backends.pytorch as pymia_torch
 
@@ -17,7 +18,9 @@ def main(hdf_file: str):
                                        extr.IndexingExtractor(do_pickle=True)])
 
     direct_extractor = extr.ComposeExtractor([extr.SubjectExtractor(),
-                                              extr.FilesExtractor(categories=('images', 'labels', 'mask', 'numerical', 'sex')),
+                                              extr.FilesExtractor(categories=(defs.KEY_IMAGES,
+                                                                              defs.KEY_LABELS,
+                                                                              'mask', 'numerical', 'sex')),
                                               extr.ImagePropertiesExtractor()])
 
     dataset = pymia_torch.PymiaTorchDataset(hdf_file, extr.SliceIndexing(), extractor)
@@ -26,8 +29,8 @@ def main(hdf_file: str):
 
     for i, sample in enumerate(loader):
 
-        for j in range(len(sample['subject_index'])):
-            subject_index = sample['subject_index'][j].item()
+        for j in range(len(sample[defs.KEY_SUBJECT_INDEX])):
+            subject_index = sample[defs.KEY_SUBJECT_INDEX][j].item()
             extracted_sample = dataset.direct_extract(direct_extractor, subject_index)
 
 

@@ -4,6 +4,7 @@ import typing
 
 import numpy as np
 
+import pymia.data.definition as defs
 import pymia.data.transformation as tfm
 
 
@@ -33,7 +34,7 @@ def default_sample_fn(params: dict):
     idx = params['batch_idx']
 
     data = params[key]
-    index_expr = batch['index_expr'][idx]
+    index_expr = batch[defs.KEY_INDEX_EXPR][idx]
     if isinstance(index_expr, bytes):
         # is pickled
         index_expr = pickle.loads(index_expr)
@@ -70,9 +71,9 @@ class SubjectAssembler(Assembler):
         return self._subjects_ready
 
     def add_batch(self, to_assemble, batch: dict, last_batch=False):
-        if 'subject_index' not in batch:
+        if defs.KEY_SUBJECT_INDEX not in batch:
             raise ValueError('SubjectAssembler requires "subject_index" to be extracted (use IndexingExtractor)')
-        if 'index_expr' not in batch:
+        if defs.KEY_INDEX_EXPR not in batch:
             raise ValueError('SubjectAssembler requires "index_expr" to be extracted (use IndexingExtractor)')
         if 'shape' not in batch:
             raise ValueError('SubjectAssembler requires "shape" to be extracted (use ImageShapeExtractor)')
@@ -80,7 +81,7 @@ class SubjectAssembler(Assembler):
         if not isinstance(to_assemble, dict):
             to_assemble = {'__prediction': to_assemble}
 
-        for idx in range(len(batch['subject_index'])):
+        for idx in range(len(batch[defs.KEY_SUBJECT_INDEX])):
             self.add_sample(to_assemble, batch, idx)
 
         if last_batch:
@@ -92,7 +93,7 @@ class SubjectAssembler(Assembler):
 
     def add_sample(self, to_assemble, batch, idx):
 
-        subject_index = batch['subject_index'][idx]
+        subject_index = batch[defs.KEY_SUBJECT_INDEX][idx]
 
         # initialize subject
         if subject_index not in self.predictions and not self.predictions:
@@ -155,17 +156,17 @@ class TransformSampleFn:
         batch = params['batch']
         idx = params['batch_idx']
 
-        index_expr = batch['index_expr'][idx]
+        index_expr = batch[defs.KEY_INDEX_EXPR][idx]
         if isinstance(index_expr, bytes):
             # is pickled
             index_expr = pickle.loads(index_expr)
 
         temp = tfm.raise_error_if_entry_not_extracted
         tfm.raise_error_entry_not_extracted = False
-        ret = self.transform({key: params[key], 'index_expr': index_expr})
+        ret = self.transform({key: params[key], defs.KEY_INDEX_EXPR: index_expr})
         tfm.raise_error_entry_not_extracted = temp
 
-        return ret[key], ret['index_expr']
+        return ret[key], ret[defs.KEY_INDEX_EXPR]
 
 
 class PlaneSubjectAssembler(Assembler):
@@ -180,7 +181,7 @@ class PlaneSubjectAssembler(Assembler):
         return self._subjects_ready
 
     def add_batch(self, to_assemble, batch: dict, last_batch=False):
-        if 'index_expr' not in batch:
+        if defs.KEY_INDEX_EXPR not in batch:
             raise ValueError('SubjectAssembler requires "index_expr" to be extracted (use IndexingExtractor)')
         if 'shape' not in batch:
             raise ValueError('SubjectAssembler requires "shape" to be extracted (use ImageShapeExtractor)')
@@ -188,8 +189,8 @@ class PlaneSubjectAssembler(Assembler):
         if not isinstance(to_assemble, dict):
             to_assemble = {'__prediction': to_assemble}
 
-        for idx in range(len(batch['index_expr'])):
-            index_expr = batch['index_expr'][idx]
+        for idx in range(len(batch[defs.KEY_INDEX_EXPR])):
+            index_expr = batch[defs.KEY_INDEX_EXPR][idx]
             if isinstance(index_expr, bytes):
                 # is pickled
                 index_expr = pickle.loads(index_expr)

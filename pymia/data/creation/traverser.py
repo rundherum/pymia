@@ -6,6 +6,7 @@ import numpy as np
 from pymia.data import subjectfile as subj
 import pymia.data.transformation as tfm
 import pymia.data.conversion as conv
+import pymia.data.definition as defs
 from . import callback as cb
 from . import fileloader as load
 
@@ -13,8 +14,8 @@ from . import fileloader as load
 class Traverser(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
-    def traverse(self, files: list, loader: load.Load, callbacks: t.List[cb.Callback]=None,
-                 transform: tfm.Transform=None):
+    def traverse(self, files: list, loader: load.Load, callbacks: t.List[cb.Callback] = None,
+                 transform: tfm.Transform = None):
         pass
 
 
@@ -24,7 +25,7 @@ def default_concat(data: t.List[np.ndarray]) -> np.ndarray:
 
 class SubjectFileTraverser(Traverser):
 
-    def __init__(self, categories: t.Union[str, t.Tuple[str, ...]]=None):
+    def __init__(self, categories: t.Union[str, t.Tuple[str, ...]] = None):
         """Initializes a new instance of the SubjectFileTraverser class.
 
         Args:
@@ -35,8 +36,8 @@ class SubjectFileTraverser(Traverser):
             categories = (categories, )
         self.categories = categories
 
-    def traverse(self, subject_files: t.List[subj.SubjectFile], load=load.LoadDefault(), callback: cb.Callback=None,
-                 transform: tfm.Transform=None, concat_fn=default_concat):
+    def traverse(self, subject_files: t.List[subj.SubjectFile], load=load.LoadDefault(), callback: cb.Callback = None,
+                 transform: tfm.Transform = None, concat_fn=default_concat):
         if len(subject_files) == 0:
             raise ValueError('No files')
         if not isinstance(subject_files[0], subj.SubjectFile):
@@ -55,7 +56,7 @@ class SubjectFileTraverser(Traverser):
 
         # looping over the subject files and calling callbacks
         for subject_index, subject_file in enumerate(subject_files):
-            transform_params = {'subject_index': subject_index}
+            transform_params = {defs.KEY_SUBJECT_INDEX: subject_index}
             for category in self.categories:
 
                 category_list = []

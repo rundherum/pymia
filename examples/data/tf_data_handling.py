@@ -2,6 +2,7 @@ import argparse
 
 import tensorflow as tf
 
+import pymia.data.definition as defs
 import pymia.data.extraction as extr
 import pymia.data.backends.tensorflow as pymia_tf
 
@@ -12,21 +13,25 @@ def main(hdf_file: str):
                                        extr.SubjectExtractor()])
 
     direct_extractor = extr.ComposeExtractor([extr.SubjectExtractor(),
-                                              extr.FilesExtractor(categories=('images', 'labels', 'mask', 'numerical', 'sex')),
+                                              extr.FilesExtractor(categories=(defs.KEY_IMAGES,
+                                                                              defs.KEY_LABELS,
+                                                                              'mask', 'numerical', 'sex')),
                                               extr.ImagePropertiesExtractor()])
 
     data_source = extr.dataset.PymiaDatasource(hdf_file, extr.SliceIndexing(), extractor)
 
     gen_fn = pymia_tf.get_tf_generator(data_source)
     dataset = tf.data.Dataset.from_generator(generator=gen_fn,
-                                             output_types={'images': tf.float32, 'subject_index': tf.int64, 'subject': tf.string})
+                                             output_types={defs.KEY_IMAGES: tf.float32,
+                                                           defs.KEY_SUBJECT_INDEX: tf.int64,
+                                                           defs.KEY_SUBJECT: tf.string})
 
     dataset = dataset.batch(2)
 
     for i, sample in enumerate(dataset.as_numpy_iterator()):
 
-        for j in range(len(sample['subject_index'])):
-            subject_index = sample['subject_index'][j].item()
+        for j in range(len(sample[defs.KEY_SUBJECT_INDEX])):
+            subject_index = sample[defs.KEY_SUBJECT_INDEX][j].item()
             extracted_sample = data_source.direct_extract(direct_extractor, subject_index)
 
 

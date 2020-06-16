@@ -6,7 +6,7 @@ import numpy as np
 import SimpleITK as sitk
 
 import pymia.data.conversion as conv
-import pymia.data.definition as df
+import pymia.data.definition as defs
 import pymia.data.indexexpression as expr
 from . import reader as rd
 
@@ -37,7 +37,7 @@ class NamesExtractor(Extractor):
     The names are of type str.
     """
 
-    def __init__(self, cache: bool=True, categories=('images', 'labels')) -> None:
+    def __init__(self, cache: bool=True, categories=(defs.KEY_IMAGES, defs.KEY_LABELS)) -> None:
         super().__init__()
         self.cache = cache
         self.cached_result = None
@@ -56,7 +56,7 @@ class NamesExtractor(Extractor):
     def _extract(self, reader: rd.Reader):
         d = {}
         for category in self.categories:
-            d['{}_names'.format(category)] = reader.read(df.NAMES_PLACEHOLDER.format(category))
+            d['{}_names'.format(category)] = reader.read(defs.NAMES_PLACEHOLDER.format(category))
         return d
 
 
@@ -67,9 +67,9 @@ class SubjectExtractor(Extractor):
     """
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
-        extracted['subject_index'] = params['subject_index']
-        subject_index_expr = expr.IndexExpression(params['subject_index'])
-        extracted['subject'] = reader.read(df.SUBJECT, subject_index_expr)
+        extracted[defs.KEY_SUBJECT_INDEX] = params[defs.KEY_SUBJECT_INDEX]
+        subject_index_expr = expr.IndexExpression(params[defs.KEY_SUBJECT_INDEX])
+        extracted[defs.SUBJECT] = reader.read(defs.SUBJECT, subject_index_expr)
 
 
 class IndexingExtractor(Extractor):
@@ -83,12 +83,12 @@ class IndexingExtractor(Extractor):
         self.do_pickle = do_pickle
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
-        extracted['subject_index'] = params['subject_index']
-        index_expression = params['index_expr']
+        extracted[defs.KEY_SUBJECT_INDEX] = params[defs.KEY_SUBJECT_INDEX]
+        index_expression = params[defs.KEY_INDEX_EXPR]
         if self.do_pickle:
             # pickle to prevent from problems since own class
             index_expression = pickle.dumps(index_expression)
-        extracted['index_expr'] = index_expression
+        extracted[defs.KEY_INDEX_EXPR] = index_expression
 
 
 class ImagePropertiesExtractor(Extractor):
@@ -102,12 +102,12 @@ class ImagePropertiesExtractor(Extractor):
         self.do_pickle = do_pickle
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
-        subject_index_expr = expr.IndexExpression(params['subject_index'])
+        subject_index_expr = expr.IndexExpression(params[defs.KEY_SUBJECT_INDEX])
 
-        shape = reader.read(df.INFO_SHAPE, subject_index_expr).tolist()
-        direction = reader.read(df.INFO_DIRECTION, subject_index_expr).tolist()
-        spacing = reader.read(df.INFO_SPACING, subject_index_expr).tolist()
-        origin = reader.read(df.INFO_ORIGIN, subject_index_expr).tolist()
+        shape = reader.read(defs.INFO_SHAPE, subject_index_expr).tolist()
+        direction = reader.read(defs.INFO_DIRECTION, subject_index_expr).tolist()
+        spacing = reader.read(defs.INFO_SPACING, subject_index_expr).tolist()
+        origin = reader.read(defs.INFO_ORIGIN, subject_index_expr).tolist()
 
         # todo: everything in memory?
         image = sitk.Image(shape, sitk.sitkUInt8)
@@ -120,7 +120,7 @@ class ImagePropertiesExtractor(Extractor):
         if self.do_pickle:
             # pickle to prevent from problems since own class
             img_properties = pickle.dumps(img_properties)
-        extracted['properties'] = img_properties
+        extracted[defs.KEY_PROPERTIES] = img_properties
 
 
 class FilesExtractor(Extractor):
@@ -129,17 +129,17 @@ class FilesExtractor(Extractor):
     The file paths are of type str.
     """
 
-    def __init__(self, cache: bool=True, categories=('images', 'labels')) -> None:
+    def __init__(self, cache: bool = True, categories=(defs.KEY_IMAGES, defs.KEY_LABELS)) -> None:
         super().__init__()
         self.cache = cache
         self.cached_file_root = None
         self.categories = categories
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
-        subject_index_expr = expr.IndexExpression(params['subject_index'])
+        subject_index_expr = expr.IndexExpression(params[defs.KEY_SUBJECT_INDEX])
 
         if not self.cache or self.cached_file_root is None:
-            file_root = reader.read(df.FILES_ROOT)
+            file_root = reader.read(defs.FILES_ROOT)
             self.cached_file_root = file_root
         else:
             file_root = self.cached_file_root
@@ -147,14 +147,14 @@ class FilesExtractor(Extractor):
         extracted['file_root'] = file_root
 
         for category in self.categories:
-            extracted['{}_files'.format(category)] = reader.read(df.FILES_PLACEHOLDER.format(category),
+            extracted['{}_files'.format(category)] = reader.read(defs.FILES_PLACEHOLDER.format(category),
                                                                  subject_index_expr)
 
 
 class SelectiveDataExtractor(Extractor):
     """Extracts data of a given category selectively."""
 
-    def __init__(self, selection=None, category: str='labels') -> None:
+    def __init__(self, selection=None, category: str = defs.KEY_LABELS) -> None:
         """Initializes a new instance of the SelectiveDataExtractor class.
 
         Args:
@@ -178,14 +178,14 @@ class SelectiveDataExtractor(Extractor):
             entries = reader.get_subject_entries()
             self.entry_base_names = [entry.rsplit('/', maxsplit=1)[1] for entry in entries]
 
-        if not reader.has(df.DATA_PLACEHOLDER.format(self.category)):
+        if not reader.has(defs.DATA_PLACEHOLDER.format(self.category)):
             raise ValueError('SelectiveDataExtractor requires {} to exist'.format(self.category))
 
-        subject_index = params['subject_index']
-        index_expr = params['index_expr']
+        subject_index = params[defs.KEY_SUBJECT_INDEX]
+        index_expr = params[defs.KEY_INDEX_EXPR]
 
         base_name = self.entry_base_names[subject_index]
-        data = reader.read('{}/{}'.format(df.DATA_PLACEHOLDER.format(self.category), base_name), index_expr)
+        data = reader.read('{}/{}'.format(defs.DATA_PLACEHOLDER.format(self.category), base_name), index_expr)
         label_names = extracted['{}_names'.format(self.category)]  # type: list
 
         if self.selection is None:
@@ -198,7 +198,7 @@ class SelectiveDataExtractor(Extractor):
 class RandomDataExtractor(Extractor):
     """Extracts data of a given category randomly."""
 
-    def __init__(self, selection=None, category: str='labels') -> None:
+    def __init__(self, selection=None, category: str = defs.KEY_LABELS) -> None:
         """Initializes a new instance of the RandomDataExtractor class.
 
         Args:
@@ -223,14 +223,14 @@ class RandomDataExtractor(Extractor):
             entries = reader.get_subject_entries()
             self.entry_base_names = [entry.rsplit('/', maxsplit=1)[1] for entry in entries]
 
-        if not reader.has(df.DATA_PLACEHOLDER.format(self.category)):
+        if not reader.has(defs.DATA_PLACEHOLDER.format(self.category)):
             raise ValueError('SelectiveDataExtractor requires {} to exist'.format(self.category))
 
-        subject_index = params['subject_index']
-        index_expr = params['index_expr']
+        subject_index = params[defs.KEY_SUBJECT_INDEX]
+        index_expr = params[defs.KEY_INDEX_EXPR]
 
         base_name = self.entry_base_names[subject_index]
-        data = reader.read('{}/{}'.format(df.DATA_PLACEHOLDER.format(self.category), base_name), index_expr)
+        data = reader.read('{}/{}'.format(defs.DATA_PLACEHOLDER.format(self.category), base_name), index_expr)
         label_names = extracted['{}_names'.format(self.category)]  # type: list
 
         if self.selection is None:
@@ -244,14 +244,14 @@ class RandomDataExtractor(Extractor):
 
 class ImageShapeExtractor(Extractor):
 
-    def __init__(self, numpy_format: bool=True) -> None:
+    def __init__(self, numpy_format: bool = True) -> None:
         super().__init__()
         self.numpy_format = numpy_format
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
-        subject_index_expr = expr.IndexExpression(params['subject_index'])
+        subject_index_expr = expr.IndexExpression(params[defs.KEY_SUBJECT_INDEX])
 
-        shape = reader.read(df.INFO_SHAPE, subject_index_expr)
+        shape = reader.read(defs.INFO_SHAPE, subject_index_expr)
         if self.numpy_format:
             tmp = shape[0]
             shape[0] = shape[-1]
@@ -262,7 +262,7 @@ class ImageShapeExtractor(Extractor):
 
 class DataExtractor(Extractor):
 
-    def __init__(self, categories=('images',), ignore_indexing: bool=False) -> None:
+    def __init__(self, categories=(defs.KEY_IMAGES, ), ignore_indexing: bool = False) -> None:
         super().__init__()
         self.categories = categories
         self.ignore_indexing = ignore_indexing
@@ -273,15 +273,15 @@ class DataExtractor(Extractor):
             entries = reader.get_subject_entries()
             self.entry_base_names = [entry.rsplit('/', maxsplit=1)[1] for entry in entries]
 
-        subject_index = params['subject_index']
-        index_expr = params['index_expr']
+        subject_index = params[defs.KEY_SUBJECT_INDEX]
+        index_expr = params[defs.KEY_INDEX_EXPR]
 
         base_name = self.entry_base_names[subject_index]
         for category in self.categories:
             if self.ignore_indexing:
-                data = reader.read('{}/{}'.format(df.DATA_PLACEHOLDER.format(category), base_name))
+                data = reader.read('{}/{}'.format(defs.DATA_PLACEHOLDER.format(category), base_name))
             else:
-                data = reader.read('{}/{}'.format(df.DATA_PLACEHOLDER.format(category), base_name), index_expr)
+                data = reader.read('{}/{}'.format(defs.DATA_PLACEHOLDER.format(category), base_name), index_expr)
             extracted[category] = data
 
 
@@ -305,7 +305,7 @@ class PadDataExtractor(Extractor):
         self.index_diffs = index_diffs
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
-        index_expr = params['index_expr']  # type: expr.IndexExpression
+        index_expr = params[defs.KEY_INDEX_EXPR]  # type: expr.IndexExpression
 
         # Make sure all indexing is done with slices (Example: (16,) will be changed to (slice(16, 17, None),) which
         # is equivalent), otherwise the following steps will be wrong; .
@@ -323,7 +323,7 @@ class PadDataExtractor(Extractor):
         padded_index_expr = expr.IndexExpression(padded_indexing.tolist())
 
         padded_params = params.copy()
-        padded_params['index_expr'] = padded_index_expr
+        padded_params[defs.KEY_INDEX_EXPR] = padded_index_expr
         self.extractor.extract(reader, padded_params, extracted)
 
         categories = self.extractor.categories if hasattr(self.extractor, 'categories') else [self.extractor.category]

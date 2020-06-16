@@ -6,6 +6,7 @@ import numpy as np
 
 import pymia.data as data
 import pymia.data.conversion as conv
+import pymia.data.definition as defs
 import pymia.data.extraction as extr
 
 
@@ -17,7 +18,9 @@ def main(hdf_file: str):
                                        extr.DataExtractor(('sex', ), ignore_indexing=True),
                                        extr.DataExtractor(('mask', ), ignore_indexing=False),
                                        extr.SubjectExtractor(),
-                                       extr.FilesExtractor(categories=('images', 'labels', 'mask', 'numerical', 'sex')),
+                                       extr.FilesExtractor(categories=(defs.KEY_IMAGES,
+                                                                       defs.KEY_LABELS,
+                                                                       'mask', 'numerical', 'sex')),
                                        extr.IndexingExtractor(),
                                        extr.ImagePropertiesExtractor()])
     dataset = extr.PymiaDatasource(hdf_file, extr.SliceIndexing(), extractor)
@@ -25,7 +28,7 @@ def main(hdf_file: str):
     for i in range(len(dataset)):
         item = dataset[i]
 
-        index_expr = item['index_expr']  # type: data.IndexExpression
+        index_expr = item[defs.KEY_INDEX_EXPR]  # type: data.IndexExpression
         root = item['file_root']
 
         image = None  # type: sitk.Image
@@ -34,13 +37,13 @@ def main(hdf_file: str):
             np_img = sitk.GetArrayFromImage(image).astype(np.float32)
             np_img = (np_img - np_img.mean()) / np_img.std()
             np_slice = np_img[index_expr.expression]
-            if (np_slice != item['images'][..., i]).any():
+            if (np_slice != item[defs.KEY_IMAGES][..., i]).any():
                 raise ValueError('slice not equal')
 
         # for any image
         image_properties = conv.ImageProperties(image)
 
-        if image_properties != item['properties']:
+        if image_properties != item[defs.KEY_PROPERTIES]:
             raise ValueError('image properties not equal')
 
         for file in item['labels_files']:
@@ -48,7 +51,7 @@ def main(hdf_file: str):
             np_img = sitk.GetArrayFromImage(image)
             np_img = np.expand_dims(np_img, axis=-1)  # due to the convention of having the last dim as number of channels
             np_slice = np_img[index_expr.expression]
-            if (np_slice != item['labels']).any():
+            if (np_slice != item[defs.KEY_LABELS]).any():
                 raise ValueError('slice not equal')
 
         for file in item['mask_files']:

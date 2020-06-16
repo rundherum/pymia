@@ -1,5 +1,6 @@
 import torch.utils.data.dataset as data
 
+import pymia.data.definition as defs
 import pymia.data.transformation as tfm
 import pymia.data.indexexpression as expr
 from . import reader as rd
@@ -9,8 +10,12 @@ from . import extractor as extr
 
 class PymiaDatasource:
 
-    def __init__(self, dataset_path: str, indexing_strategy: idx.IndexingStrategy=None, extractor: extr.Extractor=None,
-                 transform: tfm.Transform=None, subject_subset: list=None, init_reader_once=True) -> None:
+    def __init__(self, dataset_path: str,
+                 indexing_strategy: idx.IndexingStrategy = None,
+                 extractor: extr.Extractor = None,
+                 transform: tfm.Transform = None,
+                 subject_subset: list = None,
+                 init_reader_once: bool = True) -> None:
         self.dataset_path = dataset_path
         self.indexing_strategy = None
         self.extractor = extractor
@@ -56,12 +61,12 @@ class PymiaDatasource:
         with rd.get_reader(self.dataset_path) as reader:
             return reader.get_subjects()
 
-    def direct_extract(self, extractor: extr.Extractor, subject_index: int, index_expr: expr.IndexExpression=None,
-                       transform: tfm.Transform=None):
+    def direct_extract(self, extractor: extr.Extractor, subject_index: int, index_expr: expr.IndexExpression = None,
+                       transform: tfm.Transform = None):
         if index_expr is None:
             index_expr = expr.IndexExpression()
 
-        params = {'subject_index': subject_index, 'index_expr': index_expr}
+        params = {defs.KEY_SUBJECT_INDEX: subject_index, defs.KEY_INDEX_EXPR: index_expr}
         extracted = {}
 
         if not self.init_reader_once:

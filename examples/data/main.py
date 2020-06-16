@@ -4,6 +4,7 @@ import numpy as np
 import torch.utils.data as torch_data
 
 import pymia.data.conversion as pymia_conv
+import pymia.data.definition as pymia_defs
 import pymia.data.extraction as pymia_extr
 import pymia.data.assembler as pymia_asmbl
 import pymia.data.backends.pytorch as pymia_torch
@@ -90,19 +91,20 @@ def main(hdf_file: str):
             # feed_dict = batch_to_feed_dict(x, y, batch, False)  # e.g. for TensorFlow
             # test model, e.g.:
             # prediction = sess.run(y_model, feed_dict=feed_dict)
-            prediction = np.stack(batch['labels'], axis=0)  # we use the labels as predictions such that we can validate the assembler
+            prediction = np.stack(batch[pymia_defs.KEY_LABELS], axis=0)  # we use the labels as predictions such that we can validate the assembler
             subject_assembler.add_batch(prediction, batch)
 
         # evaluate all test images
         for subject_idx in list(subject_assembler.predictions.keys()):
             # convert prediction and labels back to SimpleITK images
             sample = dataset.direct_extract(eval_extractor, subject_idx)
-            label_image = pymia_conv.NumpySimpleITKImageBridge.convert(sample['labels'],
-                                                                       sample['properties'])
+            label_image = pymia_conv.NumpySimpleITKImageBridge.convert(sample[pymia_defs.KEY_LABELS],
+                                                                       sample[pymia_defs.KEY_PROPERTIES])
 
-            assembled = subject_assembler.get_assembled_subject(sample['subject_index'])
-            prediction_image = pymia_conv.NumpySimpleITKImageBridge.convert(assembled, sample['properties'])
-            evaluator.evaluate(prediction_image, label_image, sample['subject'])  # evaluate prediction
+            assembled = subject_assembler.get_assembled_subject(sample[pymia_defs.KEY_SUBJECT_INDEX])
+            prediction_image = pymia_conv.NumpySimpleITKImageBridge.convert(assembled,
+                                                                            sample[pymia_defs.KEY_PROPERTIES])
+            evaluator.evaluate(prediction_image, label_image, sample[pymia_defs.KEY_SUBJECT])  # evaluate prediction
 
 
 if __name__ == '__main__':

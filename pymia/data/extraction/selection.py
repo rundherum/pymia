@@ -2,6 +2,7 @@ import abc
 
 import numpy as np
 
+import pymia.data.definition as defs
 from . import dataset as ds
 
 
@@ -22,7 +23,7 @@ class NonConstantSelection(SelectionStrategy):
         self.loop_axis = loop_axis
 
     def __call__(self, sample) -> bool:
-        image_data = sample['images']
+        image_data = sample[defs.KEY_IMAGES]
 
         if self.loop_axis is None:
             return not self._all_equal(image_data)
@@ -45,12 +46,12 @@ class NonConstantSelection(SelectionStrategy):
 
 class NonBlackSelection(SelectionStrategy):
 
-    def __init__(self, black_value: float=.0) -> None:
+    def __init__(self, black_value: float = 0.0) -> None:
         # todo: add something to do this for one sequence only, too -> loop over one dim
         self.black_value = black_value
 
     def __call__(self, sample) -> bool:
-        return (sample['images'] > self.black_value).any()
+        return (sample[defs.KEY_IMAGES] > self.black_value).any()
 
     def __repr__(self) -> str:
         return '{}({})'.format(self.__class__.__name__, self.black_value)
@@ -63,7 +64,7 @@ class PercentileSelection(SelectionStrategy):
         self.percentile = percentile
 
     def __call__(self, sample) -> bool:
-        image_data = sample['images']
+        image_data = sample[defs.KEY_IMAGES]
 
         percentile_value = np.percentile(image_data, self.percentile)
         return (image_data >= percentile_value).all()
@@ -75,7 +76,7 @@ class PercentileSelection(SelectionStrategy):
 class WithForegroundSelection(SelectionStrategy):
 
     def __call__(self, sample) -> bool:
-        return (sample['labels']).any()
+        return (sample[defs.KEY_LABELS]).any()
 
 
 class SubjectSelection(SelectionStrategy):
@@ -89,7 +90,7 @@ class SubjectSelection(SelectionStrategy):
         self.subjects = subjects
 
     def __call__(self, sample) -> bool:
-        return sample['subject'] in self.subjects or sample['subject_index'] in self.subjects
+        return sample[defs.KEY_SUBJECT] in self.subjects or sample[defs.KEY_SUBJECT_INDEX] in self.subjects
 
     def __repr__(self) -> str:
         return '{} ({})'.format(self.__class__.__name__, ','.join(self.subjects))
