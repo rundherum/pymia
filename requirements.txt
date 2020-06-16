@@ -1,7 +1,4 @@
 h5py
-matplotlib
 numpy
 SimpleITK
-pyyaml
 scipy
-torch
