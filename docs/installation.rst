@@ -30,7 +30,16 @@ pymia requires Python 3.6 (or higher) and depends on the following packages:
  - `SimpleITK <http://www.simpleitk.org/>`_
 
 Note that not all dependencies are installed directly but only required when certain modules are used.
-Upon loading a module, pymia will check if the dependencies are fulfilled.
+Upon loading a module, pymia will check if the dependencies are fulfilled. For instance, if you want to use the
+:py:mod:`data` package, you need to either install PyTorch by
+
+    - :bash:`pip install torch`
+
+or TensorFlow by
+
+    - :bash:`pip install tensorflow`
+
+depending on your preferred deep learning framework.
 
 Building the documentation
 --------------------------
