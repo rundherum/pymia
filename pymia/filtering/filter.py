@@ -1,8 +1,4 @@
-"""This module provides classes to set up a filtering pipeline.
-
-All classes in the :mod:`pymia.filtering` package implement the :class:`pymia.filtering.filter.IFilter` interface,
-and can be used to set up a pipeline with the :class:`pymia.filtering.filter.FilterPipeline`.
-"""
+"""This module provides classes to set up a filtering pipeline."""
 import abc
 import typing
 
@@ -25,11 +21,11 @@ class IFilter(abc.ABC):
         """Executes a filter on an image.
 
         Args:
-            image: The image to filter.
-            params: The filter parameters.
+            image (sitk.Image): The image to filter.
+            params (IFilterParams): The filter parameters.
 
         Returns:
-            The filtered image.
+            sitk.Image: The filtered image.
         """
         raise NotImplementedError()
 
@@ -41,7 +37,7 @@ class FilterPipeline:
         """Initializes a new instance of the FilterPipeline class.
 
         Args:
-            filters: The filters of the pipeline.
+            filters (list of IFilter): The filters of the pipeline.
         """
         self.filters = []  # holds the `IFilter`s
         self.params = []  # holds image-specific parameters
@@ -54,8 +50,8 @@ class FilterPipeline:
         """Adds a filter to the pipeline.
 
         Args:
-            filter_: A filter.
-            params: The filter parameters.
+            filter_ (IFilter): A filter.
+            params (IFilterParams): The filter parameters.
         """
         self.filters.append(filter_)
         self.params.append(params)  # params must have the same length as filters
@@ -66,8 +62,8 @@ class FilterPipeline:
         Use this function to update the parameters of a filter to be specific to the image to be filtered.
 
         Args:
-            params: The parameter(s).
-            filter_index: The filter's index the parameters belong to.
+            params (IFilterParams): The parameter(s).
+            filter_index (int): The filter's index the parameters belong to.
         """
         self.params[filter_index] = params
 
@@ -75,10 +71,10 @@ class FilterPipeline:
         """Executes the filter pipeline on an image.
 
         Args:
-            image: The image to filter.
+            image (sitk.Image): The image to filter.
 
         Returns:
-            The filtered image.
+            sitk.Image: The filtered image.
         """
         for param_index, filter_ in enumerate(self.filters):
             image = filter_.execute(image, self.params[param_index])

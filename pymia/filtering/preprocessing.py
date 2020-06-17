@@ -1,4 +1,6 @@
-"""Enables the enhancement of images before their use with other algorithms."""
+"""The pre-processing module provides filters for image pre-processing."""
+import typing
+
 import SimpleITK as sitk
 
 import pymia.filtering.filter as pymia_fltr
@@ -14,6 +16,7 @@ class BiasFieldCorrectorParams(pymia_fltr.IFilterParams):
             mask (sitk.Image): A mask image (0=background; 1=mask).
 
         Examples:
+
         To generate a default mask use Otsu's thresholding:
 
         >>> sitk.OtsuThreshold(image, 0, 1, 200)
@@ -24,27 +27,26 @@ class BiasFieldCorrectorParams(pymia_fltr.IFilterParams):
 class BiasFieldCorrector(pymia_fltr.IFilter):
     """Represents a bias field correction filter."""
 
-    def __init__(self, shrink_factor=1, convergence_threshold=0.001, max_iterations=(50, 50, 50, 50),
-                 fullwidth_at_halfmax=0.15, fiter_noise=0.01, histogram_bins=200, control_points=(4, 4, 4),
-                 spline_order=3):
+    def __init__(self, convergence_threshold: float = 0.001, max_iterations: typing.List[int] = (50, 50, 50, 50),
+                 fullwidth_at_halfmax: float = 0.15, filter_noise: float = 0.01,
+                 histogram_bins: int = 200, control_points: typing.List[int] = (4, 4, 4),
+                 spline_order: int = 3):
         """Initializes a new instance of the BiasFieldCorrector class.
 
         Args:
-            shrink_factor (float): The shrink factor. A higher factor decreases the computational time.
             convergence_threshold (float): The threshold to stop the optimizer.
-            max_iterations (list of int): The maximum number of optimizer iterations at each level.
-            fullwidth_at_halfmax (float): ?
-            fiter_noise (float): Wiener filter noise.
+            max_iterations (typing.List[int]): The maximum number of optimizer iterations at each level.
+            fullwidth_at_halfmax (float): The full width at half maximum.
+            filter_noise (float): Wiener filter noise.
             histogram_bins (int): Number of histogram bins.
-            control_points (list of int): The number of spline control points.
+            control_points (typing.List[int]): The number of spline control points.
             spline_order (int): The spline order.
         """
         super().__init__()
-        self.shrink_factor = shrink_factor
         self.convergence_threshold = convergence_threshold
         self.max_iterations = max_iterations
         self.fullwidth_at_halfmax = fullwidth_at_halfmax
-        self.filter_noise = fiter_noise
+        self.filter_noise = filter_noise
         self.histogram_bins = histogram_bins
         self.control_points = control_points
         self.spline_order = spline_order
@@ -53,7 +55,7 @@ class BiasFieldCorrector(pymia_fltr.IFilter):
         """Executes a bias field correction on an image.
 
         Args:
-            image (sitk.Image): The image.
+            image (sitk.Image): The image to filter.
             params (BiasFieldCorrectorParams): The bias field correction filter parameters.
 
         Returns:
@@ -61,8 +63,6 @@ class BiasFieldCorrector(pymia_fltr.IFilter):
         """
 
         mask = params.mask if params is not None else sitk.OtsuThreshold(image, 0, 1, 200)
-        if self.shrink_factor > 1:
-            raise ValueError('shrinking is not supported yet')
         return sitk.N4BiasFieldCorrection(image, mask, self.convergence_threshold, self.max_iterations,
                                           self.fullwidth_at_halfmax, self.filter_noise, self.histogram_bins,
                                           self.control_points, self.spline_order)
@@ -111,7 +111,7 @@ class GradientAnisotropicDiffusion(pymia_fltr.IFilter):
         """Executes a gradient anisotropic diffusion on an image.
 
         Args:
-            image (sitk.Image): The image.
+            image (sitk.Image): The image to filter.
             params (IFilterParams): The parameters (unused).
 
         Returns:
@@ -148,7 +148,7 @@ class NormalizeZScore(pymia_fltr.IFilter):
         """Executes a z-score normalization on an image.
 
         Args:
-            image (sitk.Image): The image.
+            image (sitk.Image): The image to filter.
             params (IFilterParams): The parameters (unused).
 
         Returns:
@@ -179,12 +179,12 @@ class NormalizeZScore(pymia_fltr.IFilter):
 class RescaleIntensity(pymia_fltr.IFilter):
     """Represents a rescale intensity filter."""
 
-    def __init__(self, min_intensity, max_intensity):
+    def __init__(self, min_intensity: float, max_intensity: float):
         """Initializes a new instance of the RescaleIntensity class.
 
         Args:
-            min_intensity (int): The min intensity value.
-            max_intensity (int): The max intensity value.
+            min_intensity (float): The min intensity value.
+            max_intensity (float): The max intensity value.
         """
         super().__init__()
         self.min_intensity = min_intensity
@@ -194,7 +194,7 @@ class RescaleIntensity(pymia_fltr.IFilter):
         """Executes an intensity rescaling on an image.
 
         Args:
-            image (sitk.Image): The image.
+            image (sitk.Image): The image to filter.
             params (IFilterParams): The parameters (unused).
 
         Returns:
@@ -228,9 +228,9 @@ class HistogramMatcherParams(pymia_fltr.IFilterParams):
 
 
 class HistogramMatcher(pymia_fltr.IFilter):
-    """A method to align the intensity ranges of images."""
+    """Represents a histogram matching filter."""
 
-    def __init__(self, histogram_levels=256, match_points=1, threshold_mean_intensity=True):
+    def __init__(self, histogram_levels: int = 256, match_points: int = 1, threshold_mean_intensity: bool = True):
         """Initializes a new instance of the HistogramMatcher class.
 
         Args:
@@ -247,8 +247,8 @@ class HistogramMatcher(pymia_fltr.IFilter):
         """Matches the image intensity histogram to a reference.
 
         Args:
-            image (sitk.Image): The image.
-            params (HistogramMatcherParams): The parameters.
+            image (sitk.Image): The image to filter.
+            params (HistogramMatcherParams): The filter parameters.
 
         Returns:
             sitk.Image: The filtered image.

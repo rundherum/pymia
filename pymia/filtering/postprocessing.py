@@ -1,7 +1,4 @@
-"""The post-processing module contains classes for image filtering mostly applied after a classification.
-
-Image post-processing aims to alter images such that they depict a desired representation.
-"""
+"""The post-processing module provides filters for image post-processing."""
 import SimpleITK as sitk
 
 import pymia.filtering.filter as pymia_fltr
@@ -14,7 +11,7 @@ class BinaryThreshold(pymia_fltr.IFilter):
         """Initializes a new instance of the BinaryThreshold class.
 
         Args:
-            threshold: The threshold value.
+            threshold (float): The threshold value.
         """
         super().__init__()
         self.threshold = threshold
@@ -27,8 +24,8 @@ class BinaryThreshold(pymia_fltr.IFilter):
         """Executes the binary threshold filter on an image.
 
         Args:
-            image (sitk.Image): The image.
-            params (IFilterParams): The parameters (unused).
+            image (sitk.Image): The image to filter.
+            params (IFilterParams): The filter parameters (unused).
 
         Returns:
             sitk.Image: The filtered image.
@@ -46,7 +43,7 @@ class LargestNConnectedComponents(pymia_fltr.IFilter):
     """
 
     def __init__(self, number_of_components: int = 1, consecutive_component_labels: bool = False):
-        """Initializes a new instance of the LargestNComponents class.
+        """Initializes a new instance of the LargestNConnectedComponents class.
 
         Args:
             number_of_components (int): The number of largest components to extract.
@@ -65,8 +62,8 @@ class LargestNConnectedComponents(pymia_fltr.IFilter):
         """Executes the largest N connected components filter on an image.
 
         Args:
-            image (sitk.Image): The image.
-            params (IFilterParams): The parameters (unused).
+            image (sitk.Image): The image to filter.
+            params (IFilterParams): The filter parameters (unused).
 
         Returns:
             sitk.Image: The filtered image.

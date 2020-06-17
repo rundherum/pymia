@@ -1,11 +1,8 @@
-"""The registration module contains classes for image registration.
-
-Image registration aims to align two images using a particular transformation.
-pymia currently supports multi-modal rigid registration, i.e. align two images of different modalities
-using a rigid transformation (rotation, translation, reflection, or their combination).
+"""The registration module provides classes for image registration.
 
 See Also:
     `ITK Registration <https://itk.org/Doxygen/html/RegistrationPage.html>`_
+
     `ITK Software Guide Registration <https://itk.org/ITKSoftwareGuide/html/Book2/ITKSoftwareGuide-Book2ch3.html>`_
 """
 import abc
@@ -121,8 +118,8 @@ class MultiModalRegistration(pymia_fltr.IFilter):
                  step_size: float = 0.001,
                  number_of_iterations: int = 200,
                  relaxation_factor: float = 0.5,
-                 shrink_factors: [int] = (2, 1, 1),
-                 smoothing_sigmas: [float] = (2, 1, 0),
+                 shrink_factors: typing.List[int] = (2, 1, 1),
+                 smoothing_sigmas: typing.List[float] = (2, 1, 0),
                  sampling_percentage: float = 0.2,
                  sampling_seed: int = sitk.sitkWallClock,
                  resampling_interpolator=sitk.sitkBSpline):
@@ -135,8 +132,8 @@ class MultiModalRegistration(pymia_fltr.IFilter):
             step_size (float): The optimizer's step size. Each step in the optimizer is at least this large.
             number_of_iterations (int): The maximum number of optimization iterations.
             relaxation_factor (float): The relaxation factor to penalize abrupt changes during optimization.
-            shrink_factors ([int]): The shrink factors at each shrinking level (from high to low).
-            smoothing_sigmas ([int]):  The Gaussian sigmas for smoothing at each shrinking level (in physical units).
+            shrink_factors (typing.List[int]): The shrink factors at each shrinking level (from high to low).
+            smoothing_sigmas (typing.List[int]):  The Gaussian sigmas for smoothing at each shrinking level (in physical units).
             sampling_percentage (float): Fraction of voxel of the fixed image that will be used for registration (0, 1].
                 Typical values range from 0.01 (1 %) for low detail images to 0.2 (20 %) for high detail images.
                 The higher the fraction, the higher the computational time.
@@ -207,7 +204,7 @@ class MultiModalRegistration(pymia_fltr.IFilter):
         """Executes a multi-modal rigid registration.
 
         Args:
-            image (sitk.Image): The moving image.
+            image (sitk.Image): The moving image to register.
             params (MultiModalRegistrationParams): The parameters, which contain the fixed image.
 
         Returns:
@@ -284,7 +281,7 @@ class MultiModalRegistration(pymia_fltr.IFilter):
 
 
 class PlotOnResolutionChangeCallback(RegistrationCallback):
-    """Represents a plotter for SimpleITK registrations.
+    """Represents a plotter for registrations.
 
     Saves the moving image on each resolution change and the registration end.
     """

@@ -1,4 +1,4 @@
-"""The misc (miscellaneous) module contains filters, which don't have a classical purpose."""
+"""The misc (miscellaneous) module provides filters, which don't have a classical purpose."""
 import os
 import subprocess
 import tempfile
@@ -11,14 +11,14 @@ import pymia.filtering.filter as pymia_fltr
 
 
 class Relabel(pymia_fltr.IFilter):
-    """Relabels the labels in the file by the provided rule"""
+    """Represents a relabel filter."""
 
     def __init__(self, label_changes: typing.Dict[int, typing.Union[int, tuple]]) -> None:
         """Initializes a new instance of the LargestNComponents class.
 
         Args:
-            label_changes(Dict[int, Union[int, tuple]]): Label change rule where the key is the new label and
-                the value the existing (can be multiple)
+            label_changes(typing.Dict[int, typing.Union[int, tuple]]): Label change rule where the key is the new label
+                and the value the existing (can be multiple) label.
         """
         super().__init__()
         self.label_changes = label_changes
@@ -27,8 +27,8 @@ class Relabel(pymia_fltr.IFilter):
         """Executes the relabeling of the label image.
 
         Args:
-            image (sitk.Image): The image.
-            params (IFilterParams): The parameters (unused).
+            image (sitk.Image): The image to filter.
+            params (IFilterParams): The filter parameters (unused).
 
         Returns:
             sitk.Image: The filtered image.
@@ -70,25 +70,25 @@ class SizeCorrectionParams(pymia_fltr.IFilterParams):
 
 
 class SizeCorrectionFilter(pymia_fltr.IFilter):
-    """A method to correct shape/size difference."""
+    """Represents a filter to correct the shape/size by padding or cropping."""
 
-    def __init__(self, two_sided=True, pad_constant=0.0) -> None:
+    def __init__(self, two_sided: bool = True, pad_constant: float = 0.0) -> None:
         """ Initializes a new instance of the SizeCorrectionFilter class.
 
         Args:
-            two_sided (bool): whether the cropping and padding should be applied on one or both side of the dimension.
-            pad_constant (int): constant used for padding
+            two_sided (bool): Indicates whether the cropping and padding should be applied on one or both side(s) of the dimension.
+            pad_constant (float): The constant value used for padding.
         """
         super().__init__()
         self.two_sided = two_sided
         self.pad_constant = pad_constant
 
     def execute(self, image: sitk.Image, params: SizeCorrectionParams = None) -> sitk.Image:
-        """Executes the shape/size correction by help of padding and cropping.
+        """Executes the shape/size correction by padding or cropping.
 
         Args:
-            image (sitk.Image): The image.
-            params (SizeCorrectionParams): The parameters containing the reference (target) shape.
+            image (sitk.Image): The image to filter.
+            params (SizeCorrectionParams): The filter parameters containing the reference (target) shape.
 
         Returns:
             sitk.Image: The filtered image.
@@ -146,13 +146,16 @@ class CmdlineExecutorParams(pymia_fltr.IFilterParams):
         """Initializes a new instance of the CmdlineExecutorParams class.
 
         Args:
-            arguments (t.List[str]): Additional arguments for the command line execution.
+            arguments (typing.List[str]): Additional arguments for the command line execution.
         """
         self.arguments = arguments
 
 
 class CmdlineExecutor(pymia_fltr.IFilter):
-    """Represents a command line executable."""
+    """Represents a command line executable.
+
+    Use this filter to execute for instance a C++ command line program, which loads and image, processes, and saves it.
+    """
 
     def __init__(self, executable_path: str):
         """Initializes a new instance of the CmdlineExecutor class.
@@ -167,7 +170,7 @@ class CmdlineExecutor(pymia_fltr.IFilter):
         """Executes a command line program.
 
         Args:
-            image (SimpleITK.Image): The image.
+            image (sitk.Image): The image to filter.
             params (CmdlineExecutorParams): The execution specific command line parameters.
 
         Returns:
