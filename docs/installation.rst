@@ -6,7 +6,7 @@
 Installation
 ============
 
-Install pymia using pip (e.g., within a virtualenv):
+Install pymia using pip (e.g., within a `Python virtual environment <https://www.geeksforgeeks.org/python-virtual-environment/>`_):
 
 .. code-block:: bash
 
@@ -29,17 +29,18 @@ pymia requires Python 3.6 (or higher) and depends on the following packages:
  - `SciPy <https://www.scipy.org/>`_
  - `SimpleITK <http://www.simpleitk.org/>`_
 
-Note that not all dependencies are installed directly but only required when certain modules are used.
-Upon loading a module, pymia will check if the dependencies are fulfilled. For instance, if you want to use the
-:py:mod:`data` package, you need to either install PyTorch by
+.. note::
+   For the :py:mod:`data` package, not all dependencies are installed directly due to their heaviness.
+   Meaning, you need to either manually install PyTorch by
 
-    - :bash:`pip install torch`
+       - :bash:`pip install torch`
 
-or TensorFlow by
+   or TensorFlow by
 
-    - :bash:`pip install tensorflow`
+       - :bash:`pip install tensorflow`
 
-depending on your preferred deep learning framework.
+   depending on your preferred deep learning framework when using the :py:mod:`data` package.
+   Upon loading a module from the :py:mod:`data` package, pymia will always check if the required dependencies are fulfilled.
 
 Building the documentation
 --------------------------
