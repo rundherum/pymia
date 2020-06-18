@@ -330,20 +330,21 @@ class FalseNegativeRate(IConfusionMatrixMetric):
 class FMeasure(IConfusionMatrixMetric):
     """Represents a F-measure metric."""
 
-    def __init__(self, metric: str = 'FMEASR'):
+    def __init__(self, beta: float = 1.0, metric: str = 'FMEASR'):
         """Initializes a new instance of the FMeasure class.
 
         Args:
+            beta (float): The beta to trade-off precision and recall.
+                Use 0.5 or 2 to calculate the F0.5 and F2 measure, respectively.
             metric (str): The identification string of the metric.
         """
         super().__init__(metric)
+        self.beta = beta
 
     def calculate(self):
         """Calculates the F1 measure."""
 
-        beta = 1  # or 0.5 or 2 can also calculate F2 or F0.5 measure
-
-        beta_squared = beta * beta
+        beta_squared = self.beta * self.beta
         precision = Precision()
         precision.confusion_matrix = self.confusion_matrix
         precision = precision.calculate()
