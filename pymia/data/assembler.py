@@ -75,7 +75,7 @@ class SubjectAssembler(Assembler):
             raise ValueError('SubjectAssembler requires "subject_index" to be extracted (use IndexingExtractor)')
         if defs.KEY_INDEX_EXPR not in batch:
             raise ValueError('SubjectAssembler requires "index_expr" to be extracted (use IndexingExtractor)')
-        if 'shape' not in batch:
+        if defs.KEY_SHAPE not in batch:
             raise ValueError('SubjectAssembler requires "shape" to be extracted (use ImageShapeExtractor)')
 
         if not isinstance(to_assemble, dict):
@@ -104,6 +104,7 @@ class SubjectAssembler(Assembler):
 
         for key in to_assemble:
             data = to_assemble[key][idx]
+            # todo: maybe replace the dict parameters by actual arguments. Interface does not need to be very generic.
             sample_data, index_expr = self.on_sample_fn({'key': key,
                                                          key: data,
                                                          'batch': batch,
@@ -115,7 +116,7 @@ class SubjectAssembler(Assembler):
     def _init_new_subject(self, batch, to_assemble, idx):
         subject_prediction = {}
         for key in to_assemble:
-            subject_shape = batch['shape'][idx]
+            subject_shape = batch[defs.KEY_SHAPE][idx]
             subject_shape += (to_assemble[key].shape[-1],)
             subject_prediction[key] = self.zero_fn(subject_shape, key, batch, idx)
         return subject_prediction
@@ -183,7 +184,7 @@ class PlaneSubjectAssembler(Assembler):
     def add_batch(self, to_assemble, batch: dict, last_batch=False):
         if defs.KEY_INDEX_EXPR not in batch:
             raise ValueError('SubjectAssembler requires "index_expr" to be extracted (use IndexingExtractor)')
-        if 'shape' not in batch:
+        if defs.KEY_SHAPE not in batch:
             raise ValueError('SubjectAssembler requires "shape" to be extracted (use ImageShapeExtractor)')
 
         if not isinstance(to_assemble, dict):
@@ -203,7 +204,7 @@ class PlaneSubjectAssembler(Assembler):
             if not isinstance(indexing, list):
                 indexing = [indexing]
 
-            required_plane_shape = list(batch['shape'][idx])
+            required_plane_shape = list(batch[defs.KEY_SHAPE][idx])
 
             index_at_plane = indexing[plane_dimension]
             if isinstance(index_at_plane, tuple):

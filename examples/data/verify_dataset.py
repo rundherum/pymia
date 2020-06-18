@@ -29,10 +29,10 @@ def main(hdf_file: str):
         item = dataset[i]
 
         index_expr = item[defs.KEY_INDEX_EXPR]  # type: data.IndexExpression
-        root = item['file_root']
+        root = item[defs.KEY_FILE_ROOT]
 
         image = None  # type: sitk.Image
-        for i, file in enumerate(item['images_files']):
+        for i, file in enumerate(item[defs.KEY_PLACEHOLDER_FILES.format('images')]):
             image = sitk.ReadImage(os.path.join(root, file))
             np_img = sitk.GetArrayFromImage(image).astype(np.float32)
             np_img = (np_img - np_img.mean()) / np_img.std()
@@ -46,7 +46,7 @@ def main(hdf_file: str):
         if image_properties != item[defs.KEY_PROPERTIES]:
             raise ValueError('image properties not equal')
 
-        for file in item['labels_files']:
+        for file in item[defs.KEY_PLACEHOLDER_FILES.format('labels')]:
             image = sitk.ReadImage(os.path.join(root, file))
             np_img = sitk.GetArrayFromImage(image)
             np_img = np.expand_dims(np_img, axis=-1)  # due to the convention of having the last dim as number of channels
@@ -54,7 +54,7 @@ def main(hdf_file: str):
             if (np_slice != item[defs.KEY_LABELS]).any():
                 raise ValueError('slice not equal')
 
-        for file in item['mask_files']:
+        for file in item[defs.KEY_PLACEHOLDER_FILES.format('mask')]:
             image = sitk.ReadImage(os.path.join(root, file))
             np_img = sitk.GetArrayFromImage(image)
             np_img = np.expand_dims(np_img, axis=-1)  # due to the convention of having the last dim as number of channels
@@ -62,7 +62,7 @@ def main(hdf_file: str):
             if (np_slice != item['mask']).any():
                 raise ValueError('slice not equal')
 
-        for file in item['numerical_files']:
+        for file in item[defs.KEY_PLACEHOLDER_FILES.format('numerical')]:
             with open(os.path.join(root, file), 'r') as f:
                 lines = f.readlines()
             age = float(lines[0].split(':')[1].strip())
@@ -70,7 +70,7 @@ def main(hdf_file: str):
             if age != item['numerical'][0][0] or gpa != item['numerical'][0][1]:
                 raise ValueError('value not equal')
 
-        for file in item['sex_files']:
+        for file in item[defs.KEY_PLACEHOLDER_FILES.format('sex')]:
             with open(os.path.join(root, file), 'r') as f:
                 sex = f.readlines()[2].split(':')[1].strip()
             if sex != str(item['sex'][0]):

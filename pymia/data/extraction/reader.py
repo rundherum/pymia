@@ -111,14 +111,14 @@ class Hdf5Reader(Reader):
         self.category = category
 
     def get_subject_entries(self) -> list:
-        group = defs.DATA_PLACEHOLDER.format(self.category)
+        group = defs.LOC_DATA_PLACEHOLDER.format(self.category)
         return ['{}/{}'.format(group, k) for k in sorted(self.h5[group].keys())]
 
     def get_shape(self, entry: str) -> list:
         return self.h5[entry].shape
 
     def get_subjects(self) -> list:
-        return self.read(defs.SUBJECT)
+        return self.read(defs.LOC_SUBJECT)
 
     def read(self, entry: str, index: expr.IndexExpression = None):
         if index is None:
