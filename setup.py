@@ -7,7 +7,11 @@ if sys.version_info < (3, 6):
 
 directory = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join('README.rst'), encoding='utf-8') as f:
+about = {}
+with open(os.path.join(directory, 'pymia', '__version__.py'), 'r', encoding='utf-8') as f:
+    exec(f.read(), about)
+
+with open(os.path.join('README.rst'), 'r', encoding='utf-8') as f:
     readme = f.read()
 
 REQUIRED_PACKAGES = [
@@ -18,19 +22,20 @@ REQUIRED_PACKAGES = [
 ]
 
 TEST_PACKAGES = [
-
+    'pytest >= 5',
+    'pytest-cov >= 2.10.0'
 ]
 
 setup(
-    name='pymia',
-    version='0.2.4',
-    description='pymia facilitates medical image analysis',
+    name=about['__title__'],
+    version=about['__version__'],
+    description=about['__description__'],
     long_description=readme,
     long_description_content_type='text/x-rst',
-    author='Fabian Balsiger and Alain Jungo',
-    author_email='fabian.balsiger@artorg.unibe.ch',
-    url='https://github.com/rundherum/pymia',
-    license='Apache License',
+    author=about['__author__'],
+    author_email=about['__author_email__'],
+    url=about['__url__'],
+    license=about['__license__'],
     python_requires='>=3.6',
     packages=find_packages(exclude=['docs', 'examples', 'test']),
     install_requires=REQUIRED_PACKAGES,
