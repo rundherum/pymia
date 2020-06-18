@@ -1,3 +1,10 @@
+"""The writer module provides classes to write evaluation results.
+
+All writers inherit the :class:`pymia.evaluation.writer.WriterBase`, which writes the results when
+calling :meth:`pymia.evaluation.writer.WriterBase.write`. Currently, pymia has CSV file
+(:class:`pymia.evaluation.writer.CSVWriter` and :class:`pymia.evaluation.writer.CSVStatisticsWriter`) and
+console writers (:class:`pymia.evaluation.writer.ConsoleWriter` and :class:`pymia.evaluation.writer.ConsoleStatisticsWriter`).
+"""
 import abc
 import csv
 import logging
@@ -10,7 +17,7 @@ import pymia.evaluation.evaluator as eval_
 
 
 class WriterBase(abc.ABC):
-    """Represents an evaluation results writer interface."""
+    """Represents an evaluation results writer base class."""
 
     @abc.abstractmethod
     def write(self, results: typing.List[eval_.Result], **kwargs):
@@ -61,7 +68,7 @@ class StatisticsAggregator:
         """Initializes a new instance of the StatisticsAggregator class.
 
         Args:
-            functions (dict): The function handles to calculate the statistics.
+            functions (dict): The numpy function handles to calculate the statistics.
         """
         super().__init__()
 
@@ -70,6 +77,14 @@ class StatisticsAggregator:
         self.functions = functions
 
     def calculate(self, results: typing.List[eval_.Result]) -> typing.List[eval_.Result]:
+        """Calculates aggregated results (e.g., mean and standard deviation of a metric over all cases).
+
+        Args:
+            results (typing.List[eval_.Result]): The results to aggregate.
+
+        Returns:
+            typing.List[eval_.Result]: The aggregated results.
+        """
 
         # get unique labels and metrics
         labels = sorted({result.label for result in results})
@@ -148,7 +163,7 @@ class ConsoleWriter(WriterBase):
         """Initializes a new instance of the ConsoleWriter class.
 
         Args:
-            precision (int): The float precision.
+            precision (int): The decimal precision.
             use_logging (bool): Indicates whether to use the Python logging module or not.
         """
         super().__init__()
@@ -210,7 +225,7 @@ class CSVStatisticsWriter(WriterBase):
             self.path = os.path.join(self.path, '.csv')
 
     def write(self, results: typing.List[eval_.Result], **kwargs):
-        """Writes the evaluation results.
+        """Writes the evaluation statistic results (e.g., mean and standard deviation of a metric over all cases).
 
         Args:
             results (list of eval_.Result): The evaluation results.
@@ -245,7 +260,7 @@ class ConsoleStatisticsWriter(WriterBase):
         self.precision = precision
 
     def write(self, results: typing.List[eval_.Result], **kwargs):
-        """Writes the evaluation results.
+        """Writes the evaluation statistic results (e.g., mean and standard deviation of a metric over all cases).
 
         Args:
             results (list of eval_.Result): The evaluation results.

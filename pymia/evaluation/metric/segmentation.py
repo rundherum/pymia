@@ -1,3 +1,4 @@
+"""The segmentation module provides metrics to measure image segmentation performance."""
 import abc
 import math
 import warnings
@@ -9,8 +10,8 @@ from .base import (IConfusionMatrixMetric, IDistanceMetric, ISimpleITKImageMetri
                    NotComputableMetricWarning)
 
 
-class AreaMetric(ISimpleITKImageMetric):
-    """Represents an area metric."""
+class AreaMetric(ISimpleITKImageMetric, abc.ABC):
+    """Represents an area metric base class."""
 
     def __init__(self, metric: str = 'AREA'):
         """Initializes a new instance of the AreaMetric class.
@@ -19,11 +20,6 @@ class AreaMetric(ISimpleITKImageMetric):
             metric (str): The identification string of the metric.
         """
         super().__init__(metric)
-
-    @abc.abstractmethod
-    def calculate(self):
-        """Calculates the metric."""
-        raise NotImplementedError
 
     @staticmethod
     def _calculate_area(image: sitk.Image, slice_number: int = -1) -> float:
@@ -43,8 +39,8 @@ class AreaMetric(ISimpleITKImageMetric):
         return img_arr[slice_number, ...].sum() * image.GetSpacing()[0] * image.GetSpacing()[1]
 
 
-class VolumeMetric(ISimpleITKImageMetric):
-    """Represents a volume metric."""
+class VolumeMetric(ISimpleITKImageMetric, abc.ABC):
+    """Represents a volume metric base class."""
 
     def __init__(self, metric: str = 'VOL'):
         """Initializes a new instance of the VolumeMetric class.
@@ -53,11 +49,6 @@ class VolumeMetric(ISimpleITKImageMetric):
             metric (str): The identification string of the metric.
         """
         super().__init__(metric)
-
-    @abc.abstractmethod
-    def calculate(self):
-        """Calculates the metric."""
-        raise NotImplementedError
 
     @staticmethod
     def _calculate_volume(image: sitk.Image) -> float:
@@ -453,8 +444,7 @@ class HausdorffDistance(IDistanceMetric):
     is the directed Hausdorff distance and :math:`A` and :math:`B` are the set of non-zero pixels in the images.
 
     See Also:
-        - Nikolov et al., 2018 Deep learning to achieve clinically applicable segmentation of head and neck anatomy for
-            radiotherapy. `arXiv <https://arxiv.org/abs/1809.04430>`_
+        - Nikolov, S., Blackwell, S., Mendes, R., De Fauw, J., Meyer, C., Hughes, C., … Ronneberger, O. (2018). Deep learning to achieve clinically applicable segmentation of head and neck anatomy for radiotherapy. http://arxiv.org/abs/1809.04430
         - `Original implementation <https://github.com/deepmind/surface-distance>`_
     """
 
@@ -497,7 +487,7 @@ class HausdorffDistance(IDistanceMetric):
 
 
 class InterclassCorrelation(INumpyArrayMetric):
-    """Represents a interclass correlation metric."""
+    """Represents an interclass correlation metric."""
 
     def __init__(self, metric: str = 'ICCORR'):
         """Initializes a new instance of the InterclassCorrelation class.
@@ -832,8 +822,7 @@ class SurfaceDiceOverlap(IDistanceMetric):
     """Represents a surface Dice coefficient overlap metric.
 
     See Also:
-        - Nikolov et al., 2018 Deep learning to achieve clinically applicable segmentation of head and neck anatomy for
-            radiotherapy. `arXiv <https://arxiv.org/abs/1809.04430>`_
+        - Nikolov, S., Blackwell, S., Mendes, R., De Fauw, J., Meyer, C., Hughes, C., … Ronneberger, O. (2018). Deep learning to achieve clinically applicable segmentation of head and neck anatomy for radiotherapy. http://arxiv.org/abs/1809.04430
         - `Original implementation <https://github.com/deepmind/surface-distance>`_
     """
 
@@ -875,8 +864,7 @@ class SurfaceOverlap(IDistanceMetric):
     The overlapping fraction is computed by correctly taking the area of each surface element into account.
 
     See Also:
-        - Nikolov et al., 2018 Deep learning to achieve clinically applicable segmentation of head and neck anatomy for
-            radiotherapy. `arXiv <https://arxiv.org/abs/1809.04430>`_
+        - Nikolov, S., Blackwell, S., Mendes, R., De Fauw, J., Meyer, C., Hughes, C., … Ronneberger, O. (2018). Deep learning to achieve clinically applicable segmentation of head and neck anatomy for radiotherapy. http://arxiv.org/abs/1809.04430
         - `Original implementation <https://github.com/deepmind/surface-distance>`_
     """
 

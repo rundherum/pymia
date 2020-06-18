@@ -1,12 +1,16 @@
 Evaluation (:mod:`pymia.evaluation` package)
 ============================================
 
-This package provides an easy way to evaluate the performance of your algorithms.
+The evaluation package provides metrics and evaluation functionalities.
 
-We provide a large amount of metrics for image segmentation, image reconstruction, and regression in the
-:mod:`pymia.evaluation.metric` package. The metrics can easily be used by the
-:class:`pymia.evaluation.evaluator.Evaluator` to evaluate results. The :mod:`pymia.evaluation.writer` package provides
-several writers to report the results, and statistics of the results, to CSV files and the console.
+pymia provides a large amount of metrics for image segmentation, image reconstruction, and regression in the
+:mod:`pymia.evaluation.metric.metric` package. All metrics implement the
+:class:`pymia.evaluation.metric.base.IMetric` interface, and can be used with the :mod:`pymia.evaluation.evaluator` package
+to evaluate results (e.g., with the :class:`pymia.evaluation.evaluator.Evaluator`).
+The :mod:`pymia.evaluation.writer` package provides several writers to report the results, and statistics of the results,
+to CSV files (e.g., the :class:`pymia.evaluation.writer.CSVWriter` and :class:`pymia.evaluation.writer.CSVStatisticsWriter`)
+and the console (e.g., the :class:`pymia.evaluation.writer.ConsoleWriter` and
+:class:`pymia.evaluation.writer.ConsoleStatisticsWriter`).
 
 Subpackages
 -----------

@@ -1,17 +1,4 @@
-"""The metric module contains a set of evaluation metrics.
-
-The metrics are selected based on the paper of Taha 2016.
-Refer to the paper for guidelines how to select appropriate metrics, in-depth description,
-and the math.
-
-It is possible to implement your own metrics and use them with the :class:`pymia.evaluation.evaluator.Evaluator`.
-Just inherit from :class:`pymia.evaluation.metric.base.IMetric`,
-:class:`pymia.evaluation.metric.base.IConfusionMatrixMetric`,
-:class:`pymia.evaluation.metric.base.IDistanceMetric`,
-:class:`pymia.evaluation.metric.base.ISimpleITKImageMetric` or
-:class:`pymia.evaluation.metric.base.INumpyArrayMetric`
-and implement the function :func:`pymia.evaluation.metric.base.IMetric.calculate`.
-"""
+"""The metric module provides a set of metrics."""
 from .regression import (CoefficientOfDetermination, MeanAbsoluteError, MeanSquaredError, RootMeanSquaredError,
                          NormalizedRootMeanSquaredError)
 from .segmentation import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageDistance, CohenKappaMetric,

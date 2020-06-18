@@ -1,3 +1,4 @@
+"""The base module provides metric base classes."""
 import abc
 
 import numpy as np
@@ -30,8 +31,7 @@ class Distances:
     """Represents distances for distance metrics.
 
     See Also:
-        - Nikolov et al., 2018 Deep learning to achieve clinically applicable segmentation of head and neck anatomy for
-        radiotherapy. `arXiv <https://arxiv.org/abs/1809.04430>`_
+        - Nikolov, S., Blackwell, S., Mendes, R., De Fauw, J., Meyer, C., Hughes, C., … Ronneberger, O. (2018). Deep learning to achieve clinically applicable segmentation of head and neck anatomy for radiotherapy. http://arxiv.org/abs/1809.04430
         - `Original implementation <https://github.com/deepmind/surface-distance>`_
     """
 
@@ -434,7 +434,7 @@ class Distances:
 
 
 class IMetric(abc.ABC):
-    """Represents an evaluation metric."""
+    """Metric base class."""
 
     def __init__(self, metric: str = 'IMetric'):
         """Initializes a new instance of the IMetric class.
@@ -460,7 +460,7 @@ class IMetric(abc.ABC):
 
 
 class IConfusionMatrixMetric(IMetric):
-    """Represents an evaluation metric based on the confusion matrix."""
+    """Represents a metric based on the confusion matrix."""
 
     def __init__(self, metric: str = 'IConfusionMatrixMetric'):
         """Initializes a new instance of the IConfusionMatrixMetric class.
@@ -471,15 +471,9 @@ class IConfusionMatrixMetric(IMetric):
         super().__init__(metric)
         self.confusion_matrix = None  # ConfusionMatrix
 
-    @abc.abstractmethod
-    def calculate(self):
-        """Calculates the metric."""
-
-        raise NotImplementedError
-
 
 class IDistanceMetric(IMetric):
-    """Represents an evaluation metric based on distances."""
+    """Represents a metric based on distances."""
 
     def __init__(self, metric: str = 'IDistanceMetric'):
         """Initializes a new instance of the IDistanceMetric class.
@@ -490,15 +484,9 @@ class IDistanceMetric(IMetric):
         super().__init__(metric)
         self.distances = None  # Distances
 
-    @abc.abstractmethod
-    def calculate(self):
-        """Calculates the metric."""
-
-        raise NotImplementedError
-
 
 class ISimpleITKImageMetric(IMetric):
-    """Represents an evaluation metric based on SimpleITK images."""
+    """Represents a metric based on SimpleITK images."""
 
     def __init__(self, metric: str = 'ISimpleITKImageMetric'):
         """Initializes a new instance of the ISimpleITKImageMetric class.
@@ -510,15 +498,9 @@ class ISimpleITKImageMetric(IMetric):
         self.reference = None  # SimpleITK.Image
         self.prediction = None  # SimpleITK.Image
 
-    @abc.abstractmethod
-    def calculate(self):
-        """Calculates the metric."""
-
-        raise NotImplementedError
-
 
 class INumpyArrayMetric(IMetric):
-    """Represents an evaluation metric based on numpy arrays."""
+    """Represents a metric based on numpy arrays."""
 
     def __init__(self, metric: str = 'INumpyArrayMetric'):
         """Initializes a new instance of the INumpyArrayMetric class.
@@ -530,15 +512,9 @@ class INumpyArrayMetric(IMetric):
         self.reference = None  # np.ndarray
         self.prediction = None  # np.ndarray
 
-    @abc.abstractmethod
-    def calculate(self):
-        """Calculates the metric."""
-
-        raise NotImplementedError
-
 
 class Information(IMetric):
-    """Represents an information.
+    """Represents an information "metric".
 
     Can be used to add an additional column of information to an evaluator.
     """

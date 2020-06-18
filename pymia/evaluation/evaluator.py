@@ -1,6 +1,8 @@
-"""The evaluator module simplifies the evaluation of results.
+"""The evaluator module provides classes to evaluate the metrics on predictions.
 
-The module provides the possibility of calculate several evaluation metrics in parallel and output them in any format.
+All evaluators inherit the :class:`pymia.evaluation.evaluator.EvaluatorBase`, which contains a list of results after
+calling :meth:`pymia.evaluation.evaluator.EvaluatorBase.evaluate`. The results can be passed to a writer of the
+:mod:`pymia.evaluation.writer` module.
 """
 import abc
 import typing
@@ -12,8 +14,17 @@ import pymia.evaluation.metric as pymia_metric
 
 
 class Result:
+    """Represents a result."""
 
     def __init__(self, id_: str, label: str, metric: str, value):
+        """Initializes a new instance of the Result class.
+
+        Args:
+            id_ (str): The identification of the result (e.g., the subject's name).
+            label (str): The label of the result (e.g., the foreground).
+            metric (str): The metric.
+            value (int, float): The value of the metric.
+        """
         self.id_ = id_
         self.label = label
         self.metric = metric
@@ -21,8 +32,14 @@ class Result:
 
 
 class EvaluatorBase(abc.ABC):
+    """Evaluator base class."""
 
     def __init__(self, metrics: typing.List[pymia_metric.IMetric]):
+        """Initializes a new instance of the EvaluatorBase class.
+
+        Args:
+            metrics (list of pymia_metric.IMetric): A list of metrics.
+        """
         self.metrics = metrics
         self.results = []
 
@@ -31,9 +48,17 @@ class EvaluatorBase(abc.ABC):
                  prediction: typing.Union[sitk.Image, np.ndarray],
                  reference: typing.Union[sitk.Image, np.ndarray],
                  id_: str, **kwargs):
+        """Evaluates the metrics on the provided prediction and reference.
+
+        Args:
+            prediction (typing.Union[sitk.Image, np.ndarray]): The prediction.
+            reference (typing.Union[sitk.Image, np.ndarray]): The reference.
+            id_ (str): The identification of the case to evaluate.
+        """
         raise NotImplementedError
 
     def clear(self):
+        """Clears the results."""
         self.results = []
 
 
@@ -63,12 +88,12 @@ class Evaluator(EvaluatorBase):
                  prediction: typing.Union[sitk.Image, np.ndarray],
                  reference: typing.Union[sitk.Image, np.ndarray],
                  id_: str, **kwargs):
-        """Evaluates the metrics on the provided image and ground truth image.
+        """Evaluates the metrics on the provided prediction and reference image.
 
         Args:
-            prediction (sitk.Image): The segmented image.
-            reference (sitk.Image): The ground truth image.
-            id_ (str): The identification of the subject to evaluate.
+            prediction (typing.Union[sitk.Image, np.ndarray]): The predicted image.
+            reference (typing.Union[sitk.Image, np.ndarray]): The reference image.
+            id_ (str): The identification of the case to evaluate.
 
         Raises:
             ValueError: If no labels are defined (see add_label).
