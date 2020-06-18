@@ -3,6 +3,23 @@
 Change history
 ==============
 
+0.3.0 (2020-06-18)
+------------------
+
+ * :py:mod:`data` package now supports PyTorch and TensorFlow
+ * :py:mod:`evaluation` package with new evaluator and writer classes
+ * Removed ``config``, ``deeplearning``, and ``plotting`` packages
+ * Improved readability of code
+ * Revised examples
+ * Revised documentation
+
+Migration guide
+^^^^^^^^^^^^^^^
+
+Heavy changes have been made to move pymia towards a lightweight data handling and evaluation library for
+medical image analysis with deep learning. Therefore, this release is, unfortunately, not backward compatible.
+To facilitate transition to this and coming versions, we thoroughly revised the documentation and the examples.
+
 0.2.4 (2020-05-22)
 ------------------
 
@@ -70,7 +87,7 @@ To have the same behaviour, replace it by:
 
 The transformation in :py:mod:`SubjectAssembler`'s ``add_batch`` has been removed and replaced by the ``on_sample_fn``
 parameter in the constructor. Replacing the transformation by this function should be straight forward by rewriting your
-transformation as function (see also the default sample function :py:function:`default_sample_fn`):
+transformation as function (see also the default sample function :py:func:`default_sample_fn`):
 
 .. code-block:: python
 
