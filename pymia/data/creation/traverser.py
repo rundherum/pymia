@@ -51,8 +51,8 @@ class SubjectFileTraverser(Traverser):
 
         callback_params = {defs.KEY_SUBJECT_FILES: subject_files}
         for category in self.categories:
-            callback_params.setdefault('categories', []).append(category)
-            callback_params['{}_names'.format(category)] = self._get_names(subject_files, category)
+            callback_params.setdefault(defs.KEY_CATEGORIES, []).append(category)
+            callback_params[defs.KEY_PLACEHOLDER_NAMES.format(category)] = self._get_names(subject_files, category)
         callback.on_start(callback_params)
 
         # looping over the subject files and calling callbacks
@@ -70,7 +70,7 @@ class SubjectFileTraverser(Traverser):
 
                 category_data = concat_fn(category_list)
                 transform_params[category] = category_data
-                transform_params['{}_properties'.format(category)] = category_property
+                transform_params[defs.KEY_PLACEHOLDER_PROPERTIES.format(category)] = category_property
 
             if transform:
                 transform_params = transform(transform_params)
