@@ -14,7 +14,7 @@ def get_all_segmentation_metrics():
     """Gets a list with all segmentation metrics.
 
     Returns:
-        list[IMetric]: A list of metrics.
+        list[Metric]: A list of metrics.
     """
     return get_overlap_metrics() + get_distance_metrics() + get_classical_metrics()
 
@@ -23,7 +23,7 @@ def get_all_regression_metrics():
     """Gets a list with all regression metrics.
 
     Returns:
-        list[IMetric]: A list of metrics.
+        list[Metric]: A list of metrics.
     """
     return [CoefficientOfDetermination(), MeanAbsoluteError(), MeanSquaredError(), RootMeanSquaredError(),
             NormalizedRootMeanSquaredError()]
@@ -33,7 +33,7 @@ def get_overlap_metrics():
     """Gets a list of overlap-based metrics.
 
     Returns:
-        list[IMetric]: A list of metrics.
+        list[Metric]: A list of metrics.
     """
     return [AdjustedRandIndex(),
             AreaUnderCurve(),
@@ -52,7 +52,7 @@ def get_distance_metrics():
     """Gets a list of distance-based metrics.
 
     Returns:
-        list[IMetric]: A list of metrics.
+        list[Metric]: A list of metrics.
     """
 
     return [HausdorffDistance(),
@@ -67,7 +67,7 @@ def get_classical_metrics():
     """Gets a list of classical metrics.
 
     Returns:
-        list[IMetric]: A list of metrics.
+        list[Metric]: A list of metrics.
     """
 
     return[Sensitivity(),

@@ -1,10 +1,10 @@
 """The regression module provides metrics to measure regression performance."""
 import numpy as np
 
-from .base import INumpyArrayMetric
+from .base import NumpyArrayMetric
 
 
-class MeanAbsoluteError(INumpyArrayMetric):
+class MeanAbsoluteError(NumpyArrayMetric):
     """Represents a mean absolute error metric."""
 
     def __init__(self, metric: str = 'MAE'):
@@ -21,7 +21,7 @@ class MeanAbsoluteError(INumpyArrayMetric):
         return np.mean(np.abs(self.reference - self.prediction))
 
 
-class MeanSquaredError(INumpyArrayMetric):
+class MeanSquaredError(NumpyArrayMetric):
     """Represents a mean squared error metric."""
 
     def __init__(self, metric: str = 'MSE'):
@@ -38,7 +38,7 @@ class MeanSquaredError(INumpyArrayMetric):
         return np.mean(np.square(self.reference - self.prediction))
 
 
-class RootMeanSquaredError(INumpyArrayMetric):
+class RootMeanSquaredError(NumpyArrayMetric):
     """Represents a root mean squared error metric."""
 
     def __init__(self, metric: str = 'RMSE'):
@@ -55,7 +55,7 @@ class RootMeanSquaredError(INumpyArrayMetric):
         return np.sqrt(np.mean(np.square(self.reference - self.prediction)))
 
 
-class NormalizedRootMeanSquaredError(INumpyArrayMetric):
+class NormalizedRootMeanSquaredError(NumpyArrayMetric):
     """Represents a normalized root mean squared error metric."""
 
     def __init__(self, metric: str = 'NRMSE'):
@@ -73,7 +73,7 @@ class NormalizedRootMeanSquaredError(INumpyArrayMetric):
         return rmse / (self.reference.max() - self.reference.min())
 
 
-class CoefficientOfDetermination(INumpyArrayMetric):
+class CoefficientOfDetermination(NumpyArrayMetric):
     """Represents a coefficient of determination (R^2) error metric."""
 
     def __init__(self, metric: str = 'R2'):

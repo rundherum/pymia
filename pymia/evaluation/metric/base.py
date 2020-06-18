@@ -433,11 +433,11 @@ class Distances:
         self.surfel_areas_pred = surfel_areas_pred
 
 
-class IMetric(abc.ABC):
+class Metric(abc.ABC):
     """Metric base class."""
 
-    def __init__(self, metric: str = 'IMetric'):
-        """Initializes a new instance of the IMetric class.
+    def __init__(self, metric: str = 'Metric'):
+        """Initializes a new instance of the Metric class.
 
         Args:
             metric (str): The identification string of the metric.
@@ -459,11 +459,11 @@ class IMetric(abc.ABC):
         return '{self.metric}'.format(self=self)
 
 
-class IConfusionMatrixMetric(IMetric):
+class ConfusionMatrixMetric(Metric):
     """Represents a metric based on the confusion matrix."""
 
-    def __init__(self, metric: str = 'IConfusionMatrixMetric'):
-        """Initializes a new instance of the IConfusionMatrixMetric class.
+    def __init__(self, metric: str = 'ConfusionMatrixMetric'):
+        """Initializes a new instance of the ConfusionMatrixMetric class.
 
         Args:
             metric (str): The identification string of the metric.
@@ -472,11 +472,11 @@ class IConfusionMatrixMetric(IMetric):
         self.confusion_matrix = None  # ConfusionMatrix
 
 
-class IDistanceMetric(IMetric):
+class DistanceMetric(Metric):
     """Represents a metric based on distances."""
 
-    def __init__(self, metric: str = 'IDistanceMetric'):
-        """Initializes a new instance of the IDistanceMetric class.
+    def __init__(self, metric: str = 'DistanceMetric'):
+        """Initializes a new instance of the DistanceMetric class.
 
         Args:
             metric (str): The identification string of the metric.
@@ -485,11 +485,11 @@ class IDistanceMetric(IMetric):
         self.distances = None  # Distances
 
 
-class ISimpleITKImageMetric(IMetric):
+class SimpleITKImageMetric(Metric):
     """Represents a metric based on SimpleITK images."""
 
-    def __init__(self, metric: str = 'ISimpleITKImageMetric'):
-        """Initializes a new instance of the ISimpleITKImageMetric class.
+    def __init__(self, metric: str = 'SimpleITKImageMetric'):
+        """Initializes a new instance of the SimpleITKImageMetric class.
 
         Args:
             metric (str): The identification string of the metric.
@@ -499,11 +499,11 @@ class ISimpleITKImageMetric(IMetric):
         self.prediction = None  # SimpleITK.Image
 
 
-class INumpyArrayMetric(IMetric):
+class NumpyArrayMetric(Metric):
     """Represents a metric based on numpy arrays."""
 
-    def __init__(self, metric: str = 'INumpyArrayMetric'):
-        """Initializes a new instance of the INumpyArrayMetric class.
+    def __init__(self, metric: str = 'NumpyArrayMetric'):
+        """Initializes a new instance of the NumpyArrayMetric class.
 
         Args:
             metric (str): The identification string of the metric.
@@ -513,7 +513,7 @@ class INumpyArrayMetric(IMetric):
         self.prediction = None  # np.ndarray
 
 
-class Information(IMetric):
+class Information(Metric):
     """Represents an information "metric".
 
     Can be used to add an additional column of information to an evaluator.

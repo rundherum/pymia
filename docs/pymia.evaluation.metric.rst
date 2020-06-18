@@ -3,12 +3,13 @@ Metric (:mod:`pymia.evaluation.metric` package)
 
 The metric package provides metrics for evaluation of image segmentation, image reconstruction, and regression.
 
-All metrics implement the :class:`pymia.evaluation.metric.base.IMetric` interface, and can be used with the
-:mod:`pymia.evaluation.evaluator` package to evaluate results (e.g., with the :class:`pymia.evaluation.evaluator.Evaluator`).
+All metrics implement the :class:`pymia.evaluation.metric.base.Metric` interface, and can be used with the
+:mod:`pymia.evaluation.evaluator` package to evaluate results
+(e.g., with the :class:`pymia.evaluation.evaluator.SegmentationEvaluator`).
 To implement your own metric and use it with the :class:`pymia.evaluation.evaluator.Evaluator`, you need to inherit from
-:class:`pymia.evaluation.metric.base.IMetric`, :class:`pymia.evaluation.metric.base.IConfusionMatrixMetric`,
-:class:`pymia.evaluation.metric.base.IDistanceMetric`, :class:`pymia.evaluation.metric.base.ISimpleITKImageMetric` or
-:class:`pymia.evaluation.metric.base.INumpyArrayMetric` and implement :func:`pymia.evaluation.metric.base.IMetric.calculate`.
+:class:`pymia.evaluation.metric.base.Metric`, :class:`pymia.evaluation.metric.base.ConfusionMatrixMetric`,
+:class:`pymia.evaluation.metric.base.DistanceMetric`, :class:`pymia.evaluation.metric.base.SimpleITKImageMetric` or
+:class:`pymia.evaluation.metric.base.NumpyArrayMetric` and implement :func:`pymia.evaluation.metric.base.Metric.calculate`.
 
 .. note::
    The segmentation metrics are selected based on the paper by Taha and Hanbury. We recommend to refer to the paper for

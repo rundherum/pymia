@@ -6,11 +6,11 @@ import warnings
 import numpy as np
 import SimpleITK as sitk
 
-from .base import (IConfusionMatrixMetric, IDistanceMetric, ISimpleITKImageMetric, INumpyArrayMetric,
+from .base import (ConfusionMatrixMetric, DistanceMetric, SimpleITKImageMetric, NumpyArrayMetric,
                    NotComputableMetricWarning)
 
 
-class AreaMetric(ISimpleITKImageMetric, abc.ABC):
+class AreaMetric(SimpleITKImageMetric, abc.ABC):
     """Represents an area metric base class."""
 
     def __init__(self, metric: str = 'AREA'):
@@ -39,7 +39,7 @@ class AreaMetric(ISimpleITKImageMetric, abc.ABC):
         return img_arr[slice_number, ...].sum() * image.GetSpacing()[0] * image.GetSpacing()[1]
 
 
-class VolumeMetric(ISimpleITKImageMetric, abc.ABC):
+class VolumeMetric(SimpleITKImageMetric, abc.ABC):
     """Represents a volume metric base class."""
 
     def __init__(self, metric: str = 'VOL'):
@@ -64,7 +64,7 @@ class VolumeMetric(ISimpleITKImageMetric, abc.ABC):
         return number_of_voxels * voxel_volume
 
 
-class Accuracy(IConfusionMatrixMetric):
+class Accuracy(ConfusionMatrixMetric):
     """Represents an accuracy metric."""
 
     def __init__(self, metric: str = 'ACURCY'):
@@ -86,7 +86,7 @@ class Accuracy(IConfusionMatrixMetric):
             return 0
 
 
-class AdjustedRandIndex(IConfusionMatrixMetric):
+class AdjustedRandIndex(ConfusionMatrixMetric):
     """Represents an adjusted rand index metric."""
 
     def __init__(self, metric: str = 'ADJRIND'):
@@ -130,7 +130,7 @@ class AdjustedRandIndex(IConfusionMatrixMetric):
             return 0
 
 
-class AreaUnderCurve(IConfusionMatrixMetric):
+class AreaUnderCurve(ConfusionMatrixMetric):
     """Represents an area under the curve metric."""
 
     def __init__(self, metric: str = 'AUC'):
@@ -158,7 +158,7 @@ class AreaUnderCurve(IConfusionMatrixMetric):
         return (true_positive_rate - false_positive_rate + 1) / 2
 
 
-class AverageDistance(ISimpleITKImageMetric):
+class AverageDistance(SimpleITKImageMetric):
     """Represents an average (Hausdorff) distance metric.
 
         Calculates the distance between the set of non-zero pixels of two images using the following equation:
@@ -197,7 +197,7 @@ class AverageDistance(ISimpleITKImageMetric):
         return distance_filter.GetAverageHausdorffDistance()
 
 
-class CohenKappaMetric(IConfusionMatrixMetric):
+class CohenKappaMetric(ConfusionMatrixMetric):
     """Represents a Cohen's kappa coefficient metric."""
 
     def __init__(self, metric: str = 'KAPPA'):
@@ -230,7 +230,7 @@ class CohenKappaMetric(IConfusionMatrixMetric):
         return (agreement - chance) / (sum_ - chance)
 
 
-class DiceCoefficient(IConfusionMatrixMetric):
+class DiceCoefficient(ConfusionMatrixMetric):
     """Represents a Dice coefficient metric with empty target handling, defined as:
 
         .. math:: \\begin{cases} 1 & \\left\\vert{y}\\right\\vert = \\left\\vert{\\hat y}\\right\\vert = 0 \\\\ Dice(y,\\hat y) & \\left\\vert{y}\\right\\vert > 0 \\\\ \\end{cases}
@@ -257,7 +257,7 @@ class DiceCoefficient(IConfusionMatrixMetric):
                (2 * self.confusion_matrix.tp + self.confusion_matrix.fp + self.confusion_matrix.fn)
 
 
-class FalseNegative(IConfusionMatrixMetric):
+class FalseNegative(ConfusionMatrixMetric):
     """Represents a false negative metric."""
 
     def __init__(self, metric: str = 'FN'):
@@ -274,7 +274,7 @@ class FalseNegative(IConfusionMatrixMetric):
         return self.confusion_matrix.fn
 
 
-class FalsePositive(IConfusionMatrixMetric):
+class FalsePositive(ConfusionMatrixMetric):
     """Represents a false positive metric."""
 
     def __init__(self, metric: str = 'FP'):
@@ -291,7 +291,7 @@ class FalsePositive(IConfusionMatrixMetric):
         return self.confusion_matrix.fp
 
 
-class Fallout(IConfusionMatrixMetric):
+class Fallout(ConfusionMatrixMetric):
     """Represents a fallout (false positive rate) metric."""
 
     def __init__(self, metric: str = 'FALLOUT'):
@@ -309,7 +309,7 @@ class Fallout(IConfusionMatrixMetric):
         return 1 - specificity
 
 
-class FalseNegativeRate(IConfusionMatrixMetric):
+class FalseNegativeRate(ConfusionMatrixMetric):
     """Represents a false negative rate metric."""
 
     def __init__(self, metric: str = 'FNR'):
@@ -327,7 +327,7 @@ class FalseNegativeRate(IConfusionMatrixMetric):
         return 1 - sensitivity
 
 
-class FMeasure(IConfusionMatrixMetric):
+class FMeasure(ConfusionMatrixMetric):
     """Represents a F-measure metric."""
 
     def __init__(self, beta: float = 1.0, metric: str = 'FMEASR'):
@@ -360,7 +360,7 @@ class FMeasure(IConfusionMatrixMetric):
             return 0
 
 
-class GlobalConsistencyError(IConfusionMatrixMetric):
+class GlobalConsistencyError(ConfusionMatrixMetric):
     """Represents a global consistency error metric.
 
     Implementation based on Martin 2001.
@@ -431,7 +431,7 @@ class GroundTruthVolume(VolumeMetric):
         return self._calculate_volume(self.reference)
 
 
-class HausdorffDistance(IDistanceMetric):
+class HausdorffDistance(DistanceMetric):
     """Represents a Hausdorff distance metric.
 
     Calculates the distance between the set of non-zero pixels of two images using the following equation:
@@ -487,7 +487,7 @@ class HausdorffDistance(IDistanceMetric):
         return max(perc_distance_gt_to_pred, perc_distance_pred_to_gt)
 
 
-class InterclassCorrelation(INumpyArrayMetric):
+class InterclassCorrelation(NumpyArrayMetric):
     """Represents an interclass correlation metric."""
 
     def __init__(self, metric: str = 'ICCORR'):
@@ -524,7 +524,7 @@ class InterclassCorrelation(INumpyArrayMetric):
         return (ssb - ssw) / (ssb + ssw)
 
 
-class JaccardCoefficient(IConfusionMatrixMetric):
+class JaccardCoefficient(ConfusionMatrixMetric):
     """Represents a Jaccard coefficient metric."""
 
     def __init__(self, metric: str = 'JACRD'):
@@ -550,7 +550,7 @@ class JaccardCoefficient(IConfusionMatrixMetric):
         return tp / (tp + fp + fn)
 
 
-class MahalanobisDistance(INumpyArrayMetric):
+class MahalanobisDistance(NumpyArrayMetric):
     """Represents a Mahalanobis distance metric."""
 
     def __init__(self, metric: str = 'MAHLNBS'):
@@ -592,7 +592,7 @@ class MahalanobisDistance(INumpyArrayMetric):
         return math.sqrt(mean.dot(common_cov_inv).dot(mean.T))
 
 
-class MutualInformation(IConfusionMatrixMetric):
+class MutualInformation(ConfusionMatrixMetric):
     """Represents a mutual information metric."""
 
     def __init__(self, metric: str = 'MUTINF'):
@@ -637,7 +637,7 @@ class MutualInformation(IConfusionMatrixMetric):
         return mi
 
 
-class Precision(IConfusionMatrixMetric):
+class Precision(ConfusionMatrixMetric):
     """Represents a precision metric."""
 
     def __init__(self, metric: str = 'PRCISON'):
@@ -659,7 +659,7 @@ class Precision(IConfusionMatrixMetric):
             return 0
 
 
-class ProbabilisticDistance(INumpyArrayMetric):
+class ProbabilisticDistance(NumpyArrayMetric):
     """Represents a probabilistic distance metric."""
 
     def __init__(self, metric: str = 'PROBDST'):
@@ -685,7 +685,7 @@ class ProbabilisticDistance(INumpyArrayMetric):
             return -1
 
 
-class RandIndex(IConfusionMatrixMetric):
+class RandIndex(ConfusionMatrixMetric):
     """Represents a rand index metric."""
 
     def __init__(self, metric: str = 'RNDIND'):
@@ -721,7 +721,7 @@ class RandIndex(IConfusionMatrixMetric):
         return (a + d) / (a + b + c + d)
 
 
-class Recall(IConfusionMatrixMetric):
+class Recall(ConfusionMatrixMetric):
     """Represents a recall metric."""
 
     def __init__(self, metric: str = 'RECALL'):
@@ -780,7 +780,7 @@ class SegmentationVolume(VolumeMetric):
         return self._calculate_volume(self.prediction)
 
 
-class Sensitivity(IConfusionMatrixMetric):
+class Sensitivity(ConfusionMatrixMetric):
     """Represents a sensitivity (true positive rate or recall) metric."""
 
     def __init__(self, metric: str = 'SNSVTY'):
@@ -802,7 +802,7 @@ class Sensitivity(IConfusionMatrixMetric):
         return self.confusion_matrix.tp / (self.confusion_matrix.tp + self.confusion_matrix.fn)
 
 
-class Specificity(IConfusionMatrixMetric):
+class Specificity(ConfusionMatrixMetric):
     """Represents a specificity metric."""
 
     def __init__(self, metric: str = 'SPCFTY'):
@@ -819,7 +819,7 @@ class Specificity(IConfusionMatrixMetric):
         return self.confusion_matrix.tn / (self.confusion_matrix.tn + self.confusion_matrix.fp)
 
 
-class SurfaceDiceOverlap(IDistanceMetric):
+class SurfaceDiceOverlap(DistanceMetric):
     """Represents a surface Dice coefficient overlap metric.
 
     See Also:
@@ -857,7 +857,7 @@ class SurfaceDiceOverlap(IDistanceMetric):
         return float(surface_dice)
 
 
-class SurfaceOverlap(IDistanceMetric):
+class SurfaceOverlap(DistanceMetric):
     """Represents a surface overlap metric.
 
     Computes the overlap of the ground truth surface with the predicted surface and vice versa allowing a
@@ -904,7 +904,7 @@ class SurfaceOverlap(IDistanceMetric):
                 return float('-inf')
 
 
-class TrueNegative(IConfusionMatrixMetric):
+class TrueNegative(ConfusionMatrixMetric):
     """Represents a true negative metric."""
 
     def __init__(self, metric: str = 'TN'):
@@ -921,7 +921,7 @@ class TrueNegative(IConfusionMatrixMetric):
         return self.confusion_matrix.tn
 
 
-class TruePositive(IConfusionMatrixMetric):
+class TruePositive(ConfusionMatrixMetric):
     """Represents a true positive metric."""
 
     def __init__(self, metric: str = 'TP'):
@@ -938,7 +938,7 @@ class TruePositive(IConfusionMatrixMetric):
         return self.confusion_matrix.tp
 
 
-class VariationOfInformation(IConfusionMatrixMetric):
+class VariationOfInformation(ConfusionMatrixMetric):
     """Represents a variation of information metric."""
 
     def __init__(self, metric: str = 'VARINFO'):
@@ -985,7 +985,7 @@ class VariationOfInformation(IConfusionMatrixMetric):
         return vi
 
 
-class VolumeSimilarity(IConfusionMatrixMetric):
+class VolumeSimilarity(ConfusionMatrixMetric):
     """Represents a volume similarity metric."""
 
     def __init__(self, metric: str = 'VOLSMTY'):

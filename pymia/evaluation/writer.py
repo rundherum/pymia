@@ -1,7 +1,7 @@
 """The writer module provides classes to write evaluation results.
 
-All writers inherit the :class:`pymia.evaluation.writer.WriterBase`, which writes the results when
-calling :meth:`pymia.evaluation.writer.WriterBase.write`. Currently, pymia has CSV file
+All writers inherit the :class:`pymia.evaluation.writer.Writer`, which writes the results when
+calling :meth:`pymia.evaluation.writer.Writer.write`. Currently, pymia has CSV file
 (:class:`pymia.evaluation.writer.CSVWriter` and :class:`pymia.evaluation.writer.CSVStatisticsWriter`) and
 console writers (:class:`pymia.evaluation.writer.ConsoleWriter` and :class:`pymia.evaluation.writer.ConsoleStatisticsWriter`).
 """
@@ -16,7 +16,7 @@ import numpy as np
 import pymia.evaluation.evaluator as eval_
 
 
-class WriterBase(abc.ABC):
+class Writer(abc.ABC):
     """Represents an evaluation results writer base class."""
 
     @abc.abstractmethod
@@ -108,7 +108,7 @@ class StatisticsAggregator:
         return aggregated_results
 
 
-class CSVWriter(WriterBase):
+class CSVWriter(Writer):
     """Represents a CSV file evaluation results writer."""
 
     def __init__(self, path: str, delimiter: str = ';'):
@@ -156,7 +156,7 @@ class CSVWriter(WriterBase):
                     writer.writerow(row)
 
 
-class ConsoleWriter(WriterBase):
+class ConsoleWriter(Writer):
     """Represents a console evaluation results writer."""
 
     def __init__(self, precision: int = 3, use_logging: bool = False):
@@ -204,7 +204,7 @@ class ConsoleWriter(WriterBase):
         self.write_helper.format_and_write(lines)
 
 
-class CSVStatisticsWriter(WriterBase):
+class CSVStatisticsWriter(Writer):
     """Represents a CSV file evaluation results statistics writer."""
 
     def __init__(self, path: str, delimiter: str = ';', functions: dict = None):
@@ -242,7 +242,7 @@ class CSVStatisticsWriter(WriterBase):
                 writer.writerow([result.label, result.metric, result.id_, result.value])
 
 
-class ConsoleStatisticsWriter(WriterBase):
+class ConsoleStatisticsWriter(Writer):
     """Represents a console evaluation results statistics writer."""
 
     def __init__(self, precision: int = 3, use_logging: bool = False,

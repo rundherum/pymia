@@ -23,7 +23,7 @@ def main(hdf_file: str):
     metrics = [metric.DiceCoefficient(), metric.HausdorffDistance(percentile=95), metric.VolumeSimilarity()]
     labels = {1: 'DUMMY-LABEL',  # todo(fabianbalsiger): adapt labels to example
               }
-    evaluator = eval_.Evaluator(metrics, labels)
+    evaluator = eval_.SegmentationEvaluator(metrics, labels)
 
     # initialize TensorBoard
     tb = tensorboard.SummaryWriter(run_dir)

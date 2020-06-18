@@ -1,7 +1,7 @@
 """The evaluator module provides classes to evaluate the metrics on predictions.
 
-All evaluators inherit the :class:`pymia.evaluation.evaluator.EvaluatorBase`, which contains a list of results after
-calling :meth:`pymia.evaluation.evaluator.EvaluatorBase.evaluate`. The results can be passed to a writer of the
+All evaluators inherit the :class:`pymia.evaluation.evaluator.Evaluator`, which contains a list of results after
+calling :meth:`pymia.evaluation.evaluator.Evaluator.evaluate`. The results can be passed to a writer of the
 :mod:`pymia.evaluation.writer` module.
 """
 import abc
@@ -31,14 +31,14 @@ class Result:
         self.value = value
 
 
-class EvaluatorBase(abc.ABC):
+class Evaluator(abc.ABC):
     """Evaluator base class."""
 
-    def __init__(self, metrics: typing.List[pymia_metric.IMetric]):
-        """Initializes a new instance of the EvaluatorBase class.
+    def __init__(self, metrics: typing.List[pymia_metric.Metric]):
+        """Initializes a new instance of the Evaluator class.
 
         Args:
-            metrics (list of pymia_metric.IMetric): A list of metrics.
+            metrics (list of pymia_metric.Metric): A list of metrics.
         """
         self.metrics = metrics
         self.results = []
@@ -62,14 +62,14 @@ class EvaluatorBase(abc.ABC):
         self.results = []
 
 
-class Evaluator(EvaluatorBase):
-    """Represents an evaluator, evaluating metrics on predictions against references."""
+class SegmentationEvaluator(Evaluator):
+    """Represents a segmentation evaluator, evaluating metrics on predictions against references."""
 
-    def __init__(self, metrics: typing.List[pymia_metric.IMetric], labels: dict):
-        """Initializes a new instance of the Evaluator class.
+    def __init__(self, metrics: typing.List[pymia_metric.Metric], labels: dict):
+        """Initializes a new instance of the SegmentationEvaluator class.
 
         Args:
-            metrics (list of pymia_metric.IMetric): A list of metrics.
+            metrics (list of pymia_metric.Metric): A list of metrics.
             labels (dict): A dictionary with labels (key of type int) and label descriptions (value of type string).
         """
         super().__init__(metrics)
@@ -116,10 +116,10 @@ class Evaluator(EvaluatorBase):
             prediction_of_label = np.in1d(prediction_array.ravel(), label, True).reshape(prediction_array.shape).astype(np.uint8)
             reference_of_label = np.in1d(reference_array.ravel(), label, True).reshape(reference_array.shape).astype(np.uint8)
 
-            # calculate the confusion matrix for IConfusionMatrixMetric
+            # calculate the confusion matrix for ConfusionMatrixMetric
             confusion_matrix = pymia_metric.ConfusionMatrix(prediction_of_label, reference_of_label)
 
-            # flag indicating whether the images have been converted for ISimpleITKImageMetric
+            # flag indicating whether the images have been converted for SimpleITKImageMetric
             converted_to_image = False
             prediction_of_label_as_image = None
             reference_of_label_as_image = None
@@ -129,12 +129,12 @@ class Evaluator(EvaluatorBase):
 
             # calculate the metrics
             for param_index, metric in enumerate(self.metrics):
-                if isinstance(metric, pymia_metric.IConfusionMatrixMetric):
+                if isinstance(metric, pymia_metric.ConfusionMatrixMetric):
                     metric.confusion_matrix = confusion_matrix
-                elif isinstance(metric, pymia_metric.INumpyArrayMetric):
+                elif isinstance(metric, pymia_metric.NumpyArrayMetric):
                     metric.reference = reference_of_label
                     metric.prediction = prediction_of_label
-                elif isinstance(metric, pymia_metric.ISimpleITKImageMetric):
+                elif isinstance(metric, pymia_metric.SimpleITKImageMetric):
                     if not converted_to_image:
                         if not isinstance(prediction, sitk.Image):
                             raise ValueError('SimpleITK image is required for SimpleITK-based metrics')
@@ -146,7 +146,7 @@ class Evaluator(EvaluatorBase):
 
                     metric.reference = reference_of_label_as_image
                     metric.prediction = prediction_of_label_as_image
-                elif isinstance(metric, pymia_metric.IDistanceMetric):
+                elif isinstance(metric, pymia_metric.DistanceMetric):
                     if distances is None:
                         if isinstance(prediction, sitk.Image):
                             spacing = prediction.GetSpacing()[::-1]

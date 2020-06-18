@@ -13,7 +13,7 @@ import pymia.evaluation.metric as pymia_metric
 import pymia.evaluation.writer as writer
 
 
-def init_evaluator() -> pymia_eval.Evaluator:
+def init_evaluator() -> pymia_eval.SegmentationEvaluator:
     labels = {
         1: 'WhiteMatter',
         2: 'GreyMatter',
@@ -22,7 +22,7 @@ def init_evaluator() -> pymia_eval.Evaluator:
         5: 'Thalamus'
     }
     metrics = [pymia_metric.DiceCoefficient()]
-    return pymia_eval.Evaluator(metrics, labels)
+    return pymia_eval.SegmentationEvaluator(metrics, labels)
 
 
 def main(hdf_file: str):

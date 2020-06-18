@@ -15,7 +15,7 @@ def main(data_dir: str, result_file: str):
     labels = {1: 'DUMMY-LABEL',  # todo(fabianbalsiger): adapt labels to example
               }
     # evaluator = eval_.Evaluator(metrics, labels)
-    evaluator = eval_.Evaluator(metrics, labels)
+    evaluator = eval_.SegmentationEvaluator(metrics, labels)
 
     # get list of subjects
     subject_dirs = [subject for subject in glob.glob(os.path.join(data_dir, '*')) if os.path.isdir(subject)]
