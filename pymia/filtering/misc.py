@@ -10,7 +10,7 @@ import SimpleITK as sitk
 import pymia.filtering.filter as pymia_fltr
 
 
-class Relabel(pymia_fltr.IFilter):
+class Relabel(pymia_fltr.Filter):
     """Represents a relabel filter."""
 
     def __init__(self, label_changes: typing.Dict[int, typing.Union[int, tuple]]) -> None:
@@ -23,12 +23,12 @@ class Relabel(pymia_fltr.IFilter):
         super().__init__()
         self.label_changes = label_changes
 
-    def execute(self, image: sitk.Image, params: pymia_fltr.IFilterParams = None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: pymia_fltr.FilterParams = None) -> sitk.Image:
         """Executes the relabeling of the label image.
 
         Args:
             image (sitk.Image): The image to filter.
-            params (IFilterParams): The filter parameters (unused).
+            params (FilterParams): The filter parameters (unused).
 
         Returns:
             sitk.Image: The filtered image.
@@ -56,7 +56,7 @@ class Relabel(pymia_fltr.IFilter):
             .format(self=self, label_changes='; '.join(str_list))
 
 
-class SizeCorrectionParams(pymia_fltr.IFilterParams):
+class SizeCorrectionParams(pymia_fltr.FilterParams):
     """Size (shape) correction filter parameters."""
 
     def __init__(self, reference_shape: tuple) -> None:
@@ -69,7 +69,7 @@ class SizeCorrectionParams(pymia_fltr.IFilterParams):
         self.reference_shape = reference_shape
 
 
-class SizeCorrectionFilter(pymia_fltr.IFilter):
+class SizeCorrectionFilter(pymia_fltr.Filter):
     """Represents a filter to correct the shape/size by padding or cropping."""
 
     def __init__(self, two_sided: bool = True, pad_constant: float = 0.0) -> None:
@@ -139,7 +139,7 @@ class SizeCorrectionFilter(pymia_fltr.IFilter):
             .format(self=self)
 
 
-class CmdlineExecutorParams(pymia_fltr.IFilterParams):
+class CmdlineExecutorParams(pymia_fltr.FilterParams):
     """Command line executor filter parameters."""
 
     def __init__(self, arguments: typing.List[str]) -> None:
@@ -151,7 +151,7 @@ class CmdlineExecutorParams(pymia_fltr.IFilterParams):
         self.arguments = arguments
 
 
-class CmdlineExecutor(pymia_fltr.IFilter):
+class CmdlineExecutor(pymia_fltr.Filter):
     """Represents a command line executable.
 
     Use this filter to execute for instance a C++ command line program, which loads and image, processes, and saves it.

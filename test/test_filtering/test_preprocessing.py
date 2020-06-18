@@ -33,7 +33,7 @@ class TestNormalizeZScore(unittest.TestCase):
 
     def test_normalization_with_param(self):
         dut = pymia_fltr_prep.NormalizeZScore()
-        out = dut.execute(self.image, pymia_fltr.IFilterParams())
+        out = dut.execute(self.image, pymia_fltr.FilterParams())
         out_arr = sitk.GetArrayFromImage(out)
 
         np.testing.assert_array_almost_equal(self.desired, out_arr, decimal=12)

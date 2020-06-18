@@ -73,7 +73,7 @@ class RegistrationCallback(abc.ABC):
         pass
 
 
-class MultiModalRegistrationParams(pymia_fltr.IFilterParams):
+class MultiModalRegistrationParams(pymia_fltr.FilterParams):
     """Represents parameters for the multi-modal rigid registration."""
 
     def __init__(self, fixed_image: sitk.Image, fixed_image_mask: sitk.Image = None,
@@ -92,7 +92,7 @@ class MultiModalRegistrationParams(pymia_fltr.IFilterParams):
         self.callbacks = callbacks
 
 
-class MultiModalRegistration(pymia_fltr.IFilter):
+class MultiModalRegistration(pymia_fltr.Filter):
     """Represents a multi-modal image registration filter.
 
     The filter estimates a 3-dimensional rigid or affine transformation between images of different modalities using

@@ -4,7 +4,7 @@ import SimpleITK as sitk
 import pymia.filtering.filter as pymia_fltr
 
 
-class BinaryThreshold(pymia_fltr.IFilter):
+class BinaryThreshold(pymia_fltr.Filter):
     """Represents a binary threshold image filter."""
 
     def __init__(self, threshold: float):
@@ -20,12 +20,12 @@ class BinaryThreshold(pymia_fltr.IFilter):
         self.filter.SetOutsideValue(1)
         self.filter.SetUpperThreshold(self.threshold)
 
-    def execute(self, image: sitk.Image, params: pymia_fltr.IFilterParams = None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: pymia_fltr.FilterParams = None) -> sitk.Image:
         """Executes the binary threshold filter on an image.
 
         Args:
             image (sitk.Image): The image to filter.
-            params (IFilterParams): The filter parameters (unused).
+            params (FilterParams): The filter parameters (unused).
 
         Returns:
             sitk.Image: The filtered image.
@@ -33,7 +33,7 @@ class BinaryThreshold(pymia_fltr.IFilter):
         return self.filter.Execute(image)
 
 
-class LargestNConnectedComponents(pymia_fltr.IFilter):
+class LargestNConnectedComponents(pymia_fltr.Filter):
     """Represents a largest N connected components filter.
 
     Extracts the largest N connected components from a label image.
@@ -58,12 +58,12 @@ class LargestNConnectedComponents(pymia_fltr.IFilter):
         self.number_of_components = number_of_components
         self.consecutive_component_labels = consecutive_component_labels
 
-    def execute(self, image: sitk.Image, params: pymia_fltr.IFilterParams = None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: pymia_fltr.FilterParams = None) -> sitk.Image:
         """Executes the largest N connected components filter on an image.
 
         Args:
             image (sitk.Image): The image to filter.
-            params (IFilterParams): The filter parameters (unused).
+            params (FilterParams): The filter parameters (unused).
 
         Returns:
             sitk.Image: The filtered image.

@@ -6,7 +6,7 @@ import SimpleITK as sitk
 import pymia.filtering.filter as pymia_fltr
 
 
-class BiasFieldCorrectorParams(pymia_fltr.IFilterParams):
+class BiasFieldCorrectorParams(pymia_fltr.FilterParams):
     """Bias field correction filter parameters."""
 
     def __init__(self, mask: sitk.Image):
@@ -24,7 +24,7 @@ class BiasFieldCorrectorParams(pymia_fltr.IFilterParams):
         self.mask = mask
 
 
-class BiasFieldCorrector(pymia_fltr.IFilter):
+class BiasFieldCorrector(pymia_fltr.Filter):
     """Represents a bias field correction filter."""
 
     def __init__(self, convergence_threshold: float = 0.001, max_iterations: typing.List[int] = (50, 50, 50, 50),
@@ -85,7 +85,7 @@ class BiasFieldCorrector(pymia_fltr.IFilter):
             .format(self=self)
 
 
-class GradientAnisotropicDiffusion(pymia_fltr.IFilter):
+class GradientAnisotropicDiffusion(pymia_fltr.Filter):
     """Represents a gradient anisotropic diffusion filter."""
 
     def __init__(self,
@@ -107,12 +107,12 @@ class GradientAnisotropicDiffusion(pymia_fltr.IFilter):
         self.conductance_scaling_update_interval = conductance_scaling_update_interval
         self.no_iterations = no_iterations
 
-    def execute(self, image: sitk.Image, params: pymia_fltr.IFilterParams = None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: pymia_fltr.FilterParams = None) -> sitk.Image:
         """Executes a gradient anisotropic diffusion on an image.
 
         Args:
             image (sitk.Image): The image to filter.
-            params (IFilterParams): The parameters (unused).
+            params (FilterParams): The parameters (unused).
 
         Returns:
             sitk.Image: The smoothed image.
@@ -137,19 +137,19 @@ class GradientAnisotropicDiffusion(pymia_fltr.IFilter):
             .format(self=self)
 
 
-class NormalizeZScore(pymia_fltr.IFilter):
+class NormalizeZScore(pymia_fltr.Filter):
     """Represents a z-score normalization filter."""
 
     def __init__(self):
         """Initializes a new instance of the NormalizeZScore class."""
         super().__init__()
 
-    def execute(self, image: sitk.Image, params: pymia_fltr.IFilterParams = None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: pymia_fltr.FilterParams = None) -> sitk.Image:
         """Executes a z-score normalization on an image.
 
         Args:
             image (sitk.Image): The image to filter.
-            params (IFilterParams): The parameters (unused).
+            params (FilterParams): The parameters (unused).
 
         Returns:
             sitk.Image: The normalized image.
@@ -176,7 +176,7 @@ class NormalizeZScore(pymia_fltr.IFilter):
             .format(self=self)
 
 
-class RescaleIntensity(pymia_fltr.IFilter):
+class RescaleIntensity(pymia_fltr.Filter):
     """Represents a rescale intensity filter."""
 
     def __init__(self, min_intensity: float, max_intensity: float):
@@ -190,12 +190,12 @@ class RescaleIntensity(pymia_fltr.IFilter):
         self.min_intensity = min_intensity
         self.max_intensity = max_intensity
 
-    def execute(self, image: sitk.Image, params: pymia_fltr.IFilterParams = None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: pymia_fltr.FilterParams = None) -> sitk.Image:
         """Executes an intensity rescaling on an image.
 
         Args:
             image (sitk.Image): The image to filter.
-            params (IFilterParams): The parameters (unused).
+            params (FilterParams): The parameters (unused).
 
         Returns:
             sitk.Image: The intensity rescaled image.
@@ -215,7 +215,7 @@ class RescaleIntensity(pymia_fltr.IFilter):
             .format(self=self)
 
 
-class HistogramMatcherParams(pymia_fltr.IFilterParams):
+class HistogramMatcherParams(pymia_fltr.FilterParams):
     """Histogram matching filter parameters."""
 
     def __init__(self, reference_image: sitk.Image):
@@ -227,7 +227,7 @@ class HistogramMatcherParams(pymia_fltr.IFilterParams):
         self.reference_image = reference_image
 
 
-class HistogramMatcher(pymia_fltr.IFilter):
+class HistogramMatcher(pymia_fltr.Filter):
     """Represents a histogram matching filter."""
 
     def __init__(self, histogram_levels: int = 256, match_points: int = 1, threshold_mean_intensity: bool = True):
