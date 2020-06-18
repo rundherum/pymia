@@ -1,9 +1,8 @@
 .. _examples:
-
 Examples
 ========
 
-Here are a few example scripts to get you started as fast as possible with pymia.
+The following examples illustrate the intended use case of pymia:
 
 .. toctree::
     :maxdepth: 1
@@ -11,5 +10,5 @@ Here are a few example scripts to get you started as fast as possible with pymia
     examples.data.scaffold
     examples.data.extraction
     examples.evaluation.basic
-    examples.evaluation.deeplearning
+    examples.evaluation.logging
     examples.filtering.basic
