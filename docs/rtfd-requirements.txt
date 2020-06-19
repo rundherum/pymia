@@ -4,3 +4,4 @@ h5py
 numpy >= 1.12.1
 SimpleITK >= 1.0.0
 nbsphinx >= 0.7.1
+sphinx-copybutton >= 0.2.12
