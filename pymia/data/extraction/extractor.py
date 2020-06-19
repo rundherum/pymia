@@ -12,38 +12,57 @@ from . import reader as rd
 
 
 class Extractor(abc.ABC):
-    """Represents an extractor that extracts data from a dataset."""
+    """Interface unifying the extraction of data from a dataset."""
 
     @abc.abstractmethod
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
+        """Extract data from the dataset.
+
+        Args:
+            reader (.Reader): Reader instance that can read from dataset.
+            params (dict): Extraction parameters containing information such as subject index and index expression.
+            extracted (dict): The dictionary to put the extracted data in.
+        """
         pass
 
 
 class ComposeExtractor(Extractor):
-    """Composes multiple Extractor objects."""
 
-    def __init__(self, extractors) -> None:
+    def __init__(self, extractors: list) -> None:
+        """ Composes many :class:`.Extractor` instances and behaves like an single :class:`.Extractor` instance.
+
+        Args:
+            extractors (list): A list of :class:`.Extractor` instances.
+        """
         super().__init__()
         self.extractors = extractors
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
+        """see :meth:`.Extractor.extract`"""
         for e in self.extractors:
             e.extract(reader, params, extracted)
 
 
 class NamesExtractor(Extractor):
-    """Extracts the names of the entries within a category (i.e. the name of the enum identifying the data).
-
-    The names are of type str.
-    """
-
     def __init__(self, cache: bool = True, categories=(defs.KEY_IMAGES, defs.KEY_LABELS)) -> None:
+        """ Extracts the names of the entries within a category (e.g. "Flair", "T1" for the category "images").
+
+        Added key to :obj:`extracted`:
+
+        - :const:`pymia.data.definition.KEY_PLACEHOLDER_NAMES` with :obj:`str` content
+
+        Args:
+            cache (bool): Whether to cache the results. If :code:`True`, the dataset is only accessed once.
+                :code:`True` is often preferred since the name entries are typically unique in the dataset.
+            categories (tuple): Categories for which to extract the names
+        """
         super().__init__()
         self.cache = cache
         self.cached_result = None
         self.categories = categories
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
+        """see :meth:`.Extractor.extract`"""
         if not self.cache or self.cached_result is None:
             d = self._extract(reader)
             self.cached_result = d
@@ -63,19 +82,26 @@ class NamesExtractor(Extractor):
 class SubjectExtractor(Extractor):
     """Extracts the subject's identification.
 
-    The subject's identification is of type str.
+    Added key to :obj:`extracted`:
+
+    - :const:`pymia.data.definition.KEY_SUBJECT_INDEX` with :obj:`int` content
+    - :const:`pymia.data.definition.KEY_SUBJECT` with :obj:`str` content
     """
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
+        """see :meth:`.Extractor.extract`"""
         extracted[defs.KEY_SUBJECT_INDEX] = params[defs.KEY_SUBJECT_INDEX]
         subject_index_expr = expr.IndexExpression(params[defs.KEY_SUBJECT_INDEX])
-        extracted[defs.LOC_SUBJECT] = reader.read(defs.LOC_SUBJECT, subject_index_expr)
+        extracted[defs.KEY_SUBJECT] = reader.read(defs.LOC_SUBJECT, subject_index_expr)
 
 
 class IndexingExtractor(Extractor):
     """Extracts the index expression.
 
-    The index expression is of type IndexExpression.
+    Added key to :obj:`extracted`:
+
+    - :const:`pymia.data.definition.KEY_SUBJECT_INDEX` with :obj:`int` content
+    - :const:`pymia.data.definition.KEY_INDEX_EXPR` with :class:`.IndexExpression` content
     """
 
     def __init__(self, do_pickle: bool = False) -> None:
@@ -83,6 +109,7 @@ class IndexingExtractor(Extractor):
         self.do_pickle = do_pickle
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
+        """see :meth:`.Extractor.extract`"""
         extracted[defs.KEY_SUBJECT_INDEX] = params[defs.KEY_SUBJECT_INDEX]
         index_expression = params[defs.KEY_INDEX_EXPR]
         if self.do_pickle:
@@ -92,16 +119,23 @@ class IndexingExtractor(Extractor):
 
 
 class ImagePropertiesExtractor(Extractor):
-    """Extracts the image properties.
-
-    The image properties are of type ImageProperties.
-    """
-
     def __init__(self, do_pickle: bool = False) -> None:
+        """
+        Extracts the image properties.
+
+        Added key to :obj:`extracted`:
+
+        - :const:`pymia.data.definition.KEY_PROPERTIES` with :class:`.ImageProperties` content (or string if :code:`do_pickle`)
+
+        Args:
+            do_pickle (bool): whether to pickle the extracted :class:`.ImageProperties` instance.
+                This allows usage in multiprocessing environment.
+        """
         super().__init__()
         self.do_pickle = do_pickle
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
+        """see :meth:`.Extractor.extract`"""
         subject_index_expr = expr.IndexExpression(params[defs.KEY_SUBJECT_INDEX])
 
         shape = reader.read(defs.LOC_INFO_SHAPE, subject_index_expr).tolist()
@@ -124,18 +158,22 @@ class ImagePropertiesExtractor(Extractor):
 
 
 class FilesExtractor(Extractor):
-    """Extracts the file paths.
-
-    The file paths are of type str.
-    """
 
     def __init__(self, cache: bool = True, categories=(defs.KEY_IMAGES, defs.KEY_LABELS)) -> None:
+        """Extracts the file paths.
+
+
+        Args:
+            cache:
+            categories:
+        """
         super().__init__()
         self.cache = cache
         self.cached_file_root = None
         self.categories = categories
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
+        """see :meth:`.Extractor.extract`"""
         subject_index_expr = expr.IndexExpression(params[defs.KEY_SUBJECT_INDEX])
 
         if not self.cache or self.cached_file_root is None:
@@ -171,6 +209,7 @@ class SelectiveDataExtractor(Extractor):
         self.category = category
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
+        """see :meth:`.Extractor.extract`"""
         if defs.KEY_PLACEHOLDER_NAMES.format(self.category) not in extracted:
             raise ValueError('selection of labels requires label_names to be extracted (use NamesExtractor)')
 
@@ -216,6 +255,7 @@ class RandomDataExtractor(Extractor):
         self.category = category
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
+        """see :meth:`.Extractor.extract`"""
         if defs.KEY_PLACEHOLDER_NAMES.format(self.category) not in extracted:
             raise ValueError('selection of labels requires label_names to be extracted (use NamesExtractor)')
 
@@ -249,6 +289,7 @@ class ImageShapeExtractor(Extractor):
         self.numpy_format = numpy_format
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
+        """see :meth:`.Extractor.extract`"""
         subject_index_expr = expr.IndexExpression(params[defs.KEY_SUBJECT_INDEX])
 
         shape = reader.read(defs.LOC_INFO_SHAPE, subject_index_expr)
@@ -269,6 +310,7 @@ class DataExtractor(Extractor):
         self.entry_base_names = None
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
+        """see :meth:`.Extractor.extract`"""
         if self.entry_base_names is None:
             entries = reader.get_subject_entries()
             self.entry_base_names = [entry.rsplit('/', maxsplit=1)[1] for entry in entries]
@@ -305,6 +347,7 @@ class PadDataExtractor(Extractor):
         self.index_diffs = index_diffs
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
+        """see :meth:`.Extractor.extract`"""
         index_expr = params[defs.KEY_INDEX_EXPR]  # type: expr.IndexExpression
 
         # Make sure all indexing is done with slices (Example: (16,) will be changed to (slice(16, 17, None),) which

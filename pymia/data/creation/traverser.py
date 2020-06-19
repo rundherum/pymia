@@ -12,6 +12,10 @@ from . import fileloader as load
 
 
 class Traverser(abc.ABC):
+    """Base traverser class.
+
+    This class defines the interface for traversing subject information to build the dataset.
+    To be inherited if a alternative traverse behaviour is desired than the default :class:`.SubjectFileTraverser`."""
 
     @abc.abstractmethod
     def traverse(self, files: list, loader: load.Load, callbacks: typing.List[cb.Callback] = None,
@@ -20,17 +24,27 @@ class Traverser(abc.ABC):
 
 
 def default_concat(data: typing.List[np.ndarray]) -> np.ndarray:
+    """ Default concatenation function used to combine all entries from a category (e.g. T1, T2 data from "images" category)
+    in :meht:`.Traverser.traverse`
+
+    Args:
+        data (list): List of numpy.ndarray entries to be concatenated.
+
+    Returns:
+        numpy.ndarray: Concatenated entry.
+
+    """
     return np.stack(data, axis=-1)
 
 
 class SubjectFileTraverser(Traverser):
 
     def __init__(self, categories: typing.Union[str, typing.Tuple[str, ...]] = None):
-        """Initializes a new instance of the SubjectFileTraverser class.
+        """Class managing the dataset creation process.
 
         Args:
-            categories (str or tuple of str): The categories to traverse. If None, then all categories of a SubjectFile
-                will be traversed.
+            categories (str or tuple of str): The categories to traverse. If None, then all categories of a
+                :class:`.SubjectFile` will be traversed.
         """
         if isinstance(categories, str):
             categories = (categories, )
@@ -39,6 +53,19 @@ class SubjectFileTraverser(Traverser):
     def traverse(self, subject_files: typing.List[subj.SubjectFile], load=load.LoadDefault(),
                  callback: cb.Callback = None,
                  transform: tfm.Transform = None, concat_fn=default_concat):
+        """Controls the actual dataset creation. It goes through the file list, loads the files,
+        applies transformation to the data, and calls the callbacks to do the storing (or other stuff).
+
+        Args:
+            subject_files (list): list of :class:`SubjectFile` to be processes.
+            load (callable): A load function or :class:`.Load` instance that performs the data loading
+            callback (.Callback): A callback or composed (:class:`.ComposeCallback`) callback performing the storage of the
+                loaded data (and other things such as logging).
+            transform (.Transform): Transformation to be applied to the data after loading
+                and before :meth:`Callback.on_subject` is called
+            concat_fn (callable): Function that concatenates all the entries of a category
+                (e.g. T1, T2 data from "images" category). Default is :func:`default_concat`.
+        """
         if len(subject_files) == 0:
             raise ValueError('No files')
         if not isinstance(subject_files[0], subj.SubjectFile):
