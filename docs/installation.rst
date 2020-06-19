@@ -52,10 +52,15 @@ Building the documentation requires:
 
 #. Download or clone the code from `GitHub <https://github.com/rundherum/pymia>`_
 
-#. Install Sphinx and the RTD theme using pip:
+#. Install Sphinx and other required packages using pip:
 
    - :bash:`pip install sphinx`
    - :bash:`pip install sphinx-rtd-theme`
+   - :bash:`pip install nbsphinx`
+   - :bash:`pip install sphinx-copybutton`
+
+.. note::
+   It might further be, that you need to install `pandoc <https://pandoc.org/>`_.
 
 #. Run Sphinx in the pymia root directory to create the documentation
 

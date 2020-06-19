@@ -29,7 +29,7 @@ class Extractor(abc.ABC):
 class ComposeExtractor(Extractor):
 
     def __init__(self, extractors: list) -> None:
-        """ Composes many :class:`.Extractor` instances and behaves like an single :class:`.Extractor` instance.
+        """Composes many :class:`.Extractor` instances and behaves like an single :class:`.Extractor` instance.
 
         Args:
             extractors (list): A list of :class:`.Extractor` instances.
@@ -45,7 +45,7 @@ class ComposeExtractor(Extractor):
 
 class NamesExtractor(Extractor):
     def __init__(self, cache: bool = True, categories=(defs.KEY_IMAGES, defs.KEY_LABELS)) -> None:
-        """ Extracts the names of the entries within a category (e.g. "Flair", "T1" for the category "images").
+        """Extracts the names of the entries within a category (e.g. "Flair", "T1" for the category "images").
 
         Added key to :obj:`extracted`:
 

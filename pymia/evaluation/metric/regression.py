@@ -5,10 +5,9 @@ from .base import NumpyArrayMetric
 
 
 class MeanAbsoluteError(NumpyArrayMetric):
-    """Represents a mean absolute error metric."""
 
     def __init__(self, metric: str = 'MAE'):
-        """Initializes a new instance of the MeanAbsoluteError class.
+        """Represents a mean absolute error metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -22,10 +21,9 @@ class MeanAbsoluteError(NumpyArrayMetric):
 
 
 class MeanSquaredError(NumpyArrayMetric):
-    """Represents a mean squared error metric."""
 
     def __init__(self, metric: str = 'MSE'):
-        """Initializes a new instance of the MeanSquaredError class.
+        """Represents a mean squared error metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -39,10 +37,9 @@ class MeanSquaredError(NumpyArrayMetric):
 
 
 class RootMeanSquaredError(NumpyArrayMetric):
-    """Represents a root mean squared error metric."""
 
     def __init__(self, metric: str = 'RMSE'):
-        """Initializes a new instance of the RootMeanSquaredError class.
+        """Represents a root mean squared error metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -56,10 +53,9 @@ class RootMeanSquaredError(NumpyArrayMetric):
 
 
 class NormalizedRootMeanSquaredError(NumpyArrayMetric):
-    """Represents a normalized root mean squared error metric."""
 
     def __init__(self, metric: str = 'NRMSE'):
-        """Initializes a new instance of the NormalizedRootMeanSquaredError class.
+        """Represents a normalized root mean squared error metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -74,10 +70,9 @@ class NormalizedRootMeanSquaredError(NumpyArrayMetric):
 
 
 class CoefficientOfDetermination(NumpyArrayMetric):
-    """Represents a coefficient of determination (R^2) error metric."""
 
     def __init__(self, metric: str = 'R2'):
-        """Initializes a new instance of the CoefficientOfDetermination class.
+        """Represents a coefficient of determination (R^2) error metric.
 
         Args:
             metric (str): The identification string of the metric.

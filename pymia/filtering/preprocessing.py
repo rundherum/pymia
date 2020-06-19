@@ -7,31 +7,29 @@ import pymia.filtering.filter as pymia_fltr
 
 
 class BiasFieldCorrectorParams(pymia_fltr.FilterParams):
-    """Bias field correction filter parameters."""
 
     def __init__(self, mask: sitk.Image):
-        """Initializes a new instance of the BiasFieldCorrectorParams class.
+        """Bias field correction filter parameters used by the :class:`.BiasFieldCorrector` filter.
 
         Args:
             mask (sitk.Image): A mask image (0=background; 1=mask).
 
         Examples:
 
-        To generate a default mask use Otsu's thresholding:
+            To generate a default mask use Otsu's thresholding:
 
-        >>> sitk.OtsuThreshold(image, 0, 1, 200)
+            >>> sitk.OtsuThreshold(image, 0, 1, 200)
         """
         self.mask = mask
 
 
 class BiasFieldCorrector(pymia_fltr.Filter):
-    """Represents a bias field correction filter."""
 
     def __init__(self, convergence_threshold: float = 0.001, max_iterations: typing.List[int] = (50, 50, 50, 50),
                  fullwidth_at_halfmax: float = 0.15, filter_noise: float = 0.01,
                  histogram_bins: int = 200, control_points: typing.List[int] = (4, 4, 4),
                  spline_order: int = 3):
-        """Initializes a new instance of the BiasFieldCorrector class.
+        """Represents a bias field correction filter.
 
         Args:
             convergence_threshold (float): The threshold to stop the optimizer.
@@ -86,14 +84,13 @@ class BiasFieldCorrector(pymia_fltr.Filter):
 
 
 class GradientAnisotropicDiffusion(pymia_fltr.Filter):
-    """Represents a gradient anisotropic diffusion filter."""
 
     def __init__(self,
                  time_step: float = 0.125,
                  conductance: int = 3,
                  conductance_scaling_update_interval: int = 1,
                  no_iterations: int = 5):
-        """Initializes a new instance of the GradientAnisotropicDiffusion class.
+        """Represents a gradient anisotropic diffusion filter.
 
         Args:
             time_step (float): The time step.
@@ -140,10 +137,6 @@ class GradientAnisotropicDiffusion(pymia_fltr.Filter):
 class NormalizeZScore(pymia_fltr.Filter):
     """Represents a z-score normalization filter."""
 
-    def __init__(self):
-        """Initializes a new instance of the NormalizeZScore class."""
-        super().__init__()
-
     def execute(self, image: sitk.Image, params: pymia_fltr.FilterParams = None) -> sitk.Image:
         """Executes a z-score normalization on an image.
 
@@ -177,10 +170,9 @@ class NormalizeZScore(pymia_fltr.Filter):
 
 
 class RescaleIntensity(pymia_fltr.Filter):
-    """Represents a rescale intensity filter."""
 
     def __init__(self, min_intensity: float, max_intensity: float):
-        """Initializes a new instance of the RescaleIntensity class.
+        """Represents a rescale intensity filter.
 
         Args:
             min_intensity (float): The min intensity value.
@@ -216,10 +208,9 @@ class RescaleIntensity(pymia_fltr.Filter):
 
 
 class HistogramMatcherParams(pymia_fltr.FilterParams):
-    """Histogram matching filter parameters."""
 
     def __init__(self, reference_image: sitk.Image):
-        """Initializes a new instance of the HistogramMatcherParams class.
+        """Histogram matching filter parameters used by the :class:`.HistogramMatcher` filter.
 
         Args:
             reference_image (sitk.Image): Reference image for the matching.
@@ -228,10 +219,9 @@ class HistogramMatcherParams(pymia_fltr.FilterParams):
 
 
 class HistogramMatcher(pymia_fltr.Filter):
-    """Represents a histogram matching filter."""
 
     def __init__(self, histogram_levels: int = 256, match_points: int = 1, threshold_mean_intensity: bool = True):
-        """Initializes a new instance of the HistogramMatcher class.
+        """Represents a histogram matching filter.
 
         Args:
             histogram_levels (int): Number of histogram levels.

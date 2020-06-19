@@ -14,10 +14,9 @@ import pymia.evaluation.metric as pymia_metric
 
 
 class Result:
-    """Represents a result."""
 
     def __init__(self, id_: str, label: str, metric: str, value):
-        """Initializes a new instance of the Result class.
+        """Represents a result.
 
         Args:
             id_ (str): The identification of the result (e.g., the subject's name).
@@ -32,10 +31,9 @@ class Result:
 
 
 class Evaluator(abc.ABC):
-    """Evaluator base class."""
 
     def __init__(self, metrics: typing.List[pymia_metric.Metric]):
-        """Initializes a new instance of the Evaluator class.
+        """Evaluator base class.
 
         Args:
             metrics (list of pymia_metric.Metric): A list of metrics.
@@ -63,10 +61,9 @@ class Evaluator(abc.ABC):
 
 
 class SegmentationEvaluator(Evaluator):
-    """Represents a segmentation evaluator, evaluating metrics on predictions against references."""
 
     def __init__(self, metrics: typing.List[pymia_metric.Metric], labels: dict):
-        """Initializes a new instance of the SegmentationEvaluator class.
+        """Represents a segmentation evaluator, evaluating metrics on predictions against references.
 
         Args:
             metrics (list of pymia_metric.Metric): A list of metrics.

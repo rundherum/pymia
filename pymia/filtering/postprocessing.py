@@ -5,10 +5,9 @@ import pymia.filtering.filter as pymia_fltr
 
 
 class BinaryThreshold(pymia_fltr.Filter):
-    """Represents a binary threshold image filter."""
 
     def __init__(self, threshold: float):
-        """Initializes a new instance of the BinaryThreshold class.
+        """Represents a binary threshold image filter.
 
         Args:
             threshold (float): The threshold value.
@@ -34,16 +33,14 @@ class BinaryThreshold(pymia_fltr.Filter):
 
 
 class LargestNConnectedComponents(pymia_fltr.Filter):
-    """Represents a largest N connected components filter.
-
-    Extracts the largest N connected components from a label image.
-    By default the N components will all have the value 1 in the output image.
-    Use the `consecutive_component_labels` option such that the largest has value 1,
-    the second largest has value 2, etc. Background is always assumed to be 0.
-    """
 
     def __init__(self, number_of_components: int = 1, consecutive_component_labels: bool = False):
-        """Initializes a new instance of the LargestNConnectedComponents class.
+        """Represents a largest N connected components filter.
+
+        Extracts the largest N connected components from a label image.
+        By default the N components will all have the value 1 in the output image.
+        Use the `consecutive_component_labels` option such that the largest has value 1,
+        the second largest has value 2, etc. Background is always assumed to be 0.
 
         Args:
             number_of_components (int): The number of largest components to extract.

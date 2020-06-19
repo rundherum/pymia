@@ -11,10 +11,9 @@ import pymia.filtering.filter as pymia_fltr
 
 
 class Relabel(pymia_fltr.Filter):
-    """Represents a relabel filter."""
 
     def __init__(self, label_changes: typing.Dict[int, typing.Union[int, tuple]]) -> None:
-        """Initializes a new instance of the LargestNComponents class.
+        """Represents a relabel filter.
 
         Args:
             label_changes(typing.Dict[int, typing.Union[int, tuple]]): Label change rule where the key is the new label
@@ -57,10 +56,9 @@ class Relabel(pymia_fltr.Filter):
 
 
 class SizeCorrectionParams(pymia_fltr.FilterParams):
-    """Size (shape) correction filter parameters."""
 
     def __init__(self, reference_shape: tuple) -> None:
-        """Initializes a new instance of the SizeCorrectionParams class.
+        """Represents size (shape) correction filter parameters used by the :class:`.SizeCorrection` filter.
 
         Args:
             reference_shape (tuple): The reference or target shape.
@@ -69,11 +67,10 @@ class SizeCorrectionParams(pymia_fltr.FilterParams):
         self.reference_shape = reference_shape
 
 
-class SizeCorrectionFilter(pymia_fltr.Filter):
-    """Represents a filter to correct the shape/size by padding or cropping."""
+class SizeCorrection(pymia_fltr.Filter):
 
     def __init__(self, two_sided: bool = True, pad_constant: float = 0.0) -> None:
-        """ Initializes a new instance of the SizeCorrectionFilter class.
+        """Represents a filter to correct the shape/size by padding or cropping.
 
         Args:
             two_sided (bool): Indicates whether the cropping and padding should be applied on one or both side(s) of the dimension.
@@ -140,10 +137,9 @@ class SizeCorrectionFilter(pymia_fltr.Filter):
 
 
 class CmdlineExecutorParams(pymia_fltr.FilterParams):
-    """Command line executor filter parameters."""
 
     def __init__(self, arguments: typing.List[str]) -> None:
-        """Initializes a new instance of the CmdlineExecutorParams class.
+        """Command line executor filter parameters used by the :class:`.CmdlineExecutor` filter.
 
         Args:
             arguments (typing.List[str]): Additional arguments for the command line execution.
@@ -152,13 +148,11 @@ class CmdlineExecutorParams(pymia_fltr.FilterParams):
 
 
 class CmdlineExecutor(pymia_fltr.Filter):
-    """Represents a command line executable.
-
-    Use this filter to execute for instance a C++ command line program, which loads and image, processes, and saves it.
-    """
 
     def __init__(self, executable_path: str):
-        """Initializes a new instance of the CmdlineExecutor class.
+        """Represents a command line executable.
+
+        Use this filter to execute for instance a C++ command line program, which loads and image, processes, and saves it.
 
         Args:
             executable_path (str): The path to the executable to run.

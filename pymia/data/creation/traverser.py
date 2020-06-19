@@ -24,7 +24,7 @@ class Traverser(abc.ABC):
 
 
 def default_concat(data: typing.List[np.ndarray]) -> np.ndarray:
-    """ Default concatenation function used to combine all entries from a category (e.g. T1, T2 data from "images" category)
+    """Default concatenation function used to combine all entries from a category (e.g. T1, T2 data from "images" category)
     in :meht:`.Traverser.traverse`
 
     Args:

@@ -34,6 +34,12 @@ with open(os.path.join(basedir, 'pymia', '__version__.py'), 'r', encoding='utf-8
 shutil.copyfile(os.path.join(basedir, 'examples', 'evaluation', 'basic.ipynb'),
                 os.path.join(basedir, 'docs', 'examples.evaluation.basic.ipynb'))
 
+shutil.copyfile(os.path.join(basedir, 'examples', 'evaluation', 'logging_torch.ipynb'),
+                os.path.join(basedir, 'docs', 'examples.evaluation.logging_torch.ipynb'))
+
+shutil.copyfile(os.path.join(basedir, 'examples', 'filtering', 'basic.ipynb'),
+                os.path.join(basedir, 'docs', 'examples.filtering.basic.ipynb'))
+
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.

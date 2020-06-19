@@ -104,7 +104,7 @@ class PymiaDatasource:
         self.transform = transform
 
     def get_subjects(self):
-        """" Get all the subjects in the dataset.
+        """"Get all the subjects in the dataset.
 
         Returns:
             list: All subject identifiers in the dataset.

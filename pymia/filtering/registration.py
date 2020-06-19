@@ -1,9 +1,9 @@
 """The registration module provides classes for image registration.
 
 See Also:
-    `ITK Registration <https://itk.org/Doxygen/html/RegistrationPage.html>`_
+    - `ITK Registration <https://itk.org/Doxygen/html/RegistrationPage.html>`_
 
-    `ITK Software Guide Registration <https://itk.org/ITKSoftwareGuide/html/Book2/ITKSoftwareGuide-Book2ch3.html>`_
+    - `ITK Software Guide Registration <https://itk.org/ITKSoftwareGuide/html/Book2/ITKSoftwareGuide-Book2ch3.html>`_
 """
 import abc
 import enum
@@ -24,10 +24,9 @@ class RegistrationType(enum.Enum):
 
 
 class RegistrationCallback(abc.ABC):
-    """Represents the abstract handler for the registration callbacks."""
 
     def __init__(self) -> None:
-        """Initializes a new instance of the abstract RegistrationCallback class."""
+        """Represents the abstract handler for the registration callbacks."""
         self.registration_method = None
         self.fixed_image = None
         self.moving_image = None
@@ -74,11 +73,10 @@ class RegistrationCallback(abc.ABC):
 
 
 class MultiModalRegistrationParams(pymia_fltr.FilterParams):
-    """Represents parameters for the multi-modal rigid registration."""
 
     def __init__(self, fixed_image: sitk.Image, fixed_image_mask: sitk.Image = None,
                  callbacks: typing.List[RegistrationCallback] = None):
-        """Initializes a new instance of the MultiModalRegistrationParams class.
+        """Represents parameters for the multi-modal rigid registration used by the :class:`.MultiModalRegistration` filter.
 
         Args:
             fixed_image (sitk.Image): The fixed image for the registration.
@@ -93,23 +91,6 @@ class MultiModalRegistrationParams(pymia_fltr.FilterParams):
 
 
 class MultiModalRegistration(pymia_fltr.Filter):
-    """Represents a multi-modal image registration filter.
-
-    The filter estimates a 3-dimensional rigid or affine transformation between images of different modalities using
-    - Mutual information similarity metric
-    - Linear interpolation
-    - Gradient descent optimization
-
-    Examples:
-
-    The following example shows the usage of the MultiModalRegistration class.
-
-    >>> fixed_image = sitk.ReadImage('/path/to/image/fixed.mha')
-    >>> moving_image = sitk.ReadImage('/path/to/image/moving.mha')
-    >>> registration = MultiModalRegistration()  # specify parameters to your needs
-    >>> parameters = MultiModalRegistrationParams(fixed_image)
-    >>> registered_image = registration.execute(moving_image, parameters)
-    """
 
     def __init__(self,
                  registration_type: RegistrationType = RegistrationType.RIGID,
@@ -123,7 +104,12 @@ class MultiModalRegistration(pymia_fltr.Filter):
                  sampling_percentage: float = 0.2,
                  sampling_seed: int = sitk.sitkWallClock,
                  resampling_interpolator=sitk.sitkBSpline):
-        """Initializes a new instance of the MultiModalRegistration class.
+        """Represents a multi-modal image registration filter.
+
+        The filter estimates a 3-dimensional rigid or affine transformation between images of different modalities using
+        - Mutual information similarity metric
+        - Linear interpolation
+        - Gradient descent optimization
 
         Args:
             registration_type (RegistrationType): The type of the registration ('rigid' or 'affine').
@@ -140,6 +126,16 @@ class MultiModalRegistration(pymia_fltr.Filter):
             sampling_seed: The seed for reproducible behavior.
             resampling_interpolator: Interpolation to be applied while resampling the image by the determined
                 transformation.
+
+        Examples:
+
+            The following example shows the usage of the MultiModalRegistration class.
+
+            >>> fixed_image = sitk.ReadImage('/path/to/image/fixed.mha')
+            >>> moving_image = sitk.ReadImage('/path/to/image/moving.mha')
+            >>> registration = MultiModalRegistration()  # specify parameters to your needs
+            >>> parameters = MultiModalRegistrationParams(fixed_image)
+            >>> registered_image = registration.execute(moving_image, parameters)
         """
         super().__init__()
 
@@ -281,13 +277,12 @@ class MultiModalRegistration(pymia_fltr.Filter):
 
 
 class PlotOnResolutionChangeCallback(RegistrationCallback):
-    """Represents a plotter for registrations.
-
-    Saves the moving image on each resolution change and the registration end.
-    """
 
     def __init__(self, plot_dir: str, file_name_prefix: str = '') -> None:
-        """
+        """Represents a plotter for registrations.
+
+        Saves the moving image on each resolution change and the registration end.
+
         Args:
             plot_dir (str): Path to the directory where to save the plots.
             file_name_prefix (str): The file name prefix for the plots.

@@ -10,10 +10,9 @@ class FilterParams(abc.ABC):
 
 
 class Filter(abc.ABC):
-    """Filter base class."""
 
     def __init__(self):
-        """Initializes a new instance of the Filter class."""
+        """Filter base class."""
         self.verbose = False
 
     @abc.abstractmethod
@@ -31,10 +30,9 @@ class Filter(abc.ABC):
 
 
 class FilterPipeline:
-    """Represents a filter pipeline, which sequentially executes filters (:class:`pymia.filtering.filter.Filter`) on an image."""
 
     def __init__(self, filters: typing.List[Filter] = None):
-        """Initializes a new instance of the FilterPipeline class.
+        """Represents a filter pipeline, which sequentially executes filters (:class:`.Filter`) on an image.
 
         Args:
             filters (list of Filter): The filters of the pipeline.
