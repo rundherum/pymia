@@ -129,7 +129,7 @@ class PymiaDatasource:
             transform (.Transform): Transformation(s) to be applied to the extracted data.
 
         Returns:
-            dict: Extracted data in a dictionary. Keys are defined by the :class:`.Extractor`(s) used.
+            dict: Extracted data in a dictionary. Keys are defined by the used :class:`.Extractor`.
         """
         if index_expr is None:
             index_expr = expr.IndexExpression()
