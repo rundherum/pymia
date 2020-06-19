@@ -39,11 +39,12 @@ class RandomCrop(tfm.Transform):
                 If axis is not defined, the cropping will be applied from the first dimension onwards of the sample.
                 Use None to exclude an axis or define axis to specify the axis/axes to crop.
                 E.g.:
-                    shape=256 with the default axis parameter results in a shape of 256 x ...
-                    shape=(256, 128) with the default axis parameter results in a shape of 256 x 128 x ...
-                    shape=(None, 256) with the default axis parameter results in a shape of <as before> x 256 x ...
-                    shape=(256, 128) with axis=(1, 0) results in a shape of 128 x 256 x ...
-                    shape=(None, 128, 256) with axis=(1, 2, 0) results in a shape of 256 x <as before> x 256 x ...
+
+                - shape=256 with the default axis parameter results in a shape of 256 x ...
+                - shape=(256, 128) with the default axis parameter results in a shape of 256 x 128 x ...
+                - shape=(None, 256) with the default axis parameter results in a shape of <as before> x 256 x ...
+                - shape=(256, 128) with axis=(1, 0) results in a shape of 128 x 256 x ...
+                - shape=(None, 128, 256) with axis=(1, 2, 0) results in a shape of 256 x <as before> x 256 x ...
             axis (int, tuple): Axis or axes to which the shape int or tuple correspond(s) to.
                 If defined, must have the same length as shape.
             p (float): The probability of the cropping to be applied.
@@ -245,11 +246,12 @@ class RandomShift(tfm.Transform):
                 If axis is not defined, the shifting will be applied from the first dimension onwards of the sample.
                 Use None to exclude an axis or define axis to specify the axis/axes to crop.
                 E.g.:
-                    shift=0.2 with the default axis parameter shifts the sample along the 1st axis.
-                    shift=(0.2, 0.1) with the default axis parameter shifts the sample along the 1st and 2nd axes.
-                    shift=(None, 0.2) with the default axis parameter shifts the sample along the 2st axis.
-                    shift=(0.2, 0.1) with axis=(1, 0) shifts the sample along the 1st and 2nd axes.
-                    shift=(None, 0.1, 0.2) with axis=(1, 2, 0) shifts the sample along the 1st and 3rd axes.
+
+                - shift=0.2 with the default axis parameter shifts the sample along the 1st axis.
+                - shift=(0.2, 0.1) with the default axis parameter shifts the sample along the 1st and 2nd axes.
+                - shift=(None, 0.2) with the default axis parameter shifts the sample along the 2st axis.
+                - shift=(0.2, 0.1) with axis=(1, 0) shifts the sample along the 1st and 2nd axes.
+                - shift=(None, 0.1, 0.2) with axis=(1, 2, 0) shifts the sample along the 1st and 3rd axes.
             axis (int, tuple): Axis or axes to which the shift int or tuple correspond(s) to.
                 If defined, must have the same length as shape.
             p (float): The probability of the shift to be applied.
