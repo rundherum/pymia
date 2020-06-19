@@ -1,4 +1,4 @@
-.. _example-filtering1:
+
 Filter pipelines
 ================
 

@@ -1,4 +1,5 @@
 .. _example-data1:
+
 How to use the pymia for deep learning projects - Part 1: Handle your data
 ==========================================================================
 
@@ -27,4 +28,3 @@ Next, we will define a main script for training and validation of our deep learn
 A lot is happening here, so let's break it down. First of all, we want to extract that data slice-wise. Therefore, the indexing strategy to extract the image slices from the dataset is
 
 `indexing_strategy = pymia_extr.SliceIndexing()`
-
