@@ -18,6 +18,7 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
+import shutil
 import sys
 
 import sphinx_rtd_theme
@@ -28,6 +29,10 @@ sys.path.insert(0, basedir)
 about = {}
 with open(os.path.join(basedir, 'pymia', '__version__.py'), 'r', encoding='utf-8') as f:
     exec(f.read(), about)
+
+# -- Copy example Jupyter notebooks for documentation building
+shutil.copyfile(os.path.join(basedir, 'examples', 'evaluation', 'basic.ipynb'),
+                os.path.join(basedir, 'docs', 'examples.evaluation.basic.ipynb'))
 
 # -- General configuration ------------------------------------------------
 
