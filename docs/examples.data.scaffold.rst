@@ -1,4 +1,4 @@
-.. _example-data1:
+.. _example-data1-old:
 
 How to use the pymia for deep learning projects - Part 1: Handle your data
 ==========================================================================

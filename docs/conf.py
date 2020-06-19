@@ -31,6 +31,9 @@ with open(os.path.join(basedir, 'pymia', '__version__.py'), 'r', encoding='utf-8
     exec(f.read(), about)
 
 # -- Copy example Jupyter notebooks for documentation building
+shutil.copyfile(os.path.join(basedir, 'examples', 'data', 'creation.ipynb'),
+                os.path.join(basedir, 'docs', 'examples.data.creation.ipynb'))
+
 shutil.copyfile(os.path.join(basedir, 'examples', 'evaluation', 'basic.ipynb'),
                 os.path.join(basedir, 'docs', 'examples.evaluation.basic.ipynb'))
 
