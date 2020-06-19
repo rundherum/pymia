@@ -13,7 +13,7 @@ from . import fileloader as load
 
 def default_concat(data: typing.List[np.ndarray]) -> np.ndarray:
     """Default concatenation function used to combine all entries from a category (e.g. T1, T2 data from "images" category)
-    in :meht:`.Traverser.traverse`
+    in :meth:`.Traverser.traverse`
 
     Args:
         data (list): List of numpy.ndarray entries to be concatenated.
