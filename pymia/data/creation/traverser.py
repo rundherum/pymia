@@ -11,18 +11,6 @@ from . import callback as cb
 from . import fileloader as load
 
 
-class Traverser(abc.ABC):
-    """Base traverser class.
-
-    This class defines the interface for traversing subject information to build the dataset.
-    To be inherited if a alternative traverse behaviour is desired than the default :class:`.SubjectFileTraverser`."""
-
-    @abc.abstractmethod
-    def traverse(self, files: list, loader: load.Load, callbacks: typing.List[cb.Callback] = None,
-                 transform: tfm.Transform = None):
-        pass
-
-
 def default_concat(data: typing.List[np.ndarray]) -> np.ndarray:
     """Default concatenation function used to combine all entries from a category (e.g. T1, T2 data from "images" category)
     in :meht:`.Traverser.traverse`
@@ -37,7 +25,7 @@ def default_concat(data: typing.List[np.ndarray]) -> np.ndarray:
     return np.stack(data, axis=-1)
 
 
-class SubjectFileTraverser(Traverser):
+class SubjectFileTraverser:
 
     def __init__(self, categories: typing.Union[str, typing.Tuple[str, ...]] = None):
         """Class managing the dataset creation process.
