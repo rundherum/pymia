@@ -9,18 +9,38 @@ import pymia.data.transformation as tfm
 
 
 class Assembler(abc.ABC):
+    """Interface for assembling images from batch, which contain parts (chunks) of the images only."""
 
     @abc.abstractmethod
-    def add_batch(self, prediction, batch: dict):
+    def add_batch(self, to_assemble, batch: dict, last_batch=False):
+        """
+
+        Args:
+            to_assemble (object): object(s) to be assembled to an image.
+            batch (dict): The information of a batch.
+            last_batch (bool): Whether the current batch is the last.
+        """
         pass
 
     @abc.abstractmethod
     def get_assembled_subject(self, subject_index: int):
+        """
+        Args:
+            subject_index (int): Index of the assembled subject to be retrieved.
+
+        Returns:
+            object: The assembled data of the subject (might be multiple arrays).
+        """
         pass
 
     @property
     @abc.abstractmethod
     def subjects_ready(self):
+        """
+        Returns:
+            list, set: The indices of the subjects that are finished assembling.
+
+        """
         pass
 
 
@@ -43,19 +63,17 @@ def default_sample_fn(params: dict):
 
 
 class SubjectAssembler(Assembler):
-    """Assembles predictions of one or multiple subjects.
-
-    Assumes that the network output, i.e. to_assemble, is of shape (B, ..., C)
-    where B is the batch size and C is the numbers of channels (must be at least 1) and ... refers to an arbitrary image
-    dimension.
-    """
 
     def __init__(self, zero_fn=numpy_zeros, on_sample_fn=default_sample_fn):
-        """Initializes a new instance of the SubjectAssembler class.
+        """Assembles predictions of one or multiple subjects.
+
+        Assumes that the network output, i.e. to_assemble, is of shape (B, ..., C)
+        where B is the batch size and C is the numbers of channels (must be at least 1) and ... refers to an arbitrary image
+        dimension.
 
         Args:
             zero_fn: A function that initializes the numpy array to hold the predictions.
-                Args: shape: tuple with the shape of the subject's labels, id_: str identifying the subject.
+                Args: shape: tuple with the shape of the subject's labels, id: str identifying the subject.
                 Returns: A np.ndarray
             on_sample_fn: A function that processes a sample.
                 Args: params: dict with the parameters.
@@ -68,9 +86,11 @@ class SubjectAssembler(Assembler):
 
     @property
     def subjects_ready(self):
+        """see :meth:`Assembler.subjects_ready`"""
         return self._subjects_ready
 
     def add_batch(self, to_assemble, batch: dict, last_batch=False):
+        """see :meth:`Assembler.add_batch`"""
         if defs.KEY_SUBJECT_INDEX not in batch:
             raise ValueError('SubjectAssembler requires "subject_index" to be extracted (use IndexingExtractor)')
         if defs.KEY_INDEX_EXPR not in batch:
@@ -122,14 +142,7 @@ class SubjectAssembler(Assembler):
         return subject_prediction
 
     def get_assembled_subject(self, subject_index: int):
-        """Gets the prediction of a subject.
-
-        Args:
-            subject_index (int): The subject's index.
-
-        Returns:
-            np.ndarray: The prediction of the subject.
-        """
+        """see :meth:`Assembler.get_assembled_subject`"""
         try:
             self._subjects_ready.remove(subject_index)
         except KeyError:
@@ -172,6 +185,24 @@ class TransformSampleFn:
 
 class PlaneSubjectAssembler(Assembler):
     def __init__(self, merge_fn=mean_merge_fn, zero_fn=numpy_zeros):
+        """Assembles predictions of one or multiple subjects where predictions are made in all three planes.
+
+        This class assembles the prediction from all planes (axial, coronal, sagittal) and merges the prediction
+        according to :code:`merge_fn`.
+
+        Assumes that the network output, i.e. to_assemble, is of shape (B, ..., C)
+        where B is the batch size and C is the numbers of channels (must be at least 1) and ... refers to an arbitrary image
+        dimension.
+
+        Args:
+            merge_fn: A function that processes a sample.
+                Args: planes: list with the assembled prediction for all planes.
+                Returns: Merged numpy.ndarray
+            zero_fn: A function that initializes the numpy array to hold the predictions.
+                Args: shape: tuple with the shape of the subject's labels, id: str identifying the subject.
+                Returns: A np.ndarray
+        """
+
         self.planes = {}  # type: typing.Dict[int, SubjectAssembler]
         self._subjects_ready = set()
         self.zero_fn = zero_fn
@@ -179,9 +210,11 @@ class PlaneSubjectAssembler(Assembler):
 
     @property
     def subjects_ready(self):
+        """see :meth:`Assembler.subjects_ready`"""
         return self._subjects_ready
 
     def add_batch(self, to_assemble, batch: dict, last_batch=False):
+        """see :meth:`Assembler.add_batch`"""
         if defs.KEY_INDEX_EXPR not in batch:
             raise ValueError('SubjectAssembler requires "index_expr" to be extracted (use IndexingExtractor)')
         if defs.KEY_SHAPE not in batch:
@@ -231,14 +264,7 @@ class PlaneSubjectAssembler(Assembler):
         self._subjects_ready = ready
 
     def get_assembled_subject(self, subject_index: int):
-        """Gets the prediction of a subject.
-
-        Args:
-            subject_index (int): The subject's index.
-
-        Returns:
-            np.ndarray: The prediction of the subject.
-        """
+        """see :meth:`Assembler.get_assembled_subject`"""
         try:
             self._subjects_ready.remove(subject_index)
         except KeyError:
@@ -274,6 +300,14 @@ class PlaneSubjectAssembler(Assembler):
 class Subject2dAssembler(Assembler):
 
     def __init__(self, id_entry='ids') -> None:
+        """Assembles predictions of two-dimensional images.
+
+        Two-dimensional images do not specifically require assembling. For pipeline compatibility reasons this class provides
+        , nevertheless, a implementation for the two-dimensional case.
+
+        Args:
+            id_entry (str): Entry that should contain the subject index in :code:`batch`
+        """
         super().__init__()
         self._subjects_ready = set()
         self.predictions = {}
@@ -281,9 +315,11 @@ class Subject2dAssembler(Assembler):
 
     @property
     def subjects_ready(self):
+        """see :meth:`Assembler.subjects_ready`"""
         return self._subjects_ready
 
     def add_batch(self, to_assemble, batch: dict, last_batch=False):
+        """see :meth:`Assembler.add_batch`"""
         if self.id_entry not in batch:
             raise ValueError('Subject2dAssembler requires "{}" to be in the batch'.format(self.id_entry))
 
@@ -297,6 +333,7 @@ class Subject2dAssembler(Assembler):
                 self._subjects_ready.add(subject_index)
 
     def get_assembled_subject(self, subject_index):
+        """see :meth:`Assembler.get_assembled_subject`"""
         try:
             self._subjects_ready.remove(subject_index)
         except KeyError:

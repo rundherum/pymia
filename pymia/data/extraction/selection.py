@@ -7,12 +7,30 @@ from . import dataset as ds
 
 
 class SelectionStrategy(abc.ABC):
+    """Interface for selecting indices according some rule.
+
+    .. automethod:: __call__
+    .. automethod:: __repr__
+    """
 
     @abc.abstractmethod
-    def __call__(self, sample) -> bool:
+    def __call__(self, sample: dict) -> bool:
+        """
+
+        Args:
+            sample (dict): An extracted from :class:`.PymiaDatasource`.
+
+        Returns:
+            bool: Whether or not the sample should be considered.
+
+        """
         pass
 
     def __repr__(self) -> str:
+        """
+        Returns:
+            str: Representation of the strategy. Should include attributes such that it uniquely defines the strategy.
+        """
         return self.__class__.__name__
 
 

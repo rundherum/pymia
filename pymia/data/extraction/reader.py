@@ -9,10 +9,9 @@ import pymia.data.indexexpression as expr
 
 
 class Reader(abc.ABC):
-    """Represents the abstract dataset reader."""
 
     def __init__(self, file_path: str) -> None:
-        """Initializes a new instance.
+        """Abstract dataset reader.
 
         Args:
             file_path(str): The path to the dataset file.
@@ -111,16 +110,20 @@ class Hdf5Reader(Reader):
         self.category = category
 
     def get_subject_entries(self) -> list:
+        """see :meth:`.Reader.get_subject_entries`"""
         group = defs.LOC_DATA_PLACEHOLDER.format(self.category)
         return ['{}/{}'.format(group, k) for k in sorted(self.h5[group].keys())]
 
     def get_shape(self, entry: str) -> list:
+        """see :meth:`.Reader.get_shape`"""
         return self.h5[entry].shape
 
     def get_subjects(self) -> list:
+        """see :meth:`.Reader.get_subjects`"""
         return self.read(defs.LOC_SUBJECT)
 
     def read(self, entry: str, index: expr.IndexExpression = None):
+        """see :meth:`.Reader.read`"""
         if index is None:
             data = self.h5[entry][()]  # need () instead of util.IndexExpression(None) [which is equal to slice(None)]
         else:
@@ -133,12 +136,15 @@ class Hdf5Reader(Reader):
         return data
 
     def has(self, entry: str) -> bool:
+        """see :meth:`.Reader.has`"""
         return entry in self.h5
 
     def open(self):
+        """see :meth:`.Reader.open`"""
         self.h5 = h5py.File(self.file_path, mode='r', libver='latest')
 
     def close(self):
+        """see :meth:`.Reader.close`"""
         if self.h5 is not None:
             self.h5.close()
             self.h5 = None
@@ -166,3 +172,5 @@ def get_reader(file_path: str, direct_open: bool = False) -> Reader:
 
 
 reader_registry = {'.h5': Hdf5Reader, '.hdf5': Hdf5Reader}
+"""Registry defining the mapping between file extension and :class:`.Reader` class. 
+    Alternative writers need to be added to this registry in order to use :func:`.get_reader`."""

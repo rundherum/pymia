@@ -17,7 +17,6 @@ Assembler (:mod:`pymia.data.assembler` module)
 
 .. automodule:: pymia.data.assembler
     :members:
-    :undoc-members:
     :show-inheritance:
 
 Augmentation (:mod:`pymia.data.augmentation` module)
@@ -25,7 +24,6 @@ Augmentation (:mod:`pymia.data.augmentation` module)
 
 .. automodule:: pymia.data.augmentation
     :members:
-    :undoc-members:
     :show-inheritance:
 
 Conversion (:mod:`pymia.data.conversion` module)
@@ -33,7 +31,6 @@ Conversion (:mod:`pymia.data.conversion` module)
 
 .. automodule:: pymia.data.conversion
     :members:
-    :undoc-members:
     :show-inheritance:
 
 Definition (:mod:`pymia.data.definition` module)

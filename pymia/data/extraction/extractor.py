@@ -54,7 +54,7 @@ class NamesExtractor(Extractor):
         Args:
             cache (bool): Whether to cache the results. If :code:`True`, the dataset is only accessed once.
                 :code:`True` is often preferred since the name entries are typically unique in the dataset.
-            categories (tuple): Categories for which to extract the names
+            categories (tuple): Categories for which to extract the names.
         """
         super().__init__()
         self.cache = cache
@@ -162,10 +162,16 @@ class FilesExtractor(Extractor):
     def __init__(self, cache: bool = True, categories=(defs.KEY_IMAGES, defs.KEY_LABELS)) -> None:
         """Extracts the file paths.
 
+        Added key to :obj:`extracted`:
+
+        - :const:`pymia.data.definition.KEY_FILE_ROOT` with :obj:`str` content
+        - :const:`pymia.data.definition.KEY_PLACEHOLDER_FILES` with :obj:`str` content
 
         Args:
-            cache:
-            categories:
+            cache (bool): Whether to cache the results. If :code:`True`, the dataset is only accessed once.
+                :code:`True` is often preferred since the file name entries are typically unique in the dataset
+                (i.e. independent of data chunks).
+            categories (tuple): Categories for which to extract the file names.
         """
         super().__init__()
         self.cache = cache
@@ -190,15 +196,19 @@ class FilesExtractor(Extractor):
 
 
 class SelectiveDataExtractor(Extractor):
-    """Extracts data of a given category selectively."""
 
     def __init__(self, selection=None, category: str = defs.KEY_LABELS) -> None:
-        """Initializes a new instance of the SelectiveDataExtractor class.
+        """Extracts data of a given category selectively.
+
+        Adds :obj:`category` as key to :obj:`extracted`.
 
         Args:
-            selection (str or tuple): Entries within the category to select.
+            selection (str, tuple): Entries (e.g., "T1", "T2") within the category to select.
                 If selection is None, the class has the same behaviour as the DataExtractor and selects all entries.
-            category (str): The category to extract data from.
+            category (str): The category (e.g. "images") to extract data from.
+
+        Note:
+            Requires results of :class:`NamesExtractor` in :obj:`extracted`.
         """
         super().__init__()
         self.entry_base_names = None
@@ -235,16 +245,19 @@ class SelectiveDataExtractor(Extractor):
 
 
 class RandomDataExtractor(Extractor):
-    """Extracts data of a given category randomly."""
 
     def __init__(self, selection=None, category: str = defs.KEY_LABELS) -> None:
-        """Initializes a new instance of the RandomDataExtractor class.
+        """Extracts data of a given category randomly.
+
+        Adds :obj:`category` as key to :obj:`extracted`.
 
         Args:
-            selection (str or tuple): Entries within the category to select an entry randomly from.
+            selection (str, tuple): Entries (e.g., "T1", "T2") within the category to select an entry randomly from.
                 If selection is None, an entry from all entries is randomly selected.
-            selection (str or tuple): Note that if selection is None, all keys are considered.
-            category (str): The category to extract data from.
+            category (str): The category (e.g. "images") to extract data from.
+
+        Note:
+            Requires results of :class:`NamesExtractor` in :obj:`extracted`.
         """
         super().__init__()
         self.entry_base_names = None
@@ -285,6 +298,15 @@ class RandomDataExtractor(Extractor):
 class ImageShapeExtractor(Extractor):
 
     def __init__(self, numpy_format: bool = True) -> None:
+        """Extracts the shape of an image.
+
+        Added key to :obj:`extracted`:
+
+        - :const:`pymia.data.definition.KEY_SHAPE` with :obj:`tuple` content
+
+        Args:
+            numpy_format (bool): Whether the shape is numpy or ITK format (first and last dimension are swapped).
+        """
         super().__init__()
         self.numpy_format = numpy_format
 
@@ -304,6 +326,15 @@ class ImageShapeExtractor(Extractor):
 class DataExtractor(Extractor):
 
     def __init__(self, categories=(defs.KEY_IMAGES, ), ignore_indexing: bool = False) -> None:
+        """Extracts data of a given category.
+
+        Adds :obj:`category` as key to :obj:`extracted`.
+
+        Args:
+            categories (tuple): Categories for which to extract the names.
+            ignore_indexing (bool): Whether to ignore the indexing in :obj:`params`. This is useful when extracting
+                entire images.
+        """
         super().__init__()
         self.categories = categories
         self.ignore_indexing = ignore_indexing
@@ -330,6 +361,15 @@ class DataExtractor(Extractor):
 class PadDataExtractor(Extractor):
 
     def __init__(self, padding: typing.Union[tuple, typing.List[tuple]], extractor: Extractor, pad_fn=None):
+        """Pads the data extracted by :obj:`extractor`
+
+        Args:
+            padding (tuple, list): Lengths of the tuple or the list must be equal to the number of dimensions of the extracted
+                data. If tuple, values are considered as symmetric padding in each dimension. If list, the each entry must
+                consist of a tuple indicating (left, right) padding for one dimension.
+            extractor (.Extractor): The extractor performing the extraction of the data to be padded.
+            pad_fn (callable, optional): Optional function performing the padding. Default is :meth:`PadDataExtractor.zero_pad`.
+        """
         super().__init__()
         if not (hasattr(extractor, 'categories') or hasattr(extractor, 'category')):
             raise ValueError('argument extractor needs to have the property "categories" or "category"')
@@ -381,6 +421,7 @@ class PadDataExtractor(Extractor):
 
     @staticmethod
     def zero_pad(data: np.ndarray, pad_shape, sub_indexing):
+        """"""
         pad_data = np.zeros(pad_shape, dtype=data.dtype)
 
         sub_indexing[:, 1] = sub_indexing[:, 0] + data.shape[:sub_indexing.shape[0]]
