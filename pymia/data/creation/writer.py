@@ -116,7 +116,7 @@ class Hdf5Writer(Writer):
 
 
 def get_writer(file_path: str) -> Writer:
-    """ Get the dataset writer corresponding to the file extension.
+    """Get the dataset writer corresponding to the file extension.
 
         Args:
             file_path(str): The path of the dataset file to be written.

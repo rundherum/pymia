@@ -4,7 +4,7 @@ import torch.utils.data.sampler as smplr
 class SubsetSequentialSampler(smplr.Sampler):
 
     def __init__(self, indices):
-        """ Samples elements sequential from a given list of indices, without replacement.
+        """Samples elements sequential from a given list of indices, without replacement.
 
         The class adopts the `troch.utils.data.Sampler
         <https://pytorch.org/docs/1.3.0/data.html#torch.utils.data.Sampler>`_ interface.

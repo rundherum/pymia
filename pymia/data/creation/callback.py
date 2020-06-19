@@ -18,7 +18,7 @@ class Callback:
     """
 
     def on_start(self, params: dict):
-        """ Called at the beginning of :meth:`.Traverser.traverse`.
+        """Called at the beginning of :meth:`.Traverser.traverse`.
 
         Args:
             params (dict): Parameters provided by the :class:`.Traverser`. The provided parameters will differ from
@@ -27,7 +27,7 @@ class Callback:
         pass
 
     def on_end(self, params: dict):
-        """ Called at the end of :meth:`.Traverser.traverse`.
+        """Called at the end of :meth:`.Traverser.traverse`.
 
         Args:
             params (dict): Parameters provided by the :class:`.Traverser`. The provided parameters will differ from
@@ -36,7 +36,7 @@ class Callback:
         pass
 
     def on_subject(self, params: dict):
-        """ Called for each subject of :meth:`.Traverser.traverse`.
+        """Called for each subject of :meth:`.Traverser.traverse`.
 
 
         Args:
@@ -228,7 +228,7 @@ class WriteFilesCallback(Callback):
 
 
 def get_default_callbacks(writer: wr.Writer) -> ComposeCallback:
-    """ Provides a selection of commonly used callbacks to write the most important information to the dataset.
+    """Provides a selection of commonly used callbacks to write the most important information to the dataset.
 
     Args:
         writer (.creation.writer.Writer): The writer used to write the data.

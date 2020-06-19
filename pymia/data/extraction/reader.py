@@ -145,7 +145,7 @@ class Hdf5Reader(Reader):
 
 
 def get_reader(file_path: str, direct_open: bool = False) -> Reader:
-    """ Get the dataset reader corresponding to the file extension.
+    """Get the dataset reader corresponding to the file extension.
 
     Args:
         file_path(str): The path to the dataset file.
