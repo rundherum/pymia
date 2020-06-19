@@ -30,10 +30,9 @@ class Writer(abc.ABC):
 
 
 class ConsoleWriterHelper:
-    """Represents a console writer helper."""
 
     def __init__(self, use_logging: bool = False):
-        """Initializes a new instance of the ConsoleWriterHelper class.
+        """Represents a console writer helper.
 
         Args:
             use_logging (bool): Indicates whether to use the Python logging module or not.
@@ -62,10 +61,9 @@ class ConsoleWriterHelper:
 
 
 class StatisticsAggregator:
-    """Represents a statistics evaluation results aggregator."""
 
     def __init__(self, functions: dict = None):
-        """Initializes a new instance of the StatisticsAggregator class.
+        """Represents a statistics evaluation results aggregator.
 
         Args:
             functions (dict): The numpy function handles to calculate the statistics.
@@ -109,10 +107,9 @@ class StatisticsAggregator:
 
 
 class CSVWriter(Writer):
-    """Represents a CSV file evaluation results writer."""
 
     def __init__(self, path: str, delimiter: str = ';'):
-        """Initializes a new instance of the CSVWriter class.
+        """Represents a CSV file evaluation results writer.
 
         Args:
             path (str): The CSV file path.
@@ -157,10 +154,9 @@ class CSVWriter(Writer):
 
 
 class ConsoleWriter(Writer):
-    """Represents a console evaluation results writer."""
 
     def __init__(self, precision: int = 3, use_logging: bool = False):
-        """Initializes a new instance of the ConsoleWriter class.
+        """Represents a console evaluation results writer.
 
         Args:
             precision (int): The decimal precision.
@@ -205,10 +201,9 @@ class ConsoleWriter(Writer):
 
 
 class CSVStatisticsWriter(Writer):
-    """Represents a CSV file evaluation results statistics writer."""
 
     def __init__(self, path: str, delimiter: str = ';', functions: dict = None):
-        """Initializes a new instance of the CSVStatisticsWriter class.
+        """Represents a CSV file evaluation results statistics writer.
 
         Args:
             path (str): The CSV file path.
@@ -243,11 +238,10 @@ class CSVStatisticsWriter(Writer):
 
 
 class ConsoleStatisticsWriter(Writer):
-    """Represents a console evaluation results statistics writer."""
 
     def __init__(self, precision: int = 3, use_logging: bool = False,
                  functions: dict = None):
-        """Initializes a new instance of the ConsoleStatisticsWriter class.
+        """Represents a console evaluation results statistics writer.
 
         Args:
             precision (int): The float precision.

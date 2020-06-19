@@ -10,33 +10,41 @@ class NotComputableMetricWarning(RuntimeWarning):
 
 
 class ConfusionMatrix:
-    """Represents a confusion matrix (or error matrix)."""
 
-    def __init__(self, prediction, label):
-        """Initializes a new instance of the ConfusionMatrix class."""
+    def __init__(self, prediction: np.ndarray, reference: np.ndarray):
+        """Represents a confusion matrix (or error matrix).
+
+        Args:
+            prediction (np.ndarray): The prediction binary array.
+            reference (np.ndarray): The reference binary array.
+        """
 
         # true positive (tp): we predict a label of 1 (positive), and the true label is 1
-        self.tp = np.sum(np.logical_and(prediction == 1, label == 1))
+        self.tp = np.sum(np.logical_and(prediction == 1, reference == 1))
         # true negative (tn): we predict a label of 0 (negative), and the true label is 0
-        self.tn = np.sum(np.logical_and(prediction == 0, label == 0))
+        self.tn = np.sum(np.logical_and(prediction == 0, reference == 0))
         # false positive (fp): we predict a label of 1 (positive), but the true label is 0
-        self.fp = np.sum(np.logical_and(prediction == 1, label == 0))
+        self.fp = np.sum(np.logical_and(prediction == 1, reference == 0))
         # false negative (fn): we predict a label of 0 (negative), but the true label is 1
-        self.fn = np.sum(np.logical_and(prediction == 0, label == 1))
+        self.fn = np.sum(np.logical_and(prediction == 0, reference == 1))
 
         self.n = prediction.size
 
 
 class Distances:
-    """Represents distances for distance metrics.
 
-    See Also:
-        - Nikolov, S., Blackwell, S., Mendes, R., De Fauw, J., Meyer, C., Hughes, C., … Ronneberger, O. (2018). Deep learning to achieve clinically applicable segmentation of head and neck anatomy for radiotherapy. http://arxiv.org/abs/1809.04430
-        - `Original implementation <https://github.com/deepmind/surface-distance>`_
-    """
+    def __init__(self, prediction: np.ndarray, reference: np.ndarray, spacing: tuple):
+        """Represents distances for distance metrics.
 
-    def __init__(self, prediction, label, spacing):
-        """Initializes a new instance of the Distances class."""
+        Args:
+            prediction (np.ndarray): The prediction binary array.
+            reference (np.ndarray): The reference binary array.
+            spacing (tuple): The spacing in mm of each dimension.
+
+        See Also:
+            - Nikolov, S., Blackwell, S., Mendes, R., De Fauw, J., Meyer, C., Hughes, C., … Ronneberger, O. (2018). Deep learning to achieve clinically applicable segmentation of head and neck anatomy for radiotherapy. http://arxiv.org/abs/1809.04430
+            - `Original implementation <https://github.com/deepmind/surface-distance>`_
+        """
 
         self.distances_gt_to_pred = None
         self.distances_pred_to_gt = None
@@ -301,7 +309,7 @@ class Distances:
             [[0.125, 0.125, 0.125]],
             [[0, 0, 0]]]
 
-        self._calculate(prediction, label, spacing)
+        self._calculate(prediction, reference, spacing)
 
     def _calculate(self, segmentation_arr, ground_truth_arr, spacing):
         if segmentation_arr.ndim == 2 and ground_truth_arr.ndim == 2 and len(spacing) == 2:
@@ -434,10 +442,9 @@ class Distances:
 
 
 class Metric(abc.ABC):
-    """Metric base class."""
 
     def __init__(self, metric: str = 'Metric'):
-        """Initializes a new instance of the Metric class.
+        """Metric base class.
 
         Args:
             metric (str): The identification string of the metric.
@@ -447,7 +454,6 @@ class Metric(abc.ABC):
     @abc.abstractmethod
     def calculate(self):
         """Calculates the metric."""
-
         raise NotImplementedError
 
     def __str__(self):
@@ -460,10 +466,9 @@ class Metric(abc.ABC):
 
 
 class ConfusionMatrixMetric(Metric):
-    """Represents a metric based on the confusion matrix."""
 
     def __init__(self, metric: str = 'ConfusionMatrixMetric'):
-        """Initializes a new instance of the ConfusionMatrixMetric class.
+        """Represents a metric based on the confusion matrix.
 
         Args:
             metric (str): The identification string of the metric.
@@ -473,10 +478,9 @@ class ConfusionMatrixMetric(Metric):
 
 
 class DistanceMetric(Metric):
-    """Represents a metric based on distances."""
 
     def __init__(self, metric: str = 'DistanceMetric'):
-        """Initializes a new instance of the DistanceMetric class.
+        """Represents a metric based on distances.
 
         Args:
             metric (str): The identification string of the metric.
@@ -486,10 +490,9 @@ class DistanceMetric(Metric):
 
 
 class SimpleITKImageMetric(Metric):
-    """Represents a metric based on SimpleITK images."""
 
     def __init__(self, metric: str = 'SimpleITKImageMetric'):
-        """Initializes a new instance of the SimpleITKImageMetric class.
+        """Represents a metric based on SimpleITK images.
 
         Args:
             metric (str): The identification string of the metric.
@@ -500,10 +503,9 @@ class SimpleITKImageMetric(Metric):
 
 
 class NumpyArrayMetric(Metric):
-    """Represents a metric based on numpy arrays."""
 
     def __init__(self, metric: str = 'NumpyArrayMetric'):
-        """Initializes a new instance of the NumpyArrayMetric class.
+        """Represents a metric based on numpy arrays.
 
         Args:
             metric (str): The identification string of the metric.
@@ -514,13 +516,11 @@ class NumpyArrayMetric(Metric):
 
 
 class Information(Metric):
-    """Represents an information "metric".
-
-    Can be used to add an additional column of information to an evaluator.
-    """
 
     def __init__(self, column_name: str, value: str):
-        """Initializes a new instance of the Information class.
+        """Represents an information "metric".
+
+        Can be used to add an additional column of information to an evaluator.
 
         Args:
             column_name (str): The identification string of the information.

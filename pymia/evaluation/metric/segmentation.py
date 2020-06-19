@@ -11,10 +11,9 @@ from .base import (ConfusionMatrixMetric, DistanceMetric, SimpleITKImageMetric, 
 
 
 class AreaMetric(SimpleITKImageMetric, abc.ABC):
-    """Represents an area metric base class."""
 
     def __init__(self, metric: str = 'AREA'):
-        """Initializes a new instance of the AreaMetric class.
+        """Represents an area metric base class.
 
         Args:
             metric (str): The identification string of the metric.
@@ -40,10 +39,9 @@ class AreaMetric(SimpleITKImageMetric, abc.ABC):
 
 
 class VolumeMetric(SimpleITKImageMetric, abc.ABC):
-    """Represents a volume metric base class."""
 
     def __init__(self, metric: str = 'VOL'):
-        """Initializes a new instance of the VolumeMetric class.
+        """Represents a volume metric base class.
 
         Args:
             metric (str): The identification string of the metric.
@@ -65,10 +63,9 @@ class VolumeMetric(SimpleITKImageMetric, abc.ABC):
 
 
 class Accuracy(ConfusionMatrixMetric):
-    """Represents an accuracy metric."""
 
     def __init__(self, metric: str = 'ACURCY'):
-        """Initializes a new instance of the Accuracy class.
+        """Represents an accuracy metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -87,10 +84,9 @@ class Accuracy(ConfusionMatrixMetric):
 
 
 class AdjustedRandIndex(ConfusionMatrixMetric):
-    """Represents an adjusted rand index metric."""
 
     def __init__(self, metric: str = 'ADJRIND'):
-        """Initializes a new instance of the AdjustedRandIndex class.
+        """Represents an adjusted rand index metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -131,10 +127,9 @@ class AdjustedRandIndex(ConfusionMatrixMetric):
 
 
 class AreaUnderCurve(ConfusionMatrixMetric):
-    """Represents an area under the curve metric."""
 
     def __init__(self, metric: str = 'AUC'):
-        """Initializes a new instance of the AreaUnderCurve class.
+        """Represents an area under the curve metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -159,7 +154,9 @@ class AreaUnderCurve(ConfusionMatrixMetric):
 
 
 class AverageDistance(SimpleITKImageMetric):
-    """Represents an average (Hausdorff) distance metric.
+
+    def __init__(self, metric: str = 'AVGDIST'):
+        """Represents an average (Hausdorff) distance metric.
 
         Calculates the distance between the set of non-zero pixels of two images using the following equation:
 
@@ -170,10 +167,6 @@ class AverageDistance(SimpleITKImageMetric):
         .. math:: d(A,B) = \\frac{1}{N} \\sum_{a \\in A} \\min_{b \\in B} \\lVert a - b \\rVert
 
         is the directed Hausdorff distance and :math:`A` and :math:`B` are the set of non-zero pixels in the images.
-        """
-
-    def __init__(self, metric: str = 'AVGDIST'):
-        """Initializes a new instance of the AverageDistance class.
 
         Args:
             metric (str): The identification string of the metric.
@@ -198,10 +191,9 @@ class AverageDistance(SimpleITKImageMetric):
 
 
 class CohenKappaMetric(ConfusionMatrixMetric):
-    """Represents a Cohen's kappa coefficient metric."""
 
     def __init__(self, metric: str = 'KAPPA'):
-        """Initializes a new instance of the CohenKappaMetric class.
+        """Represents a Cohen's kappa coefficient metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -231,15 +223,13 @@ class CohenKappaMetric(ConfusionMatrixMetric):
 
 
 class DiceCoefficient(ConfusionMatrixMetric):
-    """Represents a Dice coefficient metric with empty target handling, defined as:
+
+    def __init__(self, metric: str = 'DICE'):
+        """Represents a Dice coefficient metric with empty target handling, defined as:
 
         .. math:: \\begin{cases} 1 & \\left\\vert{y}\\right\\vert = \\left\\vert{\\hat y}\\right\\vert = 0 \\\\ Dice(y,\\hat y) & \\left\\vert{y}\\right\\vert > 0 \\\\ \\end{cases}
 
         where :math:`\\hat y` is the prediction and :math:`y` the target.
-    """
-
-    def __init__(self, metric: str = 'DICE'):
-        """Initializes a new instance of the DiceCoefficient class.
 
         Args:
             metric (str): The identification string of the metric.
@@ -258,10 +248,9 @@ class DiceCoefficient(ConfusionMatrixMetric):
 
 
 class FalseNegative(ConfusionMatrixMetric):
-    """Represents a false negative metric."""
 
     def __init__(self, metric: str = 'FN'):
-        """Initializes a new instance of the FalseNegative class.
+        """Represents a false negative metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -275,10 +264,9 @@ class FalseNegative(ConfusionMatrixMetric):
 
 
 class FalsePositive(ConfusionMatrixMetric):
-    """Represents a false positive metric."""
 
     def __init__(self, metric: str = 'FP'):
-        """Initializes a new instance of the FalsePositive class.
+        """Represents a false positive metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -292,10 +280,9 @@ class FalsePositive(ConfusionMatrixMetric):
 
 
 class Fallout(ConfusionMatrixMetric):
-    """Represents a fallout (false positive rate) metric."""
 
     def __init__(self, metric: str = 'FALLOUT'):
-        """Initializes a new instance of the Fallout class.
+        """Represents a fallout (false positive rate) metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -310,10 +297,9 @@ class Fallout(ConfusionMatrixMetric):
 
 
 class FalseNegativeRate(ConfusionMatrixMetric):
-    """Represents a false negative rate metric."""
 
     def __init__(self, metric: str = 'FNR'):
-        """Initializes a new instance of the FalseNegativeRate class.
+        """Represents a false negative rate metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -328,10 +314,9 @@ class FalseNegativeRate(ConfusionMatrixMetric):
 
 
 class FMeasure(ConfusionMatrixMetric):
-    """Represents a F-measure metric."""
 
     def __init__(self, beta: float = 1.0, metric: str = 'FMEASR'):
-        """Initializes a new instance of the FMeasure class.
+        """Represents a F-measure metric.
 
         Args:
             beta (float): The beta to trade-off precision and recall.
@@ -361,13 +346,11 @@ class FMeasure(ConfusionMatrixMetric):
 
 
 class GlobalConsistencyError(ConfusionMatrixMetric):
-    """Represents a global consistency error metric.
-
-    Implementation based on Martin 2001.
-    """
 
     def __init__(self, metric: str = 'GCOERR'):
-        """Initializes a new instance of the GlobalConsistencyError class.
+        """Represents a global consistency error metric.
+
+        Implementation based on Martin 2001. todo(fabianbalsiger): add entire reference
 
         Args:
             metric (str): The identification string of the metric.
@@ -395,10 +378,9 @@ class GlobalConsistencyError(ConfusionMatrixMetric):
 
 
 class GroundTruthArea(AreaMetric):
-    """Represents a ground truth area metric."""
 
     def __init__(self, slice_number: int = -1, metric: str = 'GTAREA'):
-        """Initializes a new instance of the GroundTruthArea class.
+        """Represents a ground truth area metric.
 
         Args:
             slice_number (int): The slice number to calculate the area.
@@ -415,10 +397,9 @@ class GroundTruthArea(AreaMetric):
 
 
 class GroundTruthVolume(VolumeMetric):
-    """Represents a ground truth volume metric."""
 
     def __init__(self, metric: str = 'GTVOL'):
-        """Initializes a new instance of the GroundTruthVolume class.
+        """Represents a ground truth volume metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -432,30 +413,28 @@ class GroundTruthVolume(VolumeMetric):
 
 
 class HausdorffDistance(DistanceMetric):
-    """Represents a Hausdorff distance metric.
-
-    Calculates the distance between the set of non-zero pixels of two images using the following equation:
-
-    .. math:: H(A,B) = max(h(A,B), h(B,A)),
-
-    where
-
-    .. math:: h(A,B) = \\max_{a \\in A} \\min_{b \\in B} \\lVert a - b \\rVert
-
-    is the directed Hausdorff distance and :math:`A` and :math:`B` are the set of non-zero pixels in the images.
-
-    See Also:
-        - Nikolov, S., Blackwell, S., Mendes, R., De Fauw, J., Meyer, C., Hughes, C., … Ronneberger, O. (2018). Deep learning to achieve clinically applicable segmentation of head and neck anatomy for radiotherapy. http://arxiv.org/abs/1809.04430
-        - `Original implementation <https://github.com/deepmind/surface-distance>`_
-    """
 
     def __init__(self, percentile: float = 100.0, metric: str = 'HDRFDST'):
-        """Initializes a new instance of the HausdorffDistance class.
+        """Represents a Hausdorff distance metric.
+
+        Calculates the distance between the set of non-zero pixels of two images using the following equation:
+
+        .. math:: H(A,B) = max(h(A,B), h(B,A)),
+
+        where
+
+        .. math:: h(A,B) = \\max_{a \\in A} \\min_{b \\in B} \\lVert a - b \\rVert
+
+        is the directed Hausdorff distance and :math:`A` and :math:`B` are the set of non-zero pixels in the images.
 
         Args:
             percentile (float): The percentile (0, 100] to compute, i.e. 100 computes the Hausdorff distance and
                 95 computes the 95th Hausdorff distance.
             metric (str): The identification string of the metric.
+
+        See Also:
+            - Nikolov, S., Blackwell, S., Mendes, R., De Fauw, J., Meyer, C., Hughes, C., … Ronneberger, O. (2018). Deep learning to achieve clinically applicable segmentation of head and neck anatomy for radiotherapy. http://arxiv.org/abs/1809.04430
+            - `Original implementation <https://github.com/deepmind/surface-distance>`_
         """
         super().__init__(metric)
         self.percentile = percentile
@@ -488,10 +467,9 @@ class HausdorffDistance(DistanceMetric):
 
 
 class InterclassCorrelation(NumpyArrayMetric):
-    """Represents an interclass correlation metric."""
 
     def __init__(self, metric: str = 'ICCORR'):
-        """Initializes a new instance of the InterclassCorrelation class.
+        """Represents an interclass correlation metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -525,10 +503,9 @@ class InterclassCorrelation(NumpyArrayMetric):
 
 
 class JaccardCoefficient(ConfusionMatrixMetric):
-    """Represents a Jaccard coefficient metric."""
 
     def __init__(self, metric: str = 'JACRD'):
-        """Initializes a new instance of the JaccardCoefficient class.
+        """Represents a Jaccard coefficient metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -551,10 +528,9 @@ class JaccardCoefficient(ConfusionMatrixMetric):
 
 
 class MahalanobisDistance(NumpyArrayMetric):
-    """Represents a Mahalanobis distance metric."""
 
     def __init__(self, metric: str = 'MAHLNBS'):
-        """Initializes a new instance of the MahalanobisDistance class.
+        """Represents a Mahalanobis distance metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -593,10 +569,9 @@ class MahalanobisDistance(NumpyArrayMetric):
 
 
 class MutualInformation(ConfusionMatrixMetric):
-    """Represents a mutual information metric."""
 
     def __init__(self, metric: str = 'MUTINF'):
-        """Initializes a new instance of the MutualInformation class.
+        """Represents a mutual information metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -638,10 +613,9 @@ class MutualInformation(ConfusionMatrixMetric):
 
 
 class Precision(ConfusionMatrixMetric):
-    """Represents a precision metric."""
 
     def __init__(self, metric: str = 'PRCISON'):
-        """Initializes a new instance of the Precision class.
+        """Represents a precision metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -660,10 +634,9 @@ class Precision(ConfusionMatrixMetric):
 
 
 class ProbabilisticDistance(NumpyArrayMetric):
-    """Represents a probabilistic distance metric."""
 
     def __init__(self, metric: str = 'PROBDST'):
-        """Initializes a new instance of the ProbabilisticDistance class.
+        """Represents a probabilistic distance metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -686,10 +659,9 @@ class ProbabilisticDistance(NumpyArrayMetric):
 
 
 class RandIndex(ConfusionMatrixMetric):
-    """Represents a rand index metric."""
 
     def __init__(self, metric: str = 'RNDIND'):
-        """Initializes a new instance of the RandIndex class.
+        """Represents a rand index metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -722,10 +694,9 @@ class RandIndex(ConfusionMatrixMetric):
 
 
 class Recall(ConfusionMatrixMetric):
-    """Represents a recall metric."""
 
     def __init__(self, metric: str = 'RECALL'):
-        """Initializes a new instance of the Recall class.
+        """Represents a recall metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -744,10 +715,9 @@ class Recall(ConfusionMatrixMetric):
 
 
 class SegmentationArea(AreaMetric):
-    """Represents a segmentation area metric."""
 
     def __init__(self, slice_number: int = -1, metric: str = 'SEGAREA'):
-        """Initializes a new instance of the SegmentationArea class.
+        """Represents a segmentation area metric.
 
         Args:
             slice_number (int): The slice number to calculate the area.
@@ -764,10 +734,9 @@ class SegmentationArea(AreaMetric):
 
 
 class SegmentationVolume(VolumeMetric):
-    """Represents a segmentation volume metric."""
 
     def __init__(self, metric: str = 'SEGVOL'):
-        """Initializes a new instance of the SegmentationVolume class.
+        """Represents a segmentation volume metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -781,10 +750,9 @@ class SegmentationVolume(VolumeMetric):
 
 
 class Sensitivity(ConfusionMatrixMetric):
-    """Represents a sensitivity (true positive rate or recall) metric."""
 
     def __init__(self, metric: str = 'SNSVTY'):
-        """Initializes a new instance of the Sensitivity class.
+        """Represents a sensitivity (true positive rate or recall) metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -803,10 +771,9 @@ class Sensitivity(ConfusionMatrixMetric):
 
 
 class Specificity(ConfusionMatrixMetric):
-    """Represents a specificity metric."""
 
     def __init__(self, metric: str = 'SPCFTY'):
-        """Initializes a new instance of the Specificity class.
+        """Represents a specificity metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -820,19 +787,17 @@ class Specificity(ConfusionMatrixMetric):
 
 
 class SurfaceDiceOverlap(DistanceMetric):
-    """Represents a surface Dice coefficient overlap metric.
-
-    See Also:
-        - Nikolov, S., Blackwell, S., Mendes, R., De Fauw, J., Meyer, C., Hughes, C., … Ronneberger, O. (2018). Deep learning to achieve clinically applicable segmentation of head and neck anatomy for radiotherapy. http://arxiv.org/abs/1809.04430
-        - `Original implementation <https://github.com/deepmind/surface-distance>`_
-    """
 
     def __init__(self, tolerance: float = 1, metric: str = 'SURFDICE'):
-        """Initializes a new instance of the SurfaceDiceOverlap class.
+        """Represents a surface Dice coefficient overlap metric.
 
         Args:
             tolerance (float): The tolerance of the surface distance in mm.
             metric (str): The identification string of the metric.
+
+        See Also:
+            - Nikolov, S., Blackwell, S., Mendes, R., De Fauw, J., Meyer, C., Hughes, C., … Ronneberger, O. (2018). Deep learning to achieve clinically applicable segmentation of head and neck anatomy for radiotherapy. http://arxiv.org/abs/1809.04430
+            - `Original implementation <https://github.com/deepmind/surface-distance>`_
         """
         super().__init__(metric)
         self.tolerance = tolerance
@@ -858,24 +823,22 @@ class SurfaceDiceOverlap(DistanceMetric):
 
 
 class SurfaceOverlap(DistanceMetric):
-    """Represents a surface overlap metric.
-
-    Computes the overlap of the ground truth surface with the predicted surface and vice versa allowing a
-    specified tolerance (maximum surface-to-surface distance that is regarded as overlapping).
-    The overlapping fraction is computed by correctly taking the area of each surface element into account.
-
-    See Also:
-        - Nikolov, S., Blackwell, S., Mendes, R., De Fauw, J., Meyer, C., Hughes, C., … Ronneberger, O. (2018). Deep learning to achieve clinically applicable segmentation of head and neck anatomy for radiotherapy. http://arxiv.org/abs/1809.04430
-        - `Original implementation <https://github.com/deepmind/surface-distance>`_
-    """
 
     def __init__(self, tolerance: float = 1.0, prediction_to_label: bool = True, metric: str = 'SURFOVLP'):
-        """Initializes a new instance of the SurfaceOverlap class.
+        """Represents a surface overlap metric.
+
+        Computes the overlap of the ground truth surface with the predicted surface and vice versa allowing a
+        specified tolerance (maximum surface-to-surface distance that is regarded as overlapping).
+        The overlapping fraction is computed by correctly taking the area of each surface element into account.
 
         Args:
             tolerance (float): The tolerance of the surface distance in mm.
             prediction_to_label (bool): Computes the prediction to labels if `True`, otherwise the label to prediction.
             metric (str): The identification string of the metric.
+
+        See Also:
+            - Nikolov, S., Blackwell, S., Mendes, R., De Fauw, J., Meyer, C., Hughes, C., … Ronneberger, O. (2018). Deep learning to achieve clinically applicable segmentation of head and neck anatomy for radiotherapy. http://arxiv.org/abs/1809.04430
+            - `Original implementation <https://github.com/deepmind/surface-distance>`_
         """
         super().__init__(metric)
         self.tolerance = tolerance
@@ -905,10 +868,9 @@ class SurfaceOverlap(DistanceMetric):
 
 
 class TrueNegative(ConfusionMatrixMetric):
-    """Represents a true negative metric."""
 
     def __init__(self, metric: str = 'TN'):
-        """Initializes a new instance of the TrueNegative class.
+        """Represents a true negative metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -922,10 +884,9 @@ class TrueNegative(ConfusionMatrixMetric):
 
 
 class TruePositive(ConfusionMatrixMetric):
-    """Represents a true positive metric."""
 
     def __init__(self, metric: str = 'TP'):
-        """Initializes a new instance of the TruePositive class.
+        """Represents a true positive metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -939,10 +900,9 @@ class TruePositive(ConfusionMatrixMetric):
 
 
 class VariationOfInformation(ConfusionMatrixMetric):
-    """Represents a variation of information metric."""
 
     def __init__(self, metric: str = 'VARINFO'):
-        """Initializes a new instance of the VariationOfInformation class.
+        """Represents a variation of information metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -986,10 +946,9 @@ class VariationOfInformation(ConfusionMatrixMetric):
 
 
 class VolumeSimilarity(ConfusionMatrixMetric):
-    """Represents a volume similarity metric."""
 
     def __init__(self, metric: str = 'VOLSMTY'):
-        """Initializes a new instance of the VolumeSimilarity class.
+        """Represents a volume similarity metric.
 
         Args:
             metric (str): The identification string of the metric.
