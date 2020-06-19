@@ -16,7 +16,7 @@ to CSV files (e.g., the :class:`pymia.evaluation.writer.CSVWriter` and :class:`p
 and the console (e.g., the :class:`pymia.evaluation.writer.ConsoleWriter` and
 :class:`pymia.evaluation.writer.ConsoleStatisticsWriter`).
 
-Refer to :ref:`Basic evaluation of results <example-evaluation1>` for a code example on how to evaluate segmentation results.
+Refer to :ref:`Evaluation of results <example-evaluation1>` for a code example on how to evaluate segmentation results.
 The code example :ref:`Logging the training progress <example-evaluation2>` illustrates how to use the evaluation package to
 log results during the training of deep learning methods.
 
