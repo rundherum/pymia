@@ -41,7 +41,6 @@ Definition (:mod:`pymia.data.definition` module)
 
 .. automodule:: pymia.data.definition
     :members:
-    :undoc-members:
     :show-inheritance:
 
 Index expression (:mod:`pymia.data.indexexpression` module)
