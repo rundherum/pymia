@@ -11,5 +11,5 @@ The following examples illustrate the intended use case of pymia:
     examples.data.scaffold
     examples.data.extraction
     examples.evaluation.basic
-    examples.evaluation.logging
+    examples.evaluation.logging_torch
     examples.filtering.basic

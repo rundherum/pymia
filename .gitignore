@@ -3,6 +3,7 @@
 ### Project specific
 examples/example-data/Subject*
 examples/example-data/*.csv
+examples/example-data/log/*
 
 ### Python template
 # Byte-compiled / optimized / DLL files
