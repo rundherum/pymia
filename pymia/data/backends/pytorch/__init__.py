@@ -3,5 +3,5 @@ try:
 except ImportError:
     raise ImportError('Module "torch" not found. Install "torch>=1.4.0" to use the pytorch module.')
 
-from .dataset import PymiaTorchDataset
+from .dataset import (PymiaTorchDataset, PytorchDatasetAdapter)
 from .sample import SubsetSequentialSampler

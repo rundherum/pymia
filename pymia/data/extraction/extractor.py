@@ -96,15 +96,21 @@ class SubjectExtractor(Extractor):
 
 
 class IndexingExtractor(Extractor):
-    """Extracts the index expression.
-
-    Added key to :obj:`extracted`:
-
-    - :const:`pymia.data.definition.KEY_SUBJECT_INDEX` with :obj:`int` content
-    - :const:`pymia.data.definition.KEY_INDEX_EXPR` with :class:`.IndexExpression` content
-    """
 
     def __init__(self, do_pickle: bool = False) -> None:
+        """Extracts the index expression.
+
+        Added key to :obj:`extracted`:
+
+        - :const:`pymia.data.definition.KEY_SUBJECT_INDEX` with :obj:`int` content
+        - :const:`pymia.data.definition.KEY_INDEX_EXPR` with :class:`.IndexExpression` content
+
+        Args:
+            do_pickle (bool): whether to pickle the extracted :class:`.ImageProperties` instance.
+                This is useful when applied with PyTorch DataLoader since it prevents from automatic translation to
+                torch.Tensor.
+
+        """
         super().__init__()
         self.do_pickle = do_pickle
 
@@ -125,7 +131,7 @@ class ImagePropertiesExtractor(Extractor):
 
         Added key to :obj:`extracted`:
 
-        - :const:`pymia.data.definition.KEY_PROPERTIES` with :class:`.ImageProperties` content (or string if :code:`do_pickle`)
+        - :const:`pymia.data.definition.KEY_PROPERTIES` with :class:`.ImageProperties` content (or byte if :code:`do_pickle`)
 
         Args:
             do_pickle (bool): whether to pickle the extracted :class:`.ImageProperties` instance.
