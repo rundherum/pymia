@@ -14,11 +14,10 @@ def main(url, out_dir):
     print(f'Extracting... (to {out_dir})')
     members = zip_.infolist()
     for member in members:
-        if member.filename.startswith('pymia-example-data-master/example-data/Subject_') or member.filename.endswith('.h5'):
+        if member.filename.startswith('Subject_') or member.filename.endswith('.h5'):
             if not os.path.basename(member.filename):
                 # is a directory
                 continue
-            member.filename = member.filename.replace('pymia-example-data-master/example-data/', '')
             zip_.extract(member, out_dir)
             print(f'extract {os.path.join(out_dir, member.filename)}')
     print('Finished')
@@ -35,7 +34,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--url',
         type=str,
-        default='https://github.com/rundherum/pymia-example-data/archive/master.zip',
+        default='https://github.com/rundherum/pymia-example-data/releases/download/v0.1.0/example-data.zip',
         help='Path to the example data zip file.'
     )
 
