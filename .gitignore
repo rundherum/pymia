@@ -3,6 +3,7 @@
 ### Project specific
 examples/example-data/Subject*
 examples/example-data/*.csv
+examples/example-data/*.h5
 examples/example-data/log/*
 
 ### Python template
