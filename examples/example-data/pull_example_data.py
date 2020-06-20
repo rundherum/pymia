@@ -14,7 +14,7 @@ def main(url, out_dir):
     print(f'Extracting... (to {out_dir})')
     members = zip_.infolist()
     for member in members:
-        if member.filename.startswith('pymia-example-data-master/example-data/Subject_'):
+        if member.filename.startswith('pymia-example-data-master/example-data/Subject_') or member.filename.endswith('.h5'):
             if not os.path.basename(member.filename):
                 # is a directory
                 continue
