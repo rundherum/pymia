@@ -21,6 +21,7 @@ Traverser (:mod:`pymia.data.creation.traverser` module)
 
 .. automodule:: pymia.data.creation.traverser
     :members:
+    :undoc-members:
     :show-inheritance:
 
 Writer (:mod:`pymia.data.creation.writer` module)

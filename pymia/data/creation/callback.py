@@ -13,34 +13,35 @@ from . import writer as wr
 class Callback:
     """Base class for the interaction with the dataset creation.
 
-    Implementations of the :class:`.Callback` class can be provided to :meth:`.Traverser.traverse` in order to
+    Implementations of the :class:`.Callback` class can be provided to :meth:`.SubjectFileTraverser.traverse` in order to
     write/process specific information of the original data.
     """
 
     def on_start(self, params: dict):
-        """Called at the beginning of :meth:`.Traverser.traverse`.
+        """Called at the beginning of :meth:`.SubjectFileTraverser.traverse`.
 
         Args:
-            params (dict): Parameters provided by the :class:`.Traverser`. The provided parameters will differ from
+            params (dict): Parameters provided by the :class:`.SubjectFileTraverser`. The provided parameters will differ from
                 :meth:`.Callback.on_subject`.
         """
         pass
 
     def on_end(self, params: dict):
-        """Called at the end of :meth:`.Traverser.traverse`.
+        """Called at the end of :meth:`.SubjectFileTraverser.traverse`.
 
         Args:
-            params (dict): Parameters provided by the :class:`.Traverser`. The provided parameters will differ from
+            params (dict): Parameters provided by the :class:`.SubjectFileTraverser`. The provided parameters will differ from
                 :meth:`.Callback.on_subject`.
         """
         pass
 
     def on_subject(self, params: dict):
-        """Called for each subject of :meth:`.Traverser.traverse`.
+        """Called for each subject of :meth:`.SubjectFileTraverser.traverse`.
 
 
         Args:
-            params (dict): Parameters provided by the :class:`.Traverser` containing subject specific information and data.
+            params (dict): Parameters provided by the :class:`.SubjectFileTraverser` containing subject specific information
+                and data.
         """
         pass
 
@@ -50,7 +51,7 @@ class ComposeCallback(Callback):
     def __init__(self, callbacks: typing.List[Callback]) -> None:
         """Composes many :class:`.Callback` instances and behaves like an single :class:`.Callback` instance.
 
-        This class allows passing multiple :class:`.Callback` to :meth:`.Traverser.traverse`.
+        This class allows passing multiple :class:`.Callback` to :meth:`.SubjectFileTraverser.traverse`.
 
         Args:
             callbacks (list): A list of :class:`.Callback` instances.
