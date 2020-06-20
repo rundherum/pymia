@@ -13,18 +13,18 @@ import typing
 
 import numpy as np
 
-import pymia.evaluation.evaluator as eval_
+import pymia.evaluation.evaluator as evaluator
 
 
 class Writer(abc.ABC):
     """Represents an evaluation results writer base class."""
 
     @abc.abstractmethod
-    def write(self, results: typing.List[eval_.Result], **kwargs):
+    def write(self, results: typing.List[evaluator.Result], **kwargs):
         """Writes the evaluation results.
 
         Args:
-            results (list of eval_.Result): The evaluation results.
+            results (list of evaluator.Result): The evaluation results.
         """
         raise NotImplementedError
 
@@ -74,14 +74,14 @@ class StatisticsAggregator:
             functions = {'MEAN': np.mean, 'STD': np.std}
         self.functions = functions
 
-    def calculate(self, results: typing.List[eval_.Result]) -> typing.List[eval_.Result]:
+    def calculate(self, results: typing.List[evaluator.Result]) -> typing.List[evaluator.Result]:
         """Calculates aggregated results (e.g., mean and standard deviation of a metric over all cases).
 
         Args:
-            results (typing.List[eval_.Result]): The results to aggregate.
+            results (typing.List[evaluator.Result]): The results to aggregate.
 
         Returns:
-            typing.List[eval_.Result]: The aggregated results.
+            typing.List[evaluator.Result]: The aggregated results.
         """
 
         # get unique labels and metrics
@@ -96,7 +96,7 @@ class StatisticsAggregator:
                 values = [r.value for r in results if r.label == label and r.metric == metric]
 
                 for fn_id, fn in self.functions.items():
-                    aggregated_results.append(eval_.Result(
+                    aggregated_results.append(evaluator.Result(
                         fn_id,
                         label,
                         metric,
@@ -123,11 +123,11 @@ class CSVWriter(Writer):
         if not self.path.lower().endswith('.csv'):
             self.path = os.path.join(self.path, '.csv')
 
-    def write(self, results: typing.List[eval_.Result], **kwargs):
+    def write(self, results: typing.List[evaluator.Result], **kwargs):
         """Writes the evaluation results to a CSV file.
 
         Args:
-            results (list of eval_.Result): The evaluation results.
+            results (typing.List[evaluator.Result]): The evaluation results.
         """
 
         # get unique ids, labels, and metrics
@@ -167,11 +167,11 @@ class ConsoleWriter(Writer):
         self.write_helper = ConsoleWriterHelper(use_logging)
         self.precision = precision
 
-    def write(self, results: typing.List[eval_.Result], **kwargs):
+    def write(self, results: typing.List[evaluator.Result], **kwargs):
         """Writes the evaluation results.
 
         Args:
-            results (list of eval_.Result): The evaluation results.
+            results (typing.List[evaluator.Result]): The evaluation results.
         """
 
         # get unique ids, labels, and metrics
@@ -219,11 +219,11 @@ class CSVStatisticsWriter(Writer):
         if not self.path.lower().endswith('.csv'):
             self.path = os.path.join(self.path, '.csv')
 
-    def write(self, results: typing.List[eval_.Result], **kwargs):
+    def write(self, results: typing.List[evaluator.Result], **kwargs):
         """Writes the evaluation statistic results (e.g., mean and standard deviation of a metric over all cases).
 
         Args:
-            results (list of eval_.Result): The evaluation results.
+            results (typing.List[evaluator.Result]): The evaluation results.
         """
         aggregated_results = self.aggregator.calculate(results)
 
@@ -253,11 +253,11 @@ class ConsoleStatisticsWriter(Writer):
         self.write_helper = ConsoleWriterHelper(use_logging)
         self.precision = precision
 
-    def write(self, results: typing.List[eval_.Result], **kwargs):
+    def write(self, results: typing.List[evaluator.Result], **kwargs):
         """Writes the evaluation statistic results (e.g., mean and standard deviation of a metric over all cases).
 
         Args:
-            results (list of eval_.Result): The evaluation results.
+            results (typing.List[evaluator.Result]): The evaluation results.
         """
         aggregated_results = self.aggregator.calculate(results)
 
