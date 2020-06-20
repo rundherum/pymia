@@ -1,37 +1,68 @@
 import argparse
 
 import torch.utils.data as torch_data
+import torch.nn as nn
+import torch
 
+import pymia.data.assembler as assm
+import pymia.data.transformation as tfm
 import pymia.data.definition as defs
 import pymia.data.extraction as extr
 import pymia.data.backends.pytorch as pymia_torch
 
 
+
+
 def main(hdf_file: str):
-    extractor = extr.ComposeExtractor([extr.NamesExtractor(),
-                                       extr.DataExtractor(),
-                                       extr.SelectiveDataExtractor(),
-                                       extr.DataExtractor(('numerical',), ignore_indexing=True),
-                                       extr.DataExtractor(('sex',), ignore_indexing=True),
-                                       extr.DataExtractor(('mask',), ignore_indexing=False),
-                                       extr.SubjectExtractor(),
-                                       extr.IndexingExtractor(do_pickle=True)])
 
-    direct_extractor = extr.ComposeExtractor([extr.SubjectExtractor(),
-                                              extr.FilesExtractor(categories=(defs.KEY_IMAGES,
-                                                                              defs.KEY_LABELS,
-                                                                              'mask', 'numerical', 'sex')),
-                                              extr.ImagePropertiesExtractor()])
+    hdf_file = '../example-data/example-data.h5'
+    # train_subjects, valid_subjects = ['Subject_1', 'Subject_2', 'Subject_3'], ['Subject_4']
 
-    dataset = pymia_torch.PymiaTorchDataset(hdf_file, extr.SliceIndexing(), extractor)
+    extractor = extr.ComposeExtractor(
+        [extr.DataExtractor(categories=(defs.KEY_IMAGES,)),
+         extr.SubjectExtractor(),
+         extr.IndexingExtractor(do_pickle=True),
 
-    loader = torch_data.dataloader.DataLoader(dataset, batch_size=2, shuffle=False)
+         extr.ImageShapeExtractor()]
+    )
 
-    for i, sample in enumerate(loader):
+    transform = tfm.Permute(permutation=(2, 1, 0), entries=(defs.KEY_IMAGES,))
 
-        for j in range(len(sample[defs.KEY_SUBJECT_INDEX])):
-            subject_index = sample[defs.KEY_SUBJECT_INDEX][j].item()
-            extracted_sample = dataset.direct_extract(direct_extractor, subject_index)
+    indexing_strategy = extr.SliceIndexing()
+    dataset = extr.PymiaDatasource(hdf_file, indexing_strategy, extractor, transform)
+
+    direct_extractor = extr.ComposeExtractor(
+        [extr.ImagePropertiesExtractor(),
+         extr.DataExtractor(categories=(defs.KEY_LABELS,))]
+    )
+    assembler = assm.SubjectAssembler()
+
+    # torch specific handling
+    pytorch_dataset = pymia_torch.PytorchDatasetAdapter(dataset)
+    loader = torch_data.dataloader.DataLoader(pytorch_dataset, batch_size=2, shuffle=False)
+    dummy_network = nn.Sequential(
+        nn.Conv2d(in_channels=2, out_channels=8, kernel_size=3, padding=1),
+        nn.Conv2d(in_channels=8, out_channels=1, kernel_size=3, padding=1),
+        nn.Sigmoid()
+    )
+    torch.set_grad_enabled(False)
+
+    for i, batch in enumerate(loader):
+
+        x = batch[defs.KEY_IMAGES]
+
+        prediction = dummy_network(x)
+
+        is_last = i == len(loader) - 1
+        assembler.add_batch(prediction.numpy(), batch, is_last)
+
+        for subject_index in assembler.subjects_ready:
+            subject_prediction = assembler.get_assembled_subject(subject_index)
+
+            direct_sample = dataset.direct_extract(direct_extractor, subject_index)
+
+            a = 1
+            # do_eval(subject_prediction, direct_sample[defs.KEY_LABELS])
 
 
 if __name__ == '__main__':
