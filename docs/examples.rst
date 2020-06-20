@@ -10,7 +10,7 @@ The following examples illustrate the intended use case of pymia:
 
     examples.data.creation
     examples.data.scaffold
-    examples.data.extraction
+    examples.data.extraction_assembling
     examples.evaluation.basic
     examples.evaluation.logging_torch
     examples.filtering.basic
