@@ -37,6 +37,7 @@ def main(hdf_file: str):
     )
     assembler = assm.SubjectAssembler()
 
+
     # torch specific handling
     pytorch_dataset = pymia_torch.PytorchDatasetAdapter(dataset)
     loader = torch_data.dataloader.DataLoader(pytorch_dataset, batch_size=2, shuffle=False)
@@ -63,6 +64,8 @@ def main(hdf_file: str):
 
             a = 1
             # do_eval(subject_prediction, direct_sample[defs.KEY_LABELS])
+
+
 
 
 if __name__ == '__main__':
