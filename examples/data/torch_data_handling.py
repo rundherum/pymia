@@ -32,7 +32,7 @@ def main(hdf_file: str):
         [extr.ImagePropertiesExtractor(),
          extr.DataExtractor(categories=(defs.KEY_LABELS, defs.KEY_IMAGES))]
     )
-    assembler = assm.SubjectAssemblerNew(dataset)
+    assembler = assm.SubjectAssembler(dataset)
 
     # torch specific handling
     pytorch_dataset = pymia_torch.PytorchDatasetAdapter(dataset)

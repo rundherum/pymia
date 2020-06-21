@@ -30,7 +30,7 @@ def main(hdf_file: str):
         [extr.ImagePropertiesExtractor(),
          extr.DataExtractor(categories=(defs.KEY_LABELS, defs.KEY_IMAGES))]
     )
-    assembler = assm.SubjectAssemblerNew(dataset)
+    assembler = assm.SubjectAssembler(dataset)
 
     gen_fn = pymia_tf.get_tf_generator(dataset)
     tf_dataset = tf.data.Dataset.from_generator(generator=gen_fn,
