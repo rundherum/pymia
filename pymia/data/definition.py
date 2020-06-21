@@ -26,3 +26,4 @@ KEY_SHAPE = 'shape'  #:
 KEY_SUBJECT = 'subject'  #:
 KEY_SUBJECT_INDEX = 'subject_index'  #:
 KEY_INDEX_EXPR = 'index_expr'  #:
+KEY_SAMPLE_INDEX = 'sample_index'  #:

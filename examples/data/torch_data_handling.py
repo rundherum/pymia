@@ -19,14 +19,10 @@ def main(hdf_file: str):
     # train_subjects, valid_subjects = ['Subject_1', 'Subject_2', 'Subject_3'], ['Subject_4']
 
     extractor = extr.ComposeExtractor(
-        [extr.DataExtractor(categories=(defs.KEY_IMAGES,)),
-         extr.SubjectExtractor(),
-         extr.IndexingExtractor(do_pickle=True),
-
-         extr.ImageShapeExtractor()]
+        [extr.DataExtractor(categories=(defs.KEY_IMAGES,))]
     )
 
-    transform = tfm.Permute(permutation=(2, 1, 0), entries=(defs.KEY_IMAGES,))
+    transform = tfm.Permute(permutation=(2, 0, 1), entries=(defs.KEY_IMAGES,))
 
     indexing_strategy = extr.SliceIndexing()
     dataset = extr.PymiaDatasource(hdf_file, indexing_strategy, extractor, transform)
@@ -35,7 +31,7 @@ def main(hdf_file: str):
         [extr.ImagePropertiesExtractor(),
          extr.DataExtractor(categories=(defs.KEY_LABELS,))]
     )
-    assembler = assm.SubjectAssembler()
+    assembler = assm.SubjectAssemblerNew(dataset)
 
     # torch specific handling
     pytorch_dataset = pymia_torch.PytorchDatasetAdapter(dataset)
@@ -49,12 +45,19 @@ def main(hdf_file: str):
 
     for i, batch in enumerate(loader):
 
-        x = batch[defs.KEY_IMAGES]
+        x, sample_indices = batch[defs.KEY_IMAGES], batch[defs.KEY_SAMPLE_INDEX]
 
         prediction = dummy_network(x)
 
+
+
         is_last = i == len(loader) - 1
-        assembler.add_batch(prediction.numpy(), batch, is_last)
+        numpy_prediction = prediction.numpy().transpose((0, 2, 3, 1))
+        assembler.add_batch(numpy_prediction, sample_indices.numpy(), is_last)
+
+        are_ready = assembler.subjects_ready
+        if len(are_ready) == 0:
+            continue
 
         for subject_index in assembler.subjects_ready:
             subject_prediction = assembler.get_assembled_subject(subject_index)
