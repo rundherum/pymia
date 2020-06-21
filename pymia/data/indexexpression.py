@@ -15,6 +15,7 @@ class IndexExpression:
                 list length of :obj:`indexing`
         """
         self.expression = None
+        """list of :obj:`slice` objects defining the slicing each axis"""
         self.set_indexing(indexing, axis)
 
     def set_indexing(self, indexing: t.Union[int, tuple, slice, t.List[int], t.List[tuple], t.List[list]],
@@ -49,7 +50,8 @@ class IndexExpression:
     def get_indexing(self):
         """
         Returns:
-            list: a list of :obj:`slice` that applicable to a numpy.array
+            list: a list tuples defining the indexing (i.e., None, index, (start, stop)) at each axis. Can be used to generate
+            a new index expression.
         """
         indexing = []
         # todo(alainjungo): handle case when self.expression is of type slice
