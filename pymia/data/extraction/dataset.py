@@ -51,6 +51,8 @@ class PymiaDatasource:
         self.subject_subset = subject_subset
         self.init_reader_once = init_reader_once
         self.indices = []
+        """list: A list containing all sample indices. This is a mapping from item `i` to tuple 
+        `(subject_index, index_expression)`."""
         self.reader = None
 
         # init indices
@@ -155,7 +157,9 @@ class PymiaDatasource:
 
     def __getitem__(self, item):
         subject_index, index_expr = self.indices[item]
-        return self.direct_extract(self.extractor, subject_index, index_expr, self.transform)
+        extracted = self.direct_extract(self.extractor, subject_index, index_expr, self.transform)
+        extracted[defs.KEY_SAMPLE_INDEX] = item
+        return extracted
 
     def __del__(self):
         self.close_reader()

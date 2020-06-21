@@ -6,6 +6,7 @@ import numpy as np
 
 import pymia.data.definition as defs
 import pymia.data.transformation as tfm
+import pymia.data.extraction as extr
 
 
 class Assembler(abc.ABC):
@@ -36,35 +37,17 @@ class Assembler(abc.ABC):
     @property
     @abc.abstractmethod
     def subjects_ready(self):
-        """
-        Returns:
-            list, set: The indices of the subjects that are finished assembling.
-
-        """
+        """list, set: The indices of the subjects that are finished assembling."""
         pass
 
 
-def numpy_zeros(shape: tuple, id_: str, batch: dict, idx: int):
+def numpy_zeros(shape: tuple, assembling_key: str, subject_index: int):
     return np.zeros(shape)
-
-
-def default_sample_fn(params: dict):
-    key = params['key']
-    batch = params['batch']
-    idx = params['batch_idx']
-
-    data = params[key]
-    index_expr = batch[defs.KEY_INDEX_EXPR][idx]
-    if isinstance(index_expr, bytes):
-        # is pickled
-        index_expr = pickle.loads(index_expr)
-
-    return data, index_expr
 
 
 class SubjectAssembler(Assembler):
 
-    def __init__(self, zero_fn=numpy_zeros, on_sample_fn=default_sample_fn):
+    def __init__(self, zero_fn=numpy_zeros, on_sample_fn=None):
         """Assembles predictions of one or multiple subjects.
 
         Assumes that the network output, i.e. to_assemble, is of shape (B, ..., C)
@@ -156,28 +139,130 @@ class SubjectAssembler(Assembler):
         return assembled
 
 
+class SubjectAssemblerNew(Assembler):
+
+    def __init__(self, datasource: extr.PymiaDatasource, zero_fn=numpy_zeros, assemble_interaction_fn=None):
+        """Assembles predictions of one or multiple subjects.
+
+        Assumes that the network output, i.e. to_assemble, is of shape (B, ..., C)
+        where B is the batch size and C is the numbers of channels (must be at least 1) and ... refers to an arbitrary image
+        dimension.
+
+        Args:
+            zero_fn: A function that initializes the numpy array to hold the predictions.
+                Args: shape: tuple with the shape of the subject's labels.
+                Returns: A np.ndarray
+            assemble_interaction_fn (callable, optional): A `callable` that may modify the sample and indexing before adding
+                the data to the assembled array. This enables handling special cases. Must follow the
+                :code:`.AssembleInteractionFn.__call__` interface. By default neither data nor indexing is modified.
+        """
+        self.datasource = datasource
+        self.zero_fn = zero_fn
+        self.assemble_interaction_fn = assemble_interaction_fn
+        self._subjects_ready = set()
+        self.predictions = {}
+
+    @property
+    def subjects_ready(self):
+        """see :meth:`Assembler.subjects_ready`"""
+        return self._subjects_ready
+
+    def add_batch(self, to_assemble: typing.Union[np.ndarray, typing.Dict[str, np.ndarray]], sample_indices: np.ndarray,
+                  last_batch=False, **kwargs):
+        """see :meth:`Assembler.add_batch`"""
+        if not isinstance(to_assemble, dict):
+            to_assemble = {'__prediction': to_assemble}
+
+        sample_indices = sample_indices.tolist()  # to ensure that not np.int64 entries, but int
+
+        for batch_idx, sample_idx in enumerate(sample_indices):
+            self.add_sample(to_assemble, batch_idx, sample_idx)
+
+        if last_batch:
+            # to prevent from last batch to be ignored
+            self.end()
+
+    def end(self):
+        self._subjects_ready = set(self.predictions.keys())
+
+    def add_sample(self, to_assemble, batch_idx, sample_idx):
+        subject_index, index_expression = self.datasource.indices[sample_idx]
+
+        # initialize subject
+        if subject_index not in self.predictions and not self.predictions:  # fist subject
+            self.predictions[subject_index] = self._init_new_subject(to_assemble, subject_index)
+        elif subject_index not in self.predictions:  # new subject
+            self._subjects_ready = set(self.predictions.keys())
+            self.predictions[subject_index] = self._init_new_subject(to_assemble, subject_index)
+
+        for key in to_assemble:
+            data = to_assemble[key][batch_idx]
+            if self.assemble_interaction_fn:
+                data, index_expression = self.assemble_interaction_fn(key, data, index_expression)
+            self.predictions[subject_index][key][index_expression.expression] = data
+
+    def _init_new_subject(self, to_assemble, subject_index):
+        subject_prediction = {}
+
+        extractor = extr.ImageShapeExtractor(numpy_format=True)
+        subject_shape = self.datasource.direct_extract(extractor, subject_index)[defs.KEY_SHAPE]
+        for key in to_assemble:
+            assemble_shape = subject_shape + (to_assemble[key].shape[-1],)
+            subject_prediction[key] = self.zero_fn(assemble_shape, key, subject_index)
+        return subject_prediction
+
+    def get_assembled_subject(self, subject_index: int):
+        """see :meth:`Assembler.get_assembled_subject`"""
+        try:
+            self._subjects_ready.remove(subject_index)
+        except KeyError:
+            # check if subject is assembled but not listed as ready
+            # this can happen if only one subject was assembled or last
+            if subject_index not in self.predictions:
+                raise ValueError('Subject with index {} not in assembler'.format(subject_index))
+        assembled = self.predictions.pop(subject_index)
+        if '__prediction' in assembled:
+            return assembled['__prediction']
+        return assembled
+
+
 def mean_merge_fn(planes: list):
     return np.stack(planes).mean(axis=0)
 
 
-class TransformSampleFn:
+class AssembleInteractionFn:
+    """ Function interface enabling interaction with the `index_expression` and the `data` before it gets added to the
+    assembled `prediction` in :class:`.SubjectAssembler`.
+
+
+    .. automethod:: __call__
+    """
+
+    def __call__(self, key, data, index_expr, **kwargs):
+        """
+
+        Args:
+            key (str): The identifier or key of the data.
+            data (numpy.ndarray): The data.
+            index_expr (.IndexExpression): The current index_expression that might be modified.
+            **kwargs (dict): Any other arguments
+
+        Returns:
+            tuple: Modified `data` and modified `index_expression`
+
+        """
+        raise NotImplementedError()
+
+
+class ApplyTransformInteractionFn(AssembleInteractionFn):
 
     def __init__(self, transform: tfm.Transform) -> None:
         self.transform = transform
 
-    def __call__(self, params: dict):
-        key = params['key']
-        batch = params['batch']
-        idx = params['batch_idx']
-
-        index_expr = batch[defs.KEY_INDEX_EXPR][idx]
-        if isinstance(index_expr, bytes):
-            # is pickled
-            index_expr = pickle.loads(index_expr)
-
+    def __call__(self, key, data, index_expr, **kwargs):
         temp = tfm.raise_error_if_entry_not_extracted
         tfm.raise_error_entry_not_extracted = False
-        ret = self.transform({key: params[key], defs.KEY_INDEX_EXPR: index_expr})
+        ret = self.transform({key: data, defs.KEY_INDEX_EXPR: index_expr})
         tfm.raise_error_entry_not_extracted = temp
 
         return ret[key], ret[defs.KEY_INDEX_EXPR]
@@ -248,7 +333,7 @@ class PlaneSubjectAssembler(Assembler):
                 # is one slice in off plane direction (int)
                 required_plane_shape.pop(plane_dimension)
             transform = tfm.SizeCorrection(tuple(required_plane_shape), entries=tuple(to_assemble.keys()))
-            self.planes[plane_dimension].on_sample_fn = TransformSampleFn(transform)
+            self.planes[plane_dimension].on_sample_fn = ApplyTransformInteractionFn(transform)
 
             self.planes[plane_dimension].add_sample(to_assemble, batch, idx)
 
