@@ -9,8 +9,7 @@ The following examples illustrate the intended use case of pymia:
     :maxdepth: 1
 
     examples.data.creation
-    examples.data.scaffold
-    examples.data.extraction_assembling
+    examples.data.extraction_assembly
     examples.evaluation.basic
     examples.evaluation.logging_torch
     examples.filtering.basic
