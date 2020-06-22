@@ -3,7 +3,7 @@ import abc
 import numpy as np
 
 import pymia.data.definition as defs
-from . import dataset as ds
+from . import datasource as ds
 
 
 class SelectionStrategy(abc.ABC):

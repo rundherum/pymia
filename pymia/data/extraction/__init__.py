@@ -1,6 +1,6 @@
 from .reader import (Reader, Hdf5Reader, get_reader)
 from .indexing import (IndexingStrategy, SliceIndexing, VoxelWiseIndexing, EmptyIndexing, PatchWiseIndexing)
-from .dataset import PymiaDatasource
+from .datasource import PymiaDatasource
 from .extractor import (Extractor, DataExtractor, FilesExtractor, NamesExtractor, SubjectExtractor, IndexingExtractor,
                         SelectiveDataExtractor, RandomDataExtractor, ComposeExtractor,
                         ImagePropertiesExtractor, PadDataExtractor, ImageShapeExtractor)
