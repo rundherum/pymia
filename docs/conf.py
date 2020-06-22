@@ -40,8 +40,8 @@ shutil.copyfile(os.path.join(basedir, 'examples', 'data', 'extraction_assembly.i
 shutil.copyfile(os.path.join(basedir, 'examples', 'evaluation', 'basic.ipynb'),
                 os.path.join(basedir, 'docs', 'examples.evaluation.basic.ipynb'))
 
-shutil.copyfile(os.path.join(basedir, 'examples', 'evaluation', 'logging_torch.ipynb'),
-                os.path.join(basedir, 'docs', 'examples.evaluation.logging_torch.ipynb'))
+shutil.copyfile(os.path.join(basedir, 'examples', 'evaluation', 'logging.ipynb'),
+                os.path.join(basedir, 'docs', 'examples.evaluation.logging.ipynb'))
 
 shutil.copyfile(os.path.join(basedir, 'examples', 'filtering', 'basic.ipynb'),
                 os.path.join(basedir, 'docs', 'examples.filtering.basic.ipynb'))
