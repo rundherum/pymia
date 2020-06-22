@@ -11,7 +11,7 @@ import pymia.data.backends.pytorch as pymia_torch
 
 def main():
 
-    hdf_file = '../example-data/example-data.h5'
+    hdf_file = '../example-data/example-dataset.h5'
 
     extractor = extr.ComposeExtractor(
         [extr.DataExtractor(categories=(defs.KEY_IMAGES,))]
