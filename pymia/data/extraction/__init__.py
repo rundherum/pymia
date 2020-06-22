@@ -3,6 +3,6 @@ from .indexing import (IndexingStrategy, SliceIndexing, VoxelWiseIndexing, Empty
 from .datasource import PymiaDatasource
 from .extractor import (Extractor, DataExtractor, FilesExtractor, NamesExtractor, SubjectExtractor, IndexingExtractor,
                         SelectiveDataExtractor, RandomDataExtractor, ComposeExtractor,
-                        ImagePropertiesExtractor, PadDataExtractor, ImageShapeExtractor)
+                        ImagePropertiesExtractor, PadDataExtractor, ImageShapeExtractor, FilesystemDataExtractor)
 from .selection import (select_indices, NonBlackSelection, SelectionStrategy, ComposeSelection,
                         SubjectSelection, WithForegroundSelection, PercentileSelection, NonConstantSelection)

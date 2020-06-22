@@ -1,6 +1,7 @@
 import abc
 import pickle
 import typing
+import os
 
 import numpy as np
 import SimpleITK as sitk
@@ -435,3 +436,51 @@ class PadDataExtractor(Extractor):
 
         pad_data[sub_index_expr.expression] = data
         return pad_data
+
+
+class FilesystemDataExtractor(Extractor):
+
+    @staticmethod
+    def _load_stik(file_path: str, category: str):
+        return sitk.GetArrayFromImage(sitk.ReadImage(file_path))
+
+    def __init__(self, categories=(defs.KEY_IMAGES, ), load_fn=None, ignore_indexing: bool = False, override_file_root=None) -> None:
+        """Extracts data of a given category.
+
+        Adds :obj:`category` as key to :obj:`extracted`.
+
+        Args:
+            categories (tuple): Categories for which to extract the names.
+            load_fn (callable): Callable that loads a file given the file path and the category, and returns a numpy.ndarray.
+            ignore_indexing (bool): Whether to ignore the indexing in :obj:`params`. This is useful when extracting
+                entire images.
+        """
+        super().__init__()
+        self.categories = categories
+        if load_fn is None:
+            load_fn = self._load_stik
+        self.load_fn = load_fn
+        self.ignore_indexing = ignore_indexing
+        self.cached_file_root = override_file_root
+
+    def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
+        """see :meth:`.Extractor.extract`"""
+        index_expr = params[defs.KEY_INDEX_EXPR]  # type: expr.IndexExpression
+        subject_index_expr = expr.IndexExpression(params[defs.KEY_SUBJECT_INDEX])
+
+        if self.cached_file_root is None:
+            self.cached_file_root = reader.read(defs.LOC_FILES_ROOT)
+
+        file_root = self.cached_file_root
+
+        for category in self.categories:
+            rel_file_paths = reader.read(defs.LOC_FILES_PLACEHOLDER.format(category), subject_index_expr)
+
+            loaded = []
+            for rel_file_path in rel_file_paths:
+                file_path = os.path.join(file_root, rel_file_path)
+                loaded.append(self.load_fn(file_path, category))
+            data = np.stack(loaded, axis=-1)
+            if not self.ignore_indexing:
+                data = data[index_expr.expression]
+            extracted[category] = data
