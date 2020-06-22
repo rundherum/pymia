@@ -72,7 +72,7 @@ class SubjectAssembler(Assembler):
     @property
     def subjects_ready(self):
         """see :meth:`Assembler.subjects_ready`"""
-        return self._subjects_ready
+        return self._subjects_ready.copy()
 
     def add_batch(self, to_assemble: typing.Union[np.ndarray, typing.Dict[str, np.ndarray]], sample_indices: np.ndarray,
                   last_batch=False, **kwargs):
@@ -205,7 +205,7 @@ class PlaneSubjectAssembler(Assembler):
     @property
     def subjects_ready(self):
         """see :meth:`Assembler.subjects_ready`"""
-        return self._subjects_ready
+        return self._subjects_ready.copy()
 
     def add_batch(self, to_assemble: typing.Union[np.ndarray, typing.Dict[str, np.ndarray]], sample_indices: np.ndarray,
                   last_batch=False, **kwargs):
@@ -308,7 +308,7 @@ class Subject2dAssembler(Assembler):
     @property
     def subjects_ready(self):
         """see :meth:`Assembler.subjects_ready`"""
-        return self._subjects_ready
+        return self._subjects_ready.copy()
 
     def add_batch(self, to_assemble: typing.Union[np.ndarray, typing.Dict[str, np.ndarray]], sample_indices: np.ndarray,
                   last_batch=False, **kwargs):
