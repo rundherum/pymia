@@ -39,11 +39,11 @@ class Reader(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_shape(self, entry: str) -> list:
+    def get_shape(self, subject_index: int) -> list:
         """Get the shape from an entry.
 
         Args:
-            entry(str): The dataset entry.
+            subject_index(int): The index of the subject.
 
         Returns:
             list: The shape of each dimension.
@@ -103,7 +103,7 @@ class Hdf5Reader(Reader):
 
         Args:
             file_path(str): The path to the dataset file.
-            category(str): The category of an entry that contains data of all subjects
+            category(str): The category of an entry that defines the shape request
         """
         super().__init__(file_path)
         self.h5 = None  # type: h5py.File
@@ -111,12 +111,12 @@ class Hdf5Reader(Reader):
 
     def get_subject_entries(self) -> list:
         """see :meth:`.Reader.get_subject_entries`"""
-        group = defs.LOC_DATA_PLACEHOLDER.format(self.category)
-        return ['{}/{}'.format(group, k) for k in sorted(self.h5[group].keys())]
+        nb_subjects = len(self.get_subjects())
+        return [defs.subject_index_to_str(i, nb_subjects) for i in range(nb_subjects)]
 
-    def get_shape(self, entry: str) -> list:
+    def get_shape(self, subject_index: int) -> list:
         """see :meth:`.Reader.get_shape`"""
-        return self.h5[entry].shape
+        return self.read(defs.LOC_SHAPE_PLACEHOLDER.format(self.category), expr.IndexExpression(subject_index)).tolist()
 
     def get_subjects(self) -> list:
         """see :meth:`.Reader.get_subjects`"""

@@ -106,36 +106,49 @@ class WriteDataCallback(Callback):
         subject_files = params[defs.KEY_SUBJECT_FILES]
         subject_index = params[defs.KEY_SUBJECT_INDEX]
 
-        max_digits = len(str(len(subject_files)))
-        index_str = '{{:0{}}}'.format(max_digits).format(subject_index)
+        index_str = defs.subject_index_to_str(subject_index, len(subject_files))
 
         for category in params[defs.KEY_CATEGORIES]:
             data = params[category]
             self.writer.write('{}/{}'.format(defs.LOC_DATA_PLACEHOLDER.format(category), index_str), data, dtype=data.dtype)
 
 
-class WriteSubjectCallback(Callback):
+class WriteEssentialCallback(Callback):
 
     def __init__(self, writer: wr.Writer) -> None:
-        """Callback that writes the subject information to the dataset.
+        """Callback that writes the essential information to the dataset.
 
         Args:
             writer (.creation.writer.Writer): The writer used to write the data.
         """
         self.writer = writer
+        self.reserved_for_shape = False
 
     def on_start(self, params: dict):
         """see :meth:`.Callback.on_start`."""
         subject_count = len(params[defs.KEY_SUBJECT_FILES])
         self.writer.reserve(defs.LOC_SUBJECT, (subject_count,), str)
+        self.reserved_for_shape = False
 
     def on_subject(self, params: dict):
         """see :meth:`.Callback.on_subject`."""
         subject_files = params[defs.KEY_SUBJECT_FILES]
         subject_index = params[defs.KEY_SUBJECT_INDEX]
 
+        # subject identifier/name
         subject = subject_files[subject_index].subject
         self.writer.fill(defs.LOC_SUBJECT, subject, expr.IndexExpression(subject_index))
+
+        # reserve memory for shape, not in on_start since ndim not known
+        if not self.reserved_for_shape:
+            for category in params[defs.KEY_CATEGORIES]:
+                self.writer.reserve(defs.LOC_SHAPE_PLACEHOLDER.format(category),
+                                    (len(subject_files), params[category].ndim), dtype=np.uint16)
+            self.reserved_for_shape = True
+
+        for category in params[defs.KEY_CATEGORIES]:
+            shape = params[category].shape
+            self.writer.fill(defs.LOC_SHAPE_PLACEHOLDER.format(category), shape, expr.IndexExpression(subject_index))
 
 
 class WriteImageInformationCallback(Callback):
@@ -154,20 +167,20 @@ class WriteImageInformationCallback(Callback):
     def on_start(self, params: dict):
         """see :meth:`.Callback.on_start`."""
         subject_count = len(params[defs.KEY_SUBJECT_FILES])
-        self.writer.reserve(defs.LOC_INFO_SHAPE, (subject_count, 3), dtype=np.uint16)
-        self.writer.reserve(defs.LOC_INFO_ORIGIN, (subject_count, 3), dtype=np.float)
-        self.writer.reserve(defs.LOC_INFO_DIRECTION, (subject_count, 9), dtype=np.float)
-        self.writer.reserve(defs.LOC_INFO_SPACING, (subject_count, 3), dtype=np.float)
+        self.writer.reserve(defs.LOC_IMGPROP_SHAPE, (subject_count, 3), dtype=np.uint16)
+        self.writer.reserve(defs.LOC_IMGPROP_ORIGIN, (subject_count, 3), dtype=np.float)
+        self.writer.reserve(defs.LOC_IMGPROP_DIRECTION, (subject_count, 9), dtype=np.float)
+        self.writer.reserve(defs.LOC_IMGPROP_SPACING, (subject_count, 3), dtype=np.float)
 
     def on_subject(self, params: dict):
         """see :meth:`.Callback.on_subject`."""
         subject_index = params[defs.KEY_SUBJECT_INDEX]
         properties = params[defs.KEY_PLACEHOLDER_PROPERTIES.format(self.category)]  # type: conv.ImageProperties
 
-        self.writer.fill(defs.LOC_INFO_SHAPE, properties.size, expr.IndexExpression(subject_index))
-        self.writer.fill(defs.LOC_INFO_ORIGIN, properties.origin, expr.IndexExpression(subject_index))
-        self.writer.fill(defs.LOC_INFO_DIRECTION, properties.direction, expr.IndexExpression(subject_index))
-        self.writer.fill(defs.LOC_INFO_SPACING, properties.spacing, expr.IndexExpression(subject_index))
+        self.writer.fill(defs.LOC_IMGPROP_SHAPE, properties.size, expr.IndexExpression(subject_index))
+        self.writer.fill(defs.LOC_IMGPROP_ORIGIN, properties.origin, expr.IndexExpression(subject_index))
+        self.writer.fill(defs.LOC_IMGPROP_DIRECTION, properties.direction, expr.IndexExpression(subject_index))
+        self.writer.fill(defs.LOC_IMGPROP_SPACING, properties.spacing, expr.IndexExpression(subject_index))
 
 
 class WriteNamesCallback(Callback):
@@ -208,6 +221,8 @@ class WriteFilesCallback(Callback):
         """see :meth:`.Callback.on_start`."""
         subject_files = params[defs.KEY_SUBJECT_FILES]
         self.file_root = self._get_common_path(subject_files)
+        if os.path.isfile(self.file_root):  # only the case if only one file
+            self.file_root = os.path.dirname(self.file_root)
         self.writer.write(defs.LOC_FILES_ROOT, self.file_root, dtype='str')
 
         for category in params[defs.KEY_CATEGORIES]:
@@ -243,4 +258,4 @@ def get_default_callbacks(writer: wr.Writer) -> ComposeCallback:
                             WriteFilesCallback(writer),
                             WriteNamesCallback(writer),
                             WriteImageInformationCallback(writer),
-                            WriteSubjectCallback(writer)])
+                            WriteEssentialCallback(writer)])

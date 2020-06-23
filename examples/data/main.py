@@ -43,7 +43,7 @@ def main(hdf_file: str):
                                                   pymia_extr.IndexingExtractor(do_pickle=True),
                                                   pymia_extr.DataExtractor(),
                                                   pymia_extr.SelectiveDataExtractor(),
-                                                  pymia_extr.ImageShapeExtractor()])
+                                                  pymia_extr.ImagePropertyShapeExtractor()])
 
     # define an extractor for evaluation, i.e. what information we would like to extract per sample
     eval_extractor = pymia_extr.ComposeExtractor([pymia_extr.NamesExtractor(),

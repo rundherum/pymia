@@ -87,14 +87,14 @@ class PymiaDatasource:
         with rd.get_reader(self.dataset_path) as reader:
             all_subjects = reader.get_subjects()
             last_shape = None  # remember shape to optimize initialization
-            for i, subject in enumerate(reader.get_subject_entries()):
-                if subject_subset is None or all_subjects[i] in subject_subset:
-                    current_shape = reader.get_shape(subject)
+            for subject_idx in range(len(all_subjects)):
+                if subject_subset is None or all_subjects[subject_idx] in subject_subset:
+                    current_shape = reader.get_shape(subject_idx)
                     if not last_shape == current_shape:
                         subject_indices = self.indexing_strategy(current_shape)
                         last_shape = current_shape
 
-                    subject_and_indices = zip(len(subject_indices) * [i], subject_indices)
+                    subject_and_indices = zip(len(subject_indices) * [subject_idx], subject_indices)
                     self.indices.extend(subject_and_indices)
 
     def set_transform(self, transform: tfm.Transform):

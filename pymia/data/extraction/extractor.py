@@ -145,10 +145,10 @@ class ImagePropertiesExtractor(Extractor):
         """see :meth:`.Extractor.extract`"""
         subject_index_expr = expr.IndexExpression(params[defs.KEY_SUBJECT_INDEX])
 
-        shape = reader.read(defs.LOC_INFO_SHAPE, subject_index_expr).tolist()
-        direction = reader.read(defs.LOC_INFO_DIRECTION, subject_index_expr).tolist()
-        spacing = reader.read(defs.LOC_INFO_SPACING, subject_index_expr).tolist()
-        origin = reader.read(defs.LOC_INFO_ORIGIN, subject_index_expr).tolist()
+        shape = reader.read(defs.LOC_IMGPROP_SHAPE, subject_index_expr).tolist()
+        direction = reader.read(defs.LOC_IMGPROP_DIRECTION, subject_index_expr).tolist()
+        spacing = reader.read(defs.LOC_IMGPROP_SPACING, subject_index_expr).tolist()
+        origin = reader.read(defs.LOC_IMGPROP_ORIGIN, subject_index_expr).tolist()
 
         # todo: everything in memory?
         image = sitk.Image(shape, sitk.sitkUInt8)
@@ -218,7 +218,7 @@ class SelectiveDataExtractor(Extractor):
             Requires results of :class:`NamesExtractor` in :obj:`extracted`.
         """
         super().__init__()
-        self.entry_base_names = None
+        self.subject_entries = None
 
         if isinstance(selection, str):
             selection = (selection,)
@@ -230,9 +230,8 @@ class SelectiveDataExtractor(Extractor):
         if defs.KEY_PLACEHOLDER_NAMES.format(self.category) not in extracted:
             raise ValueError('selection of labels requires label_names to be extracted (use NamesExtractor)')
 
-        if self.entry_base_names is None:
-            entries = reader.get_subject_entries()
-            self.entry_base_names = [entry.rsplit('/', maxsplit=1)[1] for entry in entries]
+        if self.subject_entries is None:
+            self.subject_entries = reader.get_subject_entries()
 
         if not reader.has(defs.LOC_DATA_PLACEHOLDER.format(self.category)):
             raise ValueError('SelectiveDataExtractor requires {} to exist'.format(self.category))
@@ -240,8 +239,8 @@ class SelectiveDataExtractor(Extractor):
         subject_index = params[defs.KEY_SUBJECT_INDEX]
         index_expr = params[defs.KEY_INDEX_EXPR]
 
-        base_name = self.entry_base_names[subject_index]
-        data = reader.read('{}/{}'.format(defs.LOC_DATA_PLACEHOLDER.format(self.category), base_name), index_expr)
+        index_str = self.subject_entries[subject_index]
+        data = reader.read('{}/{}'.format(defs.LOC_DATA_PLACEHOLDER.format(self.category), index_str), index_expr)
         label_names = extracted[defs.KEY_PLACEHOLDER_NAMES.format(self.category)]  # type: list
 
         if self.selection is None:
@@ -267,7 +266,7 @@ class RandomDataExtractor(Extractor):
             Requires results of :class:`NamesExtractor` in :obj:`extracted`.
         """
         super().__init__()
-        self.entry_base_names = None
+        self.subject_entries = None
 
         if isinstance(selection, str):
             selection = (selection,)
@@ -279,9 +278,8 @@ class RandomDataExtractor(Extractor):
         if defs.KEY_PLACEHOLDER_NAMES.format(self.category) not in extracted:
             raise ValueError('selection of labels requires label_names to be extracted (use NamesExtractor)')
 
-        if self.entry_base_names is None:
-            entries = reader.get_subject_entries()
-            self.entry_base_names = [entry.rsplit('/', maxsplit=1)[1] for entry in entries]
+        if self.subject_entries is None:
+            self.subject_entries = reader.get_subject_entries()
 
         if not reader.has(defs.LOC_DATA_PLACEHOLDER.format(self.category)):
             raise ValueError('SelectiveDataExtractor requires {} to exist'.format(self.category))
@@ -289,8 +287,8 @@ class RandomDataExtractor(Extractor):
         subject_index = params[defs.KEY_SUBJECT_INDEX]
         index_expr = params[defs.KEY_INDEX_EXPR]
 
-        base_name = self.entry_base_names[subject_index]
-        data = reader.read('{}/{}'.format(defs.LOC_DATA_PLACEHOLDER.format(self.category), base_name), index_expr)
+        index_str = self.subject_entries[subject_index]
+        data = reader.read('{}/{}'.format(defs.LOC_DATA_PLACEHOLDER.format(self.category), index_str), index_expr)
         label_names = extracted[defs.KEY_PLACEHOLDER_NAMES.format(self.category)]  # type: list
 
         if self.selection is None:
@@ -302,10 +300,10 @@ class RandomDataExtractor(Extractor):
         extracted[self.category] = np.take(data, random_index, axis=-1)
 
 
-class ImageShapeExtractor(Extractor):
+class ImagePropertyShapeExtractor(Extractor):
 
     def __init__(self, numpy_format: bool = True) -> None:
-        """Extracts the shape of an image.
+        """Extracts the shape image property of an image.
 
         Added key to :obj:`extracted`:
 
@@ -321,7 +319,7 @@ class ImageShapeExtractor(Extractor):
         """see :meth:`.Extractor.extract`"""
         subject_index_expr = expr.IndexExpression(params[defs.KEY_SUBJECT_INDEX])
 
-        shape = reader.read(defs.LOC_INFO_SHAPE, subject_index_expr)
+        shape = reader.read(defs.LOC_IMGPROP_SHAPE, subject_index_expr)
         if self.numpy_format:
             tmp = shape[0]
             shape[0] = shape[-1]
@@ -345,23 +343,22 @@ class DataExtractor(Extractor):
         super().__init__()
         self.categories = categories
         self.ignore_indexing = ignore_indexing
-        self.entry_base_names = None
+        self.subject_entries = None
 
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
         """see :meth:`.Extractor.extract`"""
-        if self.entry_base_names is None:
-            entries = reader.get_subject_entries()
-            self.entry_base_names = [entry.rsplit('/', maxsplit=1)[1] for entry in entries]
+        if self.subject_entries is None:
+            self.subject_entries = reader.get_subject_entries()
 
         subject_index = params[defs.KEY_SUBJECT_INDEX]
         index_expr = params[defs.KEY_INDEX_EXPR]
 
-        base_name = self.entry_base_names[subject_index]
+        index_str = self.subject_entries[subject_index]
         for category in self.categories:
             if self.ignore_indexing:
-                data = reader.read('{}/{}'.format(defs.LOC_DATA_PLACEHOLDER.format(category), base_name))
+                data = reader.read('{}/{}'.format(defs.LOC_DATA_PLACEHOLDER.format(category), index_str))
             else:
-                data = reader.read('{}/{}'.format(defs.LOC_DATA_PLACEHOLDER.format(category), base_name), index_expr)
+                data = reader.read('{}/{}'.format(defs.LOC_DATA_PLACEHOLDER.format(category), index_str), index_expr)
             extracted[category] = data
 
 

@@ -111,7 +111,7 @@ class SubjectAssembler(Assembler):
     def _init_new_subject(self, to_assemble, subject_index):
         subject_prediction = {}
 
-        extractor = extr.ImageShapeExtractor(numpy_format=True)
+        extractor = extr.ImagePropertyShapeExtractor(numpy_format=True)
         subject_shape = self.datasource.direct_extract(extractor, subject_index)[defs.KEY_SHAPE]
         for key in to_assemble:
             assemble_shape = subject_shape + (to_assemble[key].shape[-1],)
@@ -228,7 +228,7 @@ class PlaneSubjectAssembler(Assembler):
             if not isinstance(indexing, list):
                 indexing = [indexing]
 
-            extractor = extr.ImageShapeExtractor(numpy_format=True)
+            extractor = extr.ImagePropertyShapeExtractor(numpy_format=True)
             required_plane_shape = self.datasource.direct_extract(extractor, subject_index)[defs.KEY_SHAPE]
 
             index_at_plane = indexing[plane_dimension]
