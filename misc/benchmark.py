@@ -55,18 +55,18 @@ def get_pairs(file_root, uncompressed_file_root, numpy_file_root):
     padding = (10, 10, 10)
 
     return {
-        'dataset-slice': (data_extractor, slices),
-        'file-slice': (file_extractor, slices),
-        'file-un-slice': (file_un_extractor, slices),
-        'file-np-slice': (file_np_extractor, slices),
-        'dataset-patch': (extr.PadDataExtractor(padding, data_extractor), patches),
-        'file-patch': (extr.PadDataExtractor(padding, file_extractor), patches),
-        'file-un-patch': (extr.PadDataExtractor(padding, file_un_extractor), patches),
-        'file-np-patch': (extr.PadDataExtractor(padding, file_np_extractor), patches),
-        'dataset-full': (data_extractor, full),
-        'file-full': (file_extractor, full),
-        'file-un-full': (file_un_extractor, full),
-        'file-np-full': (file_np_extractor, full),
+        'dataset_slice': (data_extractor, slices),
+        'file_slice': (file_extractor, slices),
+        'file-un_slice': (file_un_extractor, slices),
+        'file-np_slice': (file_np_extractor, slices),
+        'dataset_patch': (extr.PadDataExtractor(padding, data_extractor), patches),
+        'file_patch': (extr.PadDataExtractor(padding, file_extractor), patches),
+        'file-un_patch': (extr.PadDataExtractor(padding, file_un_extractor), patches),
+        'file-np_patch': (extr.PadDataExtractor(padding, file_np_extractor), patches),
+        'dataset_full': (data_extractor, full),
+        'file_full': (file_extractor, full),
+        'file-un_full': (file_un_extractor, full),
+        'file-np_full': (file_np_extractor, full),
     }
 
 
