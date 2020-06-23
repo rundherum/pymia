@@ -7,7 +7,7 @@ import numpy as np
 import SimpleITK as sitk
 
 
-in_dir = '../examples/example-data'
+in_dir = '../../examples/example-data'
 out_dir_un = '../examples/example-data-uncompressed'
 out_dir_np = '../examples/example-data-numpy'
 

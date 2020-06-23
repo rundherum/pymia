@@ -5,6 +5,7 @@ examples/example-data/Subject*
 examples/example-data/*.csv
 examples/example-data/*.h5
 examples/example-data/log/*
+misc/benchmark_data/
 
 ### Python template
 # Byte-compiled / optimized / DLL files

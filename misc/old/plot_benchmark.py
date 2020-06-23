@@ -10,7 +10,7 @@ method_names = {'dataset': 'PymiaDatasource', 'file': 'MetaImage (standard)', 'f
 
 
 def main():
-    in_file = './benchmark_results_w_numpy.csv'
+    in_file = 'benchmark_results_w_numpy.csv'
 
     df = pd.read_csv(in_file, index_col='repetition')
 

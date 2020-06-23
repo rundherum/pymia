@@ -10,15 +10,6 @@ import pymia.data.definition as defs
 import pymia.data.extraction as extr
 
 
-
-# get all the h5 datasets for each nb of subjects
-
-# loop over num subjects
-    # loop over methods
-        # loop over task
-            # loop over dataset 100 samples, time every sample
-
-
 methods = ['dataset', 'file-numpy', 'file-standard', 'file-uncompressed']
 tasks = ['slice', 'patch', 'full']
 root_dir = 'benchmark_data/'
@@ -58,7 +49,7 @@ def main():
 
     out_file = f'benchmark_result_each-{entries_per_subject}.csv'
     df = pd.DataFrame(data=results)
-    df.to_csv(out_file)
+    df.to_csv(out_file, index=False)
 
 
 def np_read(file_path, cat):
@@ -89,34 +80,6 @@ def get_indexing_and_extractor(task, method):
         extractor = extr.PadDataExtractor(padding, extractor)
 
     return indexing, extractor
-
-
-def get_pairs(file_root, uncompressed_file_root, numpy_file_root):
-    data_extractor = extr.DataExtractor(categories=(defs.KEY_IMAGES,))
-    file_extractor = extr.FilesystemDataExtractor(categories=(defs.KEY_IMAGES,), override_file_root=file_root)
-    file_np_extractor = extr.FilesystemDataExtractor(categories=(defs.KEY_IMAGES,), override_file_root=numpy_file_root, load_fn=np_read)
-    file_un_extractor = extr.FilesystemDataExtractor(categories=(defs.KEY_IMAGES,), override_file_root=uncompressed_file_root)
-
-    slices = extr.SliceIndexing()
-    patches = extr.PatchWiseIndexing((64, 64, 64))
-    full = extr.EmptyIndexing()
-
-    padding = (10, 10, 10)
-
-    return {
-        'dataset_slice': (data_extractor, slices),
-        'file_slice': (file_extractor, slices),
-        'file-un_slice': (file_un_extractor, slices),
-        'file-np_slice': (file_np_extractor, slices),
-        'dataset_patch': (extr.PadDataExtractor(padding, data_extractor), patches),
-        'file_patch': (extr.PadDataExtractor(padding, file_extractor), patches),
-        'file-un_patch': (extr.PadDataExtractor(padding, file_un_extractor), patches),
-        'file-np_patch': (extr.PadDataExtractor(padding, file_np_extractor), patches),
-        'dataset_full': (data_extractor, full),
-        'file_full': (file_extractor, full),
-        'file-un_full': (file_un_extractor, full),
-        'file-np_full': (file_np_extractor, full),
-    }
 
 
 if __name__ == '__main__':

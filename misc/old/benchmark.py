@@ -8,8 +8,8 @@ import pymia.data.extraction as extr
 
 
 def main():
-    hdf_file = '../examples/example-data/example-dataset.h5'
-    file_root = '../examples/example-data'
+    hdf_file = '../../examples/example-data/example-dataset.h5'
+    file_root = '../../examples/example-data'
     file_un_root = '../examples/example-data-uncompressed'
     file_np_root = '../examples/example-data-numpy'
     repetitions = 5
