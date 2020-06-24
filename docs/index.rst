@@ -8,7 +8,7 @@ The figure below illustrates the use of pymia for deep learning-based projects. 
 
 .. image:: ./images/fig-overview.png
   :width: 800
-  :alt: Overview of the pymia library.
+  :alt: Overview of the pymia package.
 
 Getting Started
 ===============

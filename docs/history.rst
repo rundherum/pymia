@@ -16,7 +16,7 @@ Change history
 Migration guide
 ^^^^^^^^^^^^^^^
 
-Heavy changes have been made to move pymia towards a lightweight data handling and evaluation library for
+Heavy changes have been made to move pymia towards a lightweight data handling and evaluation package for
 medical image analysis with deep learning. Therefore, this release is, unfortunately, not backward compatible.
 To facilitate transition to this and coming versions, we thoroughly revised the documentation and the examples.
 
