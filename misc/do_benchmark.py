@@ -1,6 +1,5 @@
 import os
 import time
-import csv
 import random
 
 import numpy as np
@@ -25,7 +24,7 @@ def main():
     results = {}
 
     for nb_subjects in nb_subjects_list:
-        in_dir = os.path.join(root_dir, f'subjects-{nb_subjects}_each-{entries_per_subject}')
+        in_dir = os.path.join(root_dir, f'datasets_subjects-{nb_subjects}_each-{entries_per_subject}')
         for method in methods:
             hdf_file = os.path.join(in_dir, f'benchmark_{method}.h5')
             assert os.path.isfile(hdf_file)
@@ -47,7 +46,7 @@ def main():
                     for k, v in r.items():
                         results.setdefault(k, []).append(v)
 
-    out_file = f'benchmark_result_each-{entries_per_subject}.csv'
+    out_file = f'benchmark_result_each-{entries_per_subject}_new.csv'
     df = pd.DataFrame(data=results)
     df.to_csv(out_file, index=False)
 
