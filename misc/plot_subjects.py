@@ -10,7 +10,7 @@ method_names = {'dataset': 'PymiaDatasource', 'file-standard': 'MetaImage (stand
 
 
 def main():
-    in_file = './benchmark_result_each-2.csv'
+    in_file = './benchmark_result_each-2_new.csv'
     task = 'patch'  # {'slice', 'patch', 'full'}
 
     df = pd.read_csv(in_file)
