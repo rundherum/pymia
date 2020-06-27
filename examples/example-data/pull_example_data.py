@@ -5,21 +5,21 @@ import urllib.request as request
 import zipfile
 
 
-def main(url, out_dir):
+def main(url: str, data_dir: str):
     # download the data
     print(f'Downloading... ({url})')
     resp = request.urlopen(url)
     zip_ = zipfile.ZipFile(io.BytesIO(resp.read()))
 
-    print(f'Extracting... (to {out_dir})')
+    print(f'Extracting... (to {data_dir})')
     members = zip_.infolist()
     for member in members:
         if member.filename.startswith('Subject_') or member.filename.endswith('.h5'):
             if not os.path.basename(member.filename):
                 # is a directory
                 continue
-            zip_.extract(member, out_dir)
-            print(f'extract {os.path.join(out_dir, member.filename)}')
+            zip_.extract(member, data_dir)
+            print(f'extract {os.path.join(data_dir, member.filename)}')
     print('Finished')
 
 
@@ -39,11 +39,11 @@ if __name__ == '__main__':
     )
 
     parser.add_argument(
-        '--out_dir',
+        '--data_dir',
         type=str,
         default='.',
-        help='Path to extract the data to.'
+        help='Path to the data directory.'
     )
 
     args = parser.parse_args()
-    main(args.url, args.out_dir)
+    main(args.url, args.data_dir)
