@@ -1,4 +1,5 @@
 h5py
 numpy
+scikit-image
 scipy
 SimpleITK

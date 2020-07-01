@@ -25,9 +25,10 @@ Dependencies
 pymia requires Python 3.6 (or higher) and depends on the following packages:
 
  - `h5py <https://www.h5py.org/>`_
- - `NumPy <http://www.numpy.org/>`_
+ - `NumPy <https://numpy.org/>`_
+ - `scikit-image <https://scikit-image.org/>`_
  - `SciPy <https://www.scipy.org/>`_
- - `SimpleITK <http://www.simpleitk.org/>`_
+ - `SimpleITK <https://simpleitk.org/>`_
 
 .. note::
    For the :py:mod:`data` package, not all dependencies are installed directly due to their heaviness.

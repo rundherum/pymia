@@ -19,7 +19,7 @@ To implement your own metric and use it with the :class:`pymia.evaluation.evalua
       BMC Medical Imaging, 15. https://doi.org/10.1186/s12880-015-0068-x
 
 .. note::
-   The separation of the metrics into :mod:`pymia.evaluation.metric.segmentation` and :mod:`pymia.evaluation.metric.regression`
+   The separation of the metrics into :mod:`pymia.evaluation.metric.segmentation`, :mod:`pymia.evaluation.metric.segmentation`, and :mod:`pymia.evaluation.metric.reconstruction`
    is not strict. Meaning, a metric in :mod:`pymia.evaluation.metric.segmentation` could also be applied to regression.
 
 Base (:mod:`pymia.evaluation.metric.base`) module
@@ -34,6 +34,14 @@ Metric (:mod:`pymia.evaluation.metric.metric`) module
 -----------------------------------------------------
 
 .. automodule:: pymia.evaluation.metric.metric
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Reconstruction metrics (:mod:`pymia.evaluation.metric.reconstruction`) module
+-----------------------------------------------------------------------------
+
+.. automodule:: pymia.evaluation.metric.reconstruction
     :members:
     :undoc-members:
     :show-inheritance:

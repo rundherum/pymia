@@ -2,7 +2,7 @@ from .base import (ConfusionMatrix, Distances, Metric, ConfusionMatrixMetric, Di
                    NumpyArrayMetric, Information, NotComputableMetricWarning)
 from .metric import (get_all_segmentation_metrics, get_all_regression_metrics, get_overlap_metrics,
                      get_distance_metrics, get_classical_metrics)
-
+from .reconstruction import (PeakSignalToNoiseRatio, StructuralSimilarityIndexMeasure)
 from .regression import (CoefficientOfDetermination, MeanAbsoluteError, MeanSquaredError, RootMeanSquaredError,
                          NormalizedRootMeanSquaredError)
 from .segmentation import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageDistance, CohenKappaMetric,

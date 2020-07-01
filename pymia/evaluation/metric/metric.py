@@ -1,4 +1,5 @@
 """The metric module provides a set of metrics."""
+from .reconstruction import (PeakSignalToNoiseRatio, StructuralSimilarityIndexMeasure)
 from .regression import (CoefficientOfDetermination, MeanAbsoluteError, MeanSquaredError, RootMeanSquaredError,
                          NormalizedRootMeanSquaredError)
 from .segmentation import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageDistance, CohenKappaMetric,
@@ -8,6 +9,15 @@ from .segmentation import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageD
                            ProbabilisticDistance, RandIndex, Recall, SegmentationVolume,
                            Sensitivity, Specificity, SurfaceOverlap, SurfaceDiceOverlap, TrueNegative, TruePositive,
                            VariationOfInformation, VolumeSimilarity)
+
+
+def get_all_reconstruction_metrics():
+    """Gets a list with all reconstruction metrics.
+
+    Returns:
+        list[Metric]: A list of metrics.
+    """
+    return [PeakSignalToNoiseRatio(), StructuralSimilarityIndexMeasure()]
 
 
 def get_all_segmentation_metrics():
