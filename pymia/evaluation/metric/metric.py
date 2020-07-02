@@ -2,12 +2,12 @@
 from .reconstruction import (PeakSignalToNoiseRatio, StructuralSimilarityIndexMeasure)
 from .regression import (CoefficientOfDetermination, MeanAbsoluteError, MeanSquaredError, RootMeanSquaredError,
                          NormalizedRootMeanSquaredError)
-from .segmentation import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageDistance, CohenKappaMetric,
-                           DiceCoefficient, FalseNegative, FalsePositive, Fallout, FMeasure,
+from .segmentation import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageDistance, CohenKappaCoefficient,
+                           DiceCoefficient, FalseNegative, FalsePositive, Fallout, FalseNegativeRate, FMeasure,
                            GlobalConsistencyError, GroundTruthVolume, HausdorffDistance,
                            InterclassCorrelation, JaccardCoefficient, MahalanobisDistance, MutualInformation, Precision,
                            ProbabilisticDistance, RandIndex, Recall, SegmentationVolume,
-                           Sensitivity, Specificity, SurfaceOverlap, SurfaceDiceOverlap, TrueNegative, TruePositive,
+                           Sensitivity, Specificity, SurfaceDiceOverlap, SurfaceOverlap, TrueNegative, TruePositive,
                            VariationOfInformation, VolumeSimilarity)
 
 
@@ -47,7 +47,7 @@ def get_overlap_metrics():
     """
     return [AdjustedRandIndex(),
             AreaUnderCurve(),
-            CohenKappaMetric(),
+            CohenKappaCoefficient(),
             DiceCoefficient(),
             InterclassCorrelation(),
             JaccardCoefficient(),
@@ -87,6 +87,7 @@ def get_classical_metrics():
            FMeasure(),
            Accuracy(),
            Fallout(),
+           FalseNegativeRate(),
            TruePositive(),
            FalsePositive(),
            TrueNegative(),

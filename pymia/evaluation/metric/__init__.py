@@ -5,7 +5,7 @@ from .metric import (get_all_segmentation_metrics, get_all_regression_metrics, g
 from .reconstruction import (PeakSignalToNoiseRatio, StructuralSimilarityIndexMeasure)
 from .regression import (CoefficientOfDetermination, MeanAbsoluteError, MeanSquaredError, RootMeanSquaredError,
                          NormalizedRootMeanSquaredError)
-from .segmentation import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageDistance, CohenKappaMetric,
+from .segmentation import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageDistance, CohenKappaCoefficient,
                            DiceCoefficient, FalseNegative, FalsePositive, Fallout, FalseNegativeRate, FMeasure,
                            GlobalConsistencyError, GroundTruthArea, GroundTruthVolume, HausdorffDistance,
                            InterclassCorrelation, JaccardCoefficient, MahalanobisDistance, MutualInformation, Precision,

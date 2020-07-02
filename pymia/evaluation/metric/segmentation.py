@@ -190,7 +190,7 @@ class AverageDistance(SimpleITKImageMetric):
         return distance_filter.GetAverageHausdorffDistance()
 
 
-class CohenKappaMetric(ConfusionMatrixMetric):
+class CohenKappaCoefficient(ConfusionMatrixMetric):
 
     def __init__(self, metric: str = 'KAPPA'):
         """Represents a Cohen's kappa coefficient metric.
