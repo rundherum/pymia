@@ -333,7 +333,7 @@ class FMeasure(ConfusionMatrixMetric):
         precision = Precision()
         precision.confusion_matrix = self.confusion_matrix
         precision = precision.calculate()
-        recall = Recall()
+        recall = Sensitivity()
         recall.confusion_matrix = self.confusion_matrix
         recall = recall.calculate()
 
@@ -691,27 +691,6 @@ class RandIndex(ConfusionMatrixMetric):
         d = (n * n + sum_of_squares - nis - njs) / 2.
 
         return (a + d) / (a + b + c + d)
-
-
-class Recall(ConfusionMatrixMetric):
-
-    def __init__(self, metric: str = 'RECALL'):
-        """Represents a recall metric.
-
-        Args:
-            metric (str): The identification string of the metric.
-        """
-        super().__init__(metric)
-
-    def calculate(self):
-        """Calculates the recall."""
-
-        sum_ = self.confusion_matrix.tp + self.confusion_matrix.fn
-
-        if sum_ != 0:
-            return self.confusion_matrix.tp / sum_
-        else:
-            return 0
 
 
 class SegmentationArea(AreaMetric):

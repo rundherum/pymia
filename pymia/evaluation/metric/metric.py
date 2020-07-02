@@ -6,7 +6,7 @@ from .segmentation import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageD
                            DiceCoefficient, FalseNegative, FalsePositive, Fallout, FalseNegativeRate, FMeasure,
                            GlobalConsistencyError, GroundTruthVolume, HausdorffDistance,
                            InterclassCorrelation, JaccardCoefficient, MahalanobisDistance, MutualInformation, Precision,
-                           ProbabilisticDistance, RandIndex, Recall, SegmentationVolume,
+                           ProbabilisticDistance, RandIndex, SegmentationVolume,
                            Sensitivity, Specificity, SurfaceDiceOverlap, SurfaceOverlap, TrueNegative, TruePositive,
                            VariationOfInformation, VolumeSimilarity)
 
@@ -83,7 +83,6 @@ def get_classical_metrics():
     return[Sensitivity(),
            Specificity(),
            Precision(),
-           Recall(),
            FMeasure(),
            Accuracy(),
            Fallout(),

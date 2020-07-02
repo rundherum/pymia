@@ -9,6 +9,6 @@ from .segmentation import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageD
                            DiceCoefficient, FalseNegative, FalsePositive, Fallout, FalseNegativeRate, FMeasure,
                            GlobalConsistencyError, GroundTruthArea, GroundTruthVolume, HausdorffDistance,
                            InterclassCorrelation, JaccardCoefficient, MahalanobisDistance, MutualInformation, Precision,
-                           ProbabilisticDistance, RandIndex, Recall, SegmentationArea, SegmentationVolume,
+                           ProbabilisticDistance, RandIndex, SegmentationArea, SegmentationVolume,
                            Sensitivity, Specificity, SurfaceOverlap, SurfaceDiceOverlap, TrueNegative, TruePositive,
                            VariationOfInformation, VolumeSimilarity)
