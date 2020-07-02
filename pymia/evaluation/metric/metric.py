@@ -11,8 +11,8 @@ from .segmentation import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageD
                            VariationOfInformation, VolumeSimilarity)
 
 
-def get_all_reconstruction_metrics():
-    """Gets a list with all reconstruction metrics.
+def get_reconstruction_metrics():
+    """Gets a list with reconstruction metrics.
 
     Returns:
         list[Metric]: A list of metrics.
@@ -20,8 +20,8 @@ def get_all_reconstruction_metrics():
     return [PeakSignalToNoiseRatio(), StructuralSimilarityIndexMeasure()]
 
 
-def get_all_segmentation_metrics():
-    """Gets a list with all segmentation metrics.
+def get_segmentation_metrics():
+    """Gets a list with segmentation metrics.
 
     Returns:
         list[Metric]: A list of metrics.
@@ -29,7 +29,7 @@ def get_all_segmentation_metrics():
     return get_overlap_metrics() + get_distance_metrics() + get_classical_metrics()
 
 
-def get_all_regression_metrics():
+def get_regression_metrics():
     """Gets a list with all regression metrics.
 
     Returns:
