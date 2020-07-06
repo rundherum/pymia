@@ -1,4 +1,3 @@
-import abc
 import typing
 
 import numpy as np
@@ -13,7 +12,7 @@ from . import fileloader as load
 
 def default_concat(data: typing.List[np.ndarray]) -> np.ndarray:
     """Default concatenation function used to combine all entries from a category (e.g. T1, T2 data from "images" category)
-    in :meth:`.SubjectFileTraverser.traverse`
+    in :meth:`.Traverser.traverse`
 
     Args:
         data (list): List of numpy.ndarray entries to be concatenated.
@@ -24,7 +23,7 @@ def default_concat(data: typing.List[np.ndarray]) -> np.ndarray:
     return np.stack(data, axis=-1)
 
 
-class SubjectFileTraverser:
+class Traverser:
 
     def __init__(self, categories: typing.Union[str, typing.Tuple[str, ...]] = None):
         """Class managing the dataset creation process.

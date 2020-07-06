@@ -47,7 +47,7 @@ def main():
                 callbacks = crt.ComposeCallback(callbacks)
 
                 subject_files = methods_to_subject_files[method][:nb_subjects]  # only select the nb_subject firsts
-                traverser = crt.SubjectFileTraverser()
+                traverser = crt.Traverser()
                 traverser.traverse(subject_files, load=CacheLoad(), callback=callbacks)
 
 

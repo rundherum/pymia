@@ -80,7 +80,7 @@ def main(hdf_file: str, data_dir: str):
         transform = tfm.IntensityNormalization(loop_axis=3, entries=(defs.KEY_IMAGES, ))
 
         # run through the subject files (loads them, applies transformations, and calls the callback for writing them)
-        traverser = crt.SubjectFileTraverser()
+        traverser = crt.Traverser()
         traverser.traverse(subjects, callback=callbacks, load=LoadData(), transform=transform)
 
 
