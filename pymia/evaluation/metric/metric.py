@@ -1,14 +1,13 @@
 """The metric module provides a set of metrics."""
-from .reconstruction import (PeakSignalToNoiseRatio, StructuralSimilarityIndexMeasure)
-from .regression import (CoefficientOfDetermination, MeanAbsoluteError, MeanSquaredError, RootMeanSquaredError,
-                         NormalizedRootMeanSquaredError)
-from .segmentation import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageDistance, CohenKappaCoefficient,
-                           DiceCoefficient, FalseNegative, FalsePositive, Fallout, FalseNegativeRate, FMeasure,
-                           GlobalConsistencyError, HausdorffDistance,
-                           InterclassCorrelation, JaccardCoefficient, MahalanobisDistance, MutualInformation, Precision,
-                           PredictionVolume, ProbabilisticDistance, RandIndex, ReferenceVolume,
-                           Sensitivity, Specificity, SurfaceDiceOverlap, SurfaceOverlap, TrueNegative, TruePositive,
-                           VariationOfInformation, VolumeSimilarity)
+from .binary import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageDistance, CohenKappaCoefficient,
+                     DiceCoefficient, FalseNegative, FalsePositive, Fallout, FalseNegativeRate, FMeasure,
+                     GlobalConsistencyError, HausdorffDistance,
+                     InterclassCorrelation, JaccardCoefficient, MahalanobisDistance, MutualInformation, Precision,
+                     PredictionVolume, ProbabilisticDistance, RandIndex, ReferenceVolume,
+                     Sensitivity, Specificity, SurfaceDiceOverlap, SurfaceOverlap, TrueNegative, TruePositive,
+                     VariationOfInformation, VolumeSimilarity)
+from .continuous import (CoefficientOfDetermination, MeanAbsoluteError, MeanSquaredError, NormalizedRootMeanSquaredError,
+                         PeakSignalToNoiseRatio, RootMeanSquaredError, StructuralSimilarityIndexMeasure)
 
 
 def get_reconstruction_metrics():
@@ -30,7 +29,7 @@ def get_segmentation_metrics():
 
 
 def get_regression_metrics():
-    """Gets a list with all regression metrics.
+    """Gets a list with regression metrics.
 
     Returns:
         list[Metric]: A list of metrics.

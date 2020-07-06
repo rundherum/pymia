@@ -1,7 +1,10 @@
-"""The regression module provides metrics to measure regression performance."""
-import numpy as np
+"""The continuous module provides metrics to measure image reconstruction and regression performance."""
+import warnings
 
-from .base import NumpyArrayMetric
+import numpy as np
+import skimage.metrics
+
+from .base import (NumpyArrayMetric, NotComputableMetricWarning)
 
 
 class MeanAbsoluteError(NumpyArrayMetric):
@@ -92,3 +95,43 @@ class CoefficientOfDetermination(NumpyArrayMetric):
         tse = (len(y_true) - 1) * np.var(y_true, ddof=1)
         r2_score = 1 - (sse / tse)
         return r2_score
+
+
+class PeakSignalToNoiseRatio(NumpyArrayMetric):
+
+    def __init__(self, metric: str = 'PSNR'):
+        """Represents a peak signal to noise ratio metric.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
+
+    def calculate(self):
+        """Calculates the peak signal to noise ratio."""
+        psnr = skimage.metrics.peak_signal_noise_ratio(self.reference, self.prediction, data_range=self.reference.max())
+        return psnr
+
+
+class StructuralSimilarityIndexMeasure(NumpyArrayMetric):
+
+    def __init__(self, metric: str = 'SSIM'):
+        """Represents a structural similarity index measure metric.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
+
+    def calculate(self):
+        """Calculates the structural similarity index measure."""
+        if self.reference.ndim == 2:
+            ssim = skimage.metrics.structural_similarity(self.reference, self.prediction, data_range=self.reference.max())
+        elif self.reference.ndim == 3:
+            ssim = skimage.metrics.structural_similarity(self.reference, self.prediction, data_range=self.reference.max(),
+                                                         multichannelbool=True)
+        else:
+            warnings.warn('Unable to compute StructuralSimilarityIndexMeasure for images of dimension other than 2 or 3.',
+                          NotComputableMetricWarning)
+            ssim = float('-inf')
+        return ssim

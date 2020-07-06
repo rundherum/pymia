@@ -18,9 +18,6 @@ To implement your own metric and use it with the :class:`pymia.evaluation.evalua
       Taha, A. A., & Hanbury, A. (2015). Metrics for evaluating 3D medical image segmentation: analysis, selection, and tool.
       BMC Medical Imaging, 15. https://doi.org/10.1186/s12880-015-0068-x
 
-.. note::
-   The separation of the metrics into :mod:`pymia.evaluation.metric.segmentation`, :mod:`pymia.evaluation.metric.segmentation`, and :mod:`pymia.evaluation.metric.reconstruction`
-   is not strict. Meaning, a metric in :mod:`pymia.evaluation.metric.segmentation` could also be applied to regression.
 
 Base (:mod:`pymia.evaluation.metric.base`) module
 -------------------------------------------------
@@ -38,26 +35,18 @@ Metric (:mod:`pymia.evaluation.metric.metric`) module
     :undoc-members:
     :show-inheritance:
 
-Reconstruction metrics (:mod:`pymia.evaluation.metric.reconstruction`) module
------------------------------------------------------------------------------
+Binary metrics (:mod:`pymia.evaluation.metric.binary`) module
+-------------------------------------------------------------
 
-.. automodule:: pymia.evaluation.metric.reconstruction
+.. automodule:: pymia.evaluation.metric.binary
     :members:
     :undoc-members:
     :show-inheritance:
 
-Regression metrics (:mod:`pymia.evaluation.metric.regression`) module
+Continuous metrics (:mod:`pymia.evaluation.metric.continuous`) module
 ---------------------------------------------------------------------
 
-.. automodule:: pymia.evaluation.metric.regression
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-Segmentation metrics (:mod:`pymia.evaluation.metric.segmentation`) module
--------------------------------------------------------------------------
-
-.. automodule:: pymia.evaluation.metric.segmentation
+.. automodule:: pymia.evaluation.metric.continuous
     :members:
     :undoc-members:
     :show-inheritance:
