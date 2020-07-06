@@ -7,8 +7,8 @@ from .regression import (CoefficientOfDetermination, MeanAbsoluteError, MeanSqua
                          NormalizedRootMeanSquaredError)
 from .segmentation import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageDistance, CohenKappaCoefficient,
                            DiceCoefficient, FalseNegative, FalsePositive, Fallout, FalseNegativeRate, FMeasure,
-                           GlobalConsistencyError, GroundTruthArea, GroundTruthVolume, HausdorffDistance,
+                           GlobalConsistencyError, HausdorffDistance,
                            InterclassCorrelation, JaccardCoefficient, MahalanobisDistance, MutualInformation, Precision,
-                           ProbabilisticDistance, RandIndex, SegmentationArea, SegmentationVolume,
+                           PredictionArea, PredictionVolume, ProbabilisticDistance, RandIndex, ReferenceArea, ReferenceVolume,
                            Sensitivity, Specificity, SurfaceOverlap, SurfaceDiceOverlap, TrueNegative, TruePositive,
                            VariationOfInformation, VolumeSimilarity)

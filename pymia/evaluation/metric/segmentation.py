@@ -177,11 +177,11 @@ class AverageDistance(SimpleITKImageMetric):
         """Calculates the average (Hausdorff) distance."""
 
         if np.count_nonzero(sitk.GetArrayFromImage(self.reference)) == 0:
-            warnings.warn('Unable to compute average distance due to empty label mask, returning inf',
+            warnings.warn('Unable to compute average distance due to empty reference mask, returning inf',
                           NotComputableMetricWarning)
             return float('inf')
         if np.count_nonzero(sitk.GetArrayFromImage(self.prediction)) == 0:
-            warnings.warn('Unable to compute average distance due to empty segmentation mask, returning inf',
+            warnings.warn('Unable to compute average distance due to empty prediction mask, returning inf',
                           NotComputableMetricWarning)
             return float('inf')
 
@@ -377,41 +377,6 @@ class GlobalConsistencyError(ConfusionMatrixMetric):
         return min(e1, e2)
 
 
-class GroundTruthArea(AreaMetric):
-
-    def __init__(self, slice_number: int = -1, metric: str = 'GTAREA'):
-        """Represents a ground truth area metric.
-
-        Args:
-            slice_number (int): The slice number to calculate the area.
-                Defaults to -1, which will calculate the area on the intermediate slice.
-            metric (str): The identification string of the metric.
-        """
-        super().__init__(metric)
-        self.slice_number = slice_number
-
-    def calculate(self):
-        """Calculates the ground truth area on a specified slice in mm2."""
-
-        return self._calculate_area(self.reference, self.slice_number)
-
-
-class GroundTruthVolume(VolumeMetric):
-
-    def __init__(self, metric: str = 'GTVOL'):
-        """Represents a ground truth volume metric.
-
-        Args:
-            metric (str): The identification string of the metric.
-        """
-        super().__init__(metric)
-
-    def calculate(self):
-        """Calculates the ground truth volume in mm3."""
-
-        return self._calculate_volume(self.reference)
-
-
 class HausdorffDistance(DistanceMetric):
 
     def __init__(self, percentile: float = 100.0, metric: str = 'HDRFDST'):
@@ -448,7 +413,7 @@ class HausdorffDistance(DistanceMetric):
             perc_distance_gt_to_pred = self.distances.distances_gt_to_pred[
                 min(idx, len(self.distances.distances_gt_to_pred) - 1)]
         else:
-            warnings.warn('Unable to compute Hausdorff distance due to empty label mask, returning inf',
+            warnings.warn('Unable to compute Hausdorff distance due to empty reference mask, returning inf',
                           NotComputableMetricWarning)
             return float('inf')
 
@@ -459,7 +424,7 @@ class HausdorffDistance(DistanceMetric):
             perc_distance_pred_to_gt = self.distances.distances_pred_to_gt[
                 min(idx, len(self.distances.distances_pred_to_gt) - 1)]
         else:
-            warnings.warn('Unable to compute Hausdorff distance due to empty segmentation mask, returning inf',
+            warnings.warn('Unable to compute Hausdorff distance due to empty prediction mask, returning inf',
                           NotComputableMetricWarning)
             return float('inf')
 
@@ -544,11 +509,11 @@ class MahalanobisDistance(NumpyArrayMetric):
         seg_n = np.count_nonzero(self.prediction)
 
         if gt_n == 0:
-            warnings.warn('Unable to compute Mahalanobis distance due to empty label mask, returning inf',
+            warnings.warn('Unable to compute Mahalanobis distance due to empty reference mask, returning inf',
                           NotComputableMetricWarning)
             return float('inf')
         if seg_n == 0:
-            warnings.warn('Unable to compute Mahalanobis distance due to empty segmentation mask, returning inf',
+            warnings.warn('Unable to compute Mahalanobis distance due to empty prediction mask, returning inf',
                           NotComputableMetricWarning)
             return float('inf')
 
@@ -633,6 +598,41 @@ class Precision(ConfusionMatrixMetric):
             return 0
 
 
+class PredictionArea(AreaMetric):
+
+    def __init__(self, slice_number: int = -1, metric: str = 'PREDAREA'):
+        """Represents a prediction area metric.
+
+        Args:
+            slice_number (int): The slice number to calculate the area.
+                Defaults to -1, which will calculate the area on the intermediate slice.
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
+        self.slice_number = slice_number
+
+    def calculate(self):
+        """Calculates the predicted area on a specified slice in mm2."""
+
+        return self._calculate_area(self.prediction, self.slice_number)
+
+
+class PredictionVolume(VolumeMetric):
+
+    def __init__(self, metric: str = 'PREDVOL'):
+        """Represents a prediction volume metric.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
+
+    def calculate(self):
+        """Calculates the predicted volume in mm3."""
+
+        return self._calculate_volume(self.prediction)
+
+
 class ProbabilisticDistance(NumpyArrayMetric):
 
     def __init__(self, metric: str = 'PROBDST'):
@@ -693,10 +693,10 @@ class RandIndex(ConfusionMatrixMetric):
         return (a + d) / (a + b + c + d)
 
 
-class SegmentationArea(AreaMetric):
+class ReferenceArea(AreaMetric):
 
-    def __init__(self, slice_number: int = -1, metric: str = 'SEGAREA'):
-        """Represents a segmentation area metric.
+    def __init__(self, slice_number: int = -1, metric: str = 'REFAREA'):
+        """Represents a reference area metric.
 
         Args:
             slice_number (int): The slice number to calculate the area.
@@ -707,15 +707,15 @@ class SegmentationArea(AreaMetric):
         self.slice_number = slice_number
 
     def calculate(self):
-        """Calculates the segmentation area on a specified slice in mm2."""
+        """Calculates the reference area on a specified slice in mm2."""
 
-        return self._calculate_area(self.prediction, self.slice_number)
+        return self._calculate_area(self.reference, self.slice_number)
 
 
-class SegmentationVolume(VolumeMetric):
+class ReferenceVolume(VolumeMetric):
 
-    def __init__(self, metric: str = 'SEGVOL'):
-        """Represents a segmentation volume metric.
+    def __init__(self, metric: str = 'REFVOL'):
+        """Represents a reference volume metric.
 
         Args:
             metric (str): The identification string of the metric.
@@ -723,9 +723,9 @@ class SegmentationVolume(VolumeMetric):
         super().__init__(metric)
 
     def calculate(self):
-        """Calculates the segmented volume in mm3."""
+        """Calculates the reference volume in mm3."""
 
-        return self._calculate_volume(self.prediction)
+        return self._calculate_volume(self.reference)
 
 
 class Sensitivity(ConfusionMatrixMetric):
@@ -785,12 +785,12 @@ class SurfaceDiceOverlap(DistanceMetric):
         """Calculates the surface Dice coefficient overlap."""
 
         if self.distances.surfel_areas_pred is None:
-            warnings.warn('Unable to compute surface Dice coefficient overlap due to empty segmentation mask, returning -inf',
+            warnings.warn('Unable to compute surface Dice coefficient overlap due to empty prediction mask, returning -inf',
                           NotComputableMetricWarning)
             return float('-inf')
 
         if self.distances.surfel_areas_gt is None:
-            warnings.warn('Unable to compute surface Dice coefficient overlap due to empty label mask, returning -inf',
+            warnings.warn('Unable to compute surface Dice coefficient overlap due to empty reference mask, returning -inf',
                           NotComputableMetricWarning)
             return float('-inf')
 
@@ -803,16 +803,16 @@ class SurfaceDiceOverlap(DistanceMetric):
 
 class SurfaceOverlap(DistanceMetric):
 
-    def __init__(self, tolerance: float = 1.0, prediction_to_label: bool = True, metric: str = 'SURFOVLP'):
+    def __init__(self, tolerance: float = 1.0, prediction_to_reference: bool = True, metric: str = 'SURFOVLP'):
         """Represents a surface overlap metric.
 
-        Computes the overlap of the ground truth surface with the predicted surface and vice versa allowing a
+        Computes the overlap of the reference surface with the predicted surface and vice versa allowing a
         specified tolerance (maximum surface-to-surface distance that is regarded as overlapping).
         The overlapping fraction is computed by correctly taking the area of each surface element into account.
 
         Args:
             tolerance (float): The tolerance of the surface distance in mm.
-            prediction_to_label (bool): Computes the prediction to labels if `True`, otherwise the label to prediction.
+            prediction_to_reference (bool): Computes the prediction to reference if `True`, otherwise the reference to prediction.
             metric (str): The identification string of the metric.
 
         See Also:
@@ -821,18 +821,18 @@ class SurfaceOverlap(DistanceMetric):
         """
         super().__init__(metric)
         self.tolerance = tolerance
-        self.prediction_to_label = prediction_to_label
+        self.prediction_to_reference = prediction_to_reference
 
     def calculate(self):
         """Calculates the surface overlap."""
 
-        if self.prediction_to_label:
+        if self.prediction_to_reference:
             if self.distances.surfel_areas_pred is not None and np.sum(self.distances.surfel_areas_pred) > 0:
                 return float(
                     np.sum(self.distances.surfel_areas_pred[self.distances.distances_pred_to_gt <= self.tolerance])
                     / np.sum(self.distances.surfel_areas_pred))
             else:
-                warnings.warn('Unable to compute surface overlap due to empty segmentation mask, returning -inf',
+                warnings.warn('Unable to compute surface overlap due to empty prediction mask, returning -inf',
                               NotComputableMetricWarning)
                 return float('-inf')
         else:
@@ -841,7 +841,7 @@ class SurfaceOverlap(DistanceMetric):
                     np.sum(self.distances.surfel_areas_gt[self.distances.distances_gt_to_pred <= self.tolerance])
                     / np.sum(self.distances.surfel_areas_gt))
             else:
-                warnings.warn('Unable to compute surface overlap due to empty label mask, returning -inf',
+                warnings.warn('Unable to compute surface overlap due to empty reference mask, returning -inf',
                               NotComputableMetricWarning)
                 return float('-inf')
 

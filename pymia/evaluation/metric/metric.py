@@ -4,9 +4,9 @@ from .regression import (CoefficientOfDetermination, MeanAbsoluteError, MeanSqua
                          NormalizedRootMeanSquaredError)
 from .segmentation import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageDistance, CohenKappaCoefficient,
                            DiceCoefficient, FalseNegative, FalsePositive, Fallout, FalseNegativeRate, FMeasure,
-                           GlobalConsistencyError, GroundTruthVolume, HausdorffDistance,
+                           GlobalConsistencyError, HausdorffDistance,
                            InterclassCorrelation, JaccardCoefficient, MahalanobisDistance, MutualInformation, Precision,
-                           ProbabilisticDistance, RandIndex, SegmentationVolume,
+                           PredictionVolume, ProbabilisticDistance, RandIndex, ReferenceVolume,
                            Sensitivity, Specificity, SurfaceDiceOverlap, SurfaceOverlap, TrueNegative, TruePositive,
                            VariationOfInformation, VolumeSimilarity)
 
@@ -91,5 +91,5 @@ def get_classical_metrics():
            FalsePositive(),
            TrueNegative(),
            FalseNegative(),
-           GroundTruthVolume(),
-           SegmentationVolume()]
+           ReferenceVolume(),
+           PredictionVolume()]
