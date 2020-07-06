@@ -8,7 +8,7 @@ import pymia.data.conversion as conv
 
 
 class Load(abc.ABC):
-    """Interface for loading the data during the dataset creation in :meth:`.SubjectFileTraverser.traverse`
+    """Interface for loading the data during the dataset creation in :meth:`.Traverser.traverse`
     
     .. automethod:: __call__
     """
