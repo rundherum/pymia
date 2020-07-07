@@ -1,4 +1,6 @@
 """"""
+
+
 class FileCategory:
     def __init__(self, entries=None) -> None:
         if entries is None:
