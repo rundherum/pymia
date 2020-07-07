@@ -35,10 +35,10 @@ Metric (:mod:`pymia.evaluation.metric.metric`) module
     :undoc-members:
     :show-inheritance:
 
-Binary metrics (:mod:`pymia.evaluation.metric.binary`) module
--------------------------------------------------------------
+Categorical metrics (:mod:`pymia.evaluation.metric.categorical`) module
+-----------------------------------------------------------------------
 
-.. automodule:: pymia.evaluation.metric.binary
+.. automodule:: pymia.evaluation.metric.categorical
     :members:
     :undoc-members:
     :show-inheritance:

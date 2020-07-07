@@ -1,4 +1,4 @@
-"""The binary module provides metrics to measure image segmentation performance."""
+"""The categorical module provides metrics to measure image segmentation performance."""
 import abc
 import math
 import warnings

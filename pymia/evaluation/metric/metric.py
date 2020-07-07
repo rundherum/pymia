@@ -1,11 +1,11 @@
 """The metric module provides a set of metrics."""
-from .binary import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageDistance, CohenKappaCoefficient,
-                     DiceCoefficient, FalseNegative, FalsePositive, Fallout, FalseNegativeRate, FMeasure,
-                     GlobalConsistencyError, HausdorffDistance,
-                     InterclassCorrelation, JaccardCoefficient, MahalanobisDistance, MutualInformation, Precision,
-                     PredictionVolume, ProbabilisticDistance, RandIndex, ReferenceVolume,
-                     Sensitivity, Specificity, SurfaceDiceOverlap, SurfaceOverlap, TrueNegative, TruePositive,
-                     VariationOfInformation, VolumeSimilarity)
+from .categorical import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageDistance, CohenKappaCoefficient,
+                          DiceCoefficient, FalseNegative, FalsePositive, Fallout, FalseNegativeRate, FMeasure,
+                          GlobalConsistencyError, HausdorffDistance,
+                          InterclassCorrelation, JaccardCoefficient, MahalanobisDistance, MutualInformation, Precision,
+                          PredictionVolume, ProbabilisticDistance, RandIndex, ReferenceVolume,
+                          Sensitivity, Specificity, SurfaceDiceOverlap, SurfaceOverlap, TrueNegative, TruePositive,
+                          VariationOfInformation, VolumeSimilarity)
 from .continuous import (CoefficientOfDetermination, MeanAbsoluteError, MeanSquaredError, NormalizedRootMeanSquaredError,
                          PeakSignalToNoiseRatio, RootMeanSquaredError, StructuralSimilarityIndexMeasure)
 
