@@ -10,17 +10,23 @@ The extraction-assemble principle is essential for large three-dimensional image
 and thus require some kind of patch-based approach.
 
 For simplicity reasons we use slice-wise extraction in this example, meaning that the two-dimensional slices are extracted
-from the three-dimensional image. Further, the example uses the PyTorch PyTorch as a deep learning (DL) framework.
+from the three-dimensional image. Further, the example uses PyTorch as a deep learning (DL) framework.
 
-At the end of this page you find examples for the following additional use cases:
+At the end of this example you find examples for the following additional use cases:
 
-* Using pymia with TensorFlow
+* TensorFlow adaptions
 * Extracting 3-D patches
 * Extracting from a metadata dataset
 
+.. tip::
+    This example is available as Jupyter notebook at `./examples/data/extraction_assembly.ipynb` and Python scripts for PyTorch and TensorFlow at at `./examples/data/extraction_assembly.py` and `./examples/data/extraction_assembly_tensorflow.py`, respectively.
+
+    The extraction of 3-D patches is available as Python script at `./examples/data/extraction_assembly_3dpatch.py`.
+
 .. note::
-    To be able to run this example you need the example data. If you haven't already, you can obtain the example data by
-    executing `./examples/example-data/pull_example_data.py`.
+    To be able to run this example:
+
+    - Get the example data by executing `./examples/example-data/pull_example_data.py`.
 
 
 Code walkthrough
@@ -120,12 +126,8 @@ provided to the assembler, which takes care of putting chunks back together. Onc
             # do_eval()
             # do_save()
 
-Other use cases
----------------
-
-
-Using pymia with TensorFlow
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TensorFlow adaptions
+--------------------
 
 Only the :class:`.PymiaDatasource` wrapping has to be changed to use the pymia data handling together with TensorFlow instead
 of PyTorch. This change, however, implies other framework related changes.
@@ -164,7 +166,7 @@ Thus, the permutations are no longer required ::
 
 
 Extracting 3-D patches
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 To extract 3-D patches instead of slices requires only a few changes.
 
@@ -195,7 +197,7 @@ extracted and the output patch size will be 32x32x32. ::
 
 
 Extracting from a metadata dataset
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------
 
 A metadata dataset only contains metadata but not image (or other) data. Metadata datasets might be used when the amount of
 data is large. They avoid storing a copy of the data in the dataset and access the raw data directly via the file links.

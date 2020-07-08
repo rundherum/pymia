@@ -19,7 +19,7 @@ For all examples, 3 tesla MR images of the head of four healthy subjects from th
 Each subject has four 3-D images (in the MetaImage and Nifty format) and demographic information provided as a text file.
 The images are a T1-weighted MR image, a T2-weighted MR image, a label image (ground truth), and a brain mask image.
 The demographic information is artificially created age, gender, and grade point average (GPA).
-The label images contain annotations of five brain structures (white matter, grey matter, hippocampus, amygdala, and thalamus), automatically segmented by FreeSurfer 5.3 [Fischl2012]_ [Fischl2002]_.
+The label images contain annotations of five brain structures (1: white matter, 2: grey matter, 3: hippocampus, 4: amygdala, and 5: thalamus [0 is background]), automatically segmented by FreeSurfer 5.3 [Fischl2012]_ [Fischl2002]_.
 Therefore, the examples mimic the problem of medical image segmentation of brain tissues.
 
 Projects using pymia
