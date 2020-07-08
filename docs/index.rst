@@ -8,7 +8,8 @@ The data package is used to extract data (images, labels, demography, etc.) from
 The output of the neural network is then assembled back to the original format before extraction, if necessary.
 The evaluation package provides both evaluation routines as well as metrics to assess predictions against references.
 Evaluation can be used both for stand-alone result calculation and reporting, and for monitoring of the training progress.
-We recommend following our :ref:`examples <examples>`. Further, pymia provides some basic image filtering and manipulation functionality (:mod:`pymia.filtering` package).
+Further, pymia provides some basic image filtering and manipulation functionality (:mod:`pymia.filtering` package).
+We recommend following our :ref:`examples <examples>`.
 
 .. _fig-overview:
 .. figure:: ./images/fig-overview.png
@@ -35,7 +36,7 @@ If you are new to pymia, here are a few guides to get you up to speed right away
 
 * :doc:`installation` helps you installing pymia.
 
-* :doc:`examples` give you an overview of pymia's intended use. Jupyter notebooks and Python scripts are available at `<https://github.com/rundherum/pymia/tree/master/examples>`_.
+* :doc:`examples` give you an overview of pymia's intended use. Jupyter notebooks and Python scripts are available at `GitHub <https://github.com/rundherum/pymia/tree/master/examples/>`_.
 
 * Do you want to contribute? See :doc:`contribution`.
 
