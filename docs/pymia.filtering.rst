@@ -1,3 +1,5 @@
+.. module:: pymia.filtering
+
 Filtering (:mod:`pymia.filtering` package)
 ==========================================
 

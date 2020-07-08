@@ -1,3 +1,5 @@
+.. module:: pymia.evaluation
+
 Evaluation (:mod:`pymia.evaluation` package)
 ============================================
 

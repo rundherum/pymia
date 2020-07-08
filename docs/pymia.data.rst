@@ -1,3 +1,5 @@
+.. module:: pymia.data
+
 Data (:mod:`pymia.data` package)
 ================================
 
