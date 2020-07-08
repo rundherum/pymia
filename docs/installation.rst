@@ -52,6 +52,7 @@ Building the documentation requires the following packages:
  - `Read the Docs Sphinx Theme <https://sphinx-rtd-theme.readthedocs.io/en/stable/>`_
  - `nbsphinx <https://nbsphinx.readthedocs.io/en/latest/>`_
  - `Sphinx-copybutton <https://sphinx-copybutton.readthedocs.io/en/latest/>`_
+ - `Jupyter <https://jupyterlab.readthedocs.io/en/stable/>`_
 
 Install the required packages using pip:
 
@@ -61,6 +62,7 @@ Install the required packages using pip:
    pip install sphinx-rtd-theme
    pip install nbsphinx
    pip install sphinx-copybutton
+   pip install jupyter
 
 Run Sphinx in the pymia root directory to create the documentation:
 
@@ -68,6 +70,8 @@ Run Sphinx in the pymia root directory to create the documentation:
    - The documentation is now available under ``./docs/_build/index.html``
 
 .. note::
-   It might further be that you need to install `pandoc <https://pandoc.org/>`_.
+   To build the documentation including :mod:`pymia.data.backends`, the installation of PyTorch (:bash:`pip install torch`) and TensorFlow (:bash:`pip install tensorflow`) are required.
+
+   It might further be required to install `pandoc <https://pandoc.org/>`_.
 
    In case of the warning `WARNING: LaTeX command 'latex' cannot be run (needed for math display), check the imgmath_latex setting`, set the `imgmath_latex <http://www.sphinx-doc.org/en/master/usage/extensions/math.html#confval-imgmath_latex>`_ setting in the ``./docs/conf.py`` file.
