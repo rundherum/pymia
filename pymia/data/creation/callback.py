@@ -243,19 +243,23 @@ class WriteFilesCallback(Callback):
                 self.writer.fill(defs.LOC_FILES_PLACEHOLDER.format(category), relative_path, index_expr)
 
 
-def get_default_callbacks(writer: wr.Writer) -> ComposeCallback:
+def get_default_callbacks(writer: wr.Writer, meta_only=False) -> ComposeCallback:
     """Provides a selection of commonly used callbacks to write the most important information to the dataset.
 
     Args:
         writer (.creation.writer.Writer): The writer used to write the data.
+        meta_only (bool): Whether only callbacks for a metadata dataset creation should be returned.
 
     Returns:
         Callback: The composed selection of common callbacks.
 
     """
-    return ComposeCallback([MonitoringCallback(),
-                            WriteDataCallback(writer),
-                            WriteFilesCallback(writer),
-                            WriteNamesCallback(writer),
-                            WriteImageInformationCallback(writer),
-                            WriteEssentialCallback(writer)])
+    callbacks = [MonitoringCallback(),
+                 WriteDataCallback(writer),
+                 WriteFilesCallback(writer),
+                 WriteImageInformationCallback(writer),
+                 WriteEssentialCallback(writer)]
+    if not meta_only:
+        callbacks.append(WriteNamesCallback(writer))
+    return ComposeCallback(callbacks)
+

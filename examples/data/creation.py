@@ -63,7 +63,7 @@ class Subject(data.SubjectFile):
         self.subject_path = files.get(subject, '')
 
 
-def main(hdf_file: str, data_dir: str):
+def main(hdf_file: str, data_dir: str, meta: bool):
 
     # collect the files for each subject
     subjects = get_subject_files(data_dir)
@@ -74,7 +74,7 @@ def main(hdf_file: str, data_dir: str):
 
     with crt.get_writer(hdf_file) as writer:
         # initialize the callbacks that will actually write the data to the dataset file
-        callbacks = crt.get_default_callbacks(writer)
+        callbacks = crt.get_default_callbacks(writer, meta_only=meta)
 
         # add a transform to normalize the images
         transform = tfm.IntensityNormalization(loop_axis=3, entries=(defs.KEY_IMAGES, ))
@@ -161,5 +161,11 @@ if __name__ == '__main__':
         help='Path to the data directory.'
     )
 
+    parser.add_argument(
+        '--meta',
+        action='store_true',
+        help='A metadata dataset that does only save file path but no image data should be created.'
+    )
+
     args = parser.parse_args()
-    main(args.hdf_file, args.data_dir)
+    main(args.hdf_file, args.data_dir, args.meta)
