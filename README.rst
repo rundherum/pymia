@@ -5,7 +5,8 @@ pymia
    :target: http://pymia.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
 
-pymia contains generic and modular code for medical image analysis (mia) with Python (py).
-pymia aims at accelerating state-of-the-art research in medical image analysis using machine learning, especially deep learning.
-In contrast to other frameworks, pymia focuses on flexibility regarding the deep learning backend and features mainly data loading, interfaces for fast prototyping, and reproducibility.
-Founded, and actively developed and maintained, by Fabian Balsiger and Alain Jungo.
+pymia is an open-source Python (py) package for deep learning-based medical image analysis (mia).
+The package addresses two main parts of deep learning pipelines: data handling and evaluation.
+The package itself is independent of the deep learning framework used but can easily be integrated into TensorFlow and PyTorch pipelines.
+Therefore, pymia is highly flexible, allows for fast prototyping, and reduces the burden of implementing data handling and evaluation.
+Founded, actively developed and maintained, by Fabian Balsiger and Alain Jungo.

@@ -120,6 +120,9 @@ imgmath_image_format = 'svg'
 # Enable to output the class and the __init__ method docstring
 autoclass_content = 'both'
 
+# Enable figure numbering
+numfig = True
+
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
