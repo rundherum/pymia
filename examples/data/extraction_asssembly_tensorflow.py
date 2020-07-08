@@ -1,3 +1,5 @@
+import argparse
+
 import tensorflow as tf
 import tensorflow.keras as keras
 import tensorflow.keras.layers as layers
@@ -8,13 +10,11 @@ import pymia.data.assembler as assm
 import pymia.data.backends.tensorflow as pymia_tf
 
 
-def main():
-    hdf_file = '../example-data/example-dataset.h5'
+def main(hdf_file):
 
-    extractor = extr.ComposeExtractor(
-        [extr.DataExtractor(categories=(defs.KEY_IMAGES,))]
-    )
+    extractor = extr.DataExtractor(categories=(defs.KEY_IMAGES,))
 
+    # no transformation needed because TensorFlow uses channel-last
     transform = None
 
     indexing_strategy = extr.SliceIndexing()
@@ -26,10 +26,11 @@ def main():
     )
     assembler = assm.SubjectAssembler(dataset)
 
+    # TensorFlow specific handling
     gen_fn = pymia_tf.get_tf_generator(dataset)
     tf_dataset = tf.data.Dataset.from_generator(generator=gen_fn,
-                                             output_types={defs.KEY_IMAGES: tf.float32,
-                                                           defs.KEY_SAMPLE_INDEX: tf.int64})
+                                                output_types={defs.KEY_IMAGES: tf.float32,
+                                                              defs.KEY_SAMPLE_INDEX: tf.int64})
     tf_dataset = tf_dataset.batch(2)
 
     dummy_network = keras.Sequential([
@@ -38,6 +39,7 @@ def main():
     )
     nb_batches = len(dataset) // 2
 
+    # looping over the data in the dataset
     for i, batch in enumerate(tf_dataset):
         x, sample_indices = batch[defs.KEY_IMAGES], batch[defs.KEY_SAMPLE_INDEX]
 
@@ -57,4 +59,19 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    """The program's entry point.
+
+    Parse the arguments and run the program.
+    """
+
+    parser = argparse.ArgumentParser(description='Creation')
+
+    parser.add_argument(
+        '--hdf_file',
+        type=str,
+        default='../example-data/example-dataset.h5',
+        help='Path to the dataset file.'
+    )
+
+    args = parser.parse_args()
+    main(args.hdf_file)

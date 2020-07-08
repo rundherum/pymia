@@ -10,7 +10,6 @@ The following examples illustrate the intended use of pymia:
 
     examples.data.creation
     examples.data.extraction_assembly
-    examples.data.metadata_dataset
     examples.evaluation.basic
     examples.evaluation.logging
     examples.filtering.basic

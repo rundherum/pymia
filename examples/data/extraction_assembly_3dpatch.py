@@ -1,3 +1,5 @@
+import argparse
+
 import torch.utils.data as torch_data
 import torch.nn as nn
 import torch
@@ -9,17 +11,16 @@ import pymia.data.extraction as extr
 import pymia.data.backends.pytorch as pymia_torch
 
 
-def main():
+def main(hdf_file):
 
-    hdf_file = '../example-data/example-dataset.h5'
+    # Use a pad extractor in order to compensate for the valid convolutions of the network. Actual image information is padded
+    extractor = extr.PadDataExtractor((2, 2, 2), extr.DataExtractor(categories=(defs.KEY_IMAGES,)))
 
-    extractor = extr.ComposeExtractor(
-        [extr.DataExtractor(categories=(defs.KEY_IMAGES,))]
-    )
+    # Adapted permutation due to the additional dimension
+    transform = tfm.Permute(permutation=(3, 0, 1, 2), entries=(defs.KEY_IMAGES,))
 
-    transform = tfm.Permute(permutation=(2, 0, 1), entries=(defs.KEY_IMAGES,))
-
-    indexing_strategy = extr.SliceIndexing()
+    # Creating patch indexing strategy with patch_shape that equal the network output shape
+    indexing_strategy = extr.PatchWiseIndexing(patch_shape=(32, 32, 32))
     dataset = extr.PymiaDatasource(hdf_file, indexing_strategy, extractor, transform)
 
     direct_extractor = extr.ComposeExtractor(
@@ -31,20 +32,23 @@ def main():
     # torch specific handling
     pytorch_dataset = pymia_torch.PytorchDatasetAdapter(dataset)
     loader = torch_data.dataloader.DataLoader(pytorch_dataset, batch_size=2, shuffle=False)
+    # dummy CNN with valid convolutions instead of same convolutions
     dummy_network = nn.Sequential(
-        nn.Conv2d(in_channels=2, out_channels=8, kernel_size=3, padding=1),
-        nn.Conv2d(in_channels=8, out_channels=1, kernel_size=3, padding=1),
+        nn.Conv3d(in_channels=2, out_channels=8, kernel_size=3, padding=0),
+        nn.Conv3d(in_channels=8, out_channels=1, kernel_size=3, padding=0),
         nn.Sigmoid()
     )
     torch.set_grad_enabled(False)
 
     nb_batches = len(loader)
+
+    # looping over the data in the dataset
     for i, batch in enumerate(loader):
 
         x, sample_indices = batch[defs.KEY_IMAGES], batch[defs.KEY_SAMPLE_INDEX]
         prediction = dummy_network(x)
 
-        numpy_prediction = prediction.numpy().transpose((0, 2, 3, 1))
+        numpy_prediction = prediction.numpy().transpose((0, 2, 3, 4, 1))
 
         is_last = i == nb_batches - 1
         assembler.add_batch(numpy_prediction, sample_indices.numpy(), is_last)
@@ -60,5 +64,20 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    """The program's entry point.
+
+    Parse the arguments and run the program.
+    """
+
+    parser = argparse.ArgumentParser(description='Creation')
+
+    parser.add_argument(
+        '--hdf_file',
+        type=str,
+        default='../example-data/example-dataset.h5',
+        help='Path to the dataset file.'
+    )
+
+    args = parser.parse_args()
+    main(args.hdf_file)
 

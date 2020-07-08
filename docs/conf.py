@@ -34,12 +34,6 @@ with open(os.path.join(basedir, 'pymia', '__version__.py'), 'r', encoding='utf-8
 shutil.copyfile(os.path.join(basedir, 'examples', 'data', 'creation.ipynb'),
                 os.path.join(basedir, 'docs', 'examples.data.creation.ipynb'))
 
-shutil.copyfile(os.path.join(basedir, 'examples', 'data', 'extraction_assembly.ipynb'),
-                os.path.join(basedir, 'docs', 'examples.data.extraction_assembly.ipynb'))
-
-shutil.copyfile(os.path.join(basedir, 'examples', 'data', 'metadata_dataset.ipynb'),
-                os.path.join(basedir, 'docs', 'examples.data.metadata_dataset.ipynb'))
-
 shutil.copyfile(os.path.join(basedir, 'examples', 'evaluation', 'basic.ipynb'),
                 os.path.join(basedir, 'docs', 'examples.evaluation.basic.ipynb'))
 
