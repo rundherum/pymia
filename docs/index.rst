@@ -46,14 +46,14 @@ If you are new to pymia, here are a few guides to get you up to speed right away
 
 Citation
 ========
-If you use pymia for your research, please acknowledge it accordingly by citing
+If you use pymia for your research, please acknowledge it accordingly by citing:
 
 .. code-block:: none
 
     Jungo, A., Scheidegger, O., Reyes, M., & Balsiger, F. (2020). pymia: A Python package for data handling and evaluation in deep learning-based medical image analysis. ArXiv preprint.
 
 
-BibTeX
+BibTeX entry:
 
 .. code-block:: none
 

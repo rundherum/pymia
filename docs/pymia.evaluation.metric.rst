@@ -1,3 +1,5 @@
+.. module:: pymia.evaluation.metric
+
 Metric (:mod:`pymia.evaluation.metric` package)
 ===============================================
 

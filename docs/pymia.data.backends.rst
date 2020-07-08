@@ -1,3 +1,5 @@
+.. module:: pymia.data.backends
+
 Backends (:mod:`pymia.data.backends` package)
 =============================================
 
@@ -9,7 +11,7 @@ PyTorch
 .. autoclass:: SubsetSequentialSampler
 
 
-Tensorflow
+TensorFlow
 ----------
 
 .. automodule:: pymia.data.backends.tensorflow
