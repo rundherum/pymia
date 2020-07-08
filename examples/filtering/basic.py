@@ -15,7 +15,7 @@ import SimpleITK as sitk
 def main(data_dir: str):
     # initialize filter pipeline with filters
     filters = [
-        prep.GradientAnisotropicDiffusion(),
+        prep.GradientAnisotropicDiffusion(time_step=0.0625),
         prep.HistogramMatcher()
     ]
     histogram_matching_filter_idx = 1  # we need the index later to update the HistogramMatcher's parameters
