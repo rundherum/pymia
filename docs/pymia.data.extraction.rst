@@ -1,8 +1,10 @@
+.. module:: pymia.data.extraction
+
 Extraction (:mod:`pymia.data.extraction` package)
 =================================================
 
-Data set (:mod:`pymia.data.extraction.datasource` module)
----------------------------------------------------------
+Datasource (:mod:`pymia.data.extraction.datasource` module)
+-----------------------------------------------------------
 
 .. automodule:: pymia.data.extraction.datasource
     :members:

@@ -1,3 +1,5 @@
+.. module:: pymia.data.creation
+
 Creation (:mod:`pymia.data.creation` package)
 =============================================
 
