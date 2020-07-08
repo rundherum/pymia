@@ -1,10 +1,10 @@
 Extraction (:mod:`pymia.data.extraction` package)
 =================================================
 
-Data set (:mod:`pymia.data.extraction.dataset` module)
-------------------------------------------------------
+Data set (:mod:`pymia.data.extraction.datasource` module)
+---------------------------------------------------------
 
-.. automodule:: pymia.data.extraction.dataset
+.. automodule:: pymia.data.extraction.datasource
     :members:
     :undoc-members:
     :show-inheritance:

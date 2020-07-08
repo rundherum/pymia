@@ -5,7 +5,7 @@ PyTorch
 -------
 .. automodule:: pymia.data.backends.pytorch
 
-.. autoclass:: PymiaTorchDataset
+.. autoclass:: PytorchDatasetAdapter
 .. autoclass:: SubsetSequentialSampler
 
 
