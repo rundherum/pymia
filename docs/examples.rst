@@ -23,6 +23,17 @@ The demographic information is artificially created age, gender, and grade point
 The label images contain annotations of five brain structures (white matter, grey matter, hippocampus, amygdala, and thalamus), automatically segmented by FreeSurfer 5.3 [Fischl2012]_ [Fischl2002]_.
 Therefore, the examples mimic the problem of medical image segmentation of brain tissues.
 
+Projects using pymia
+--------------------
+
+pymia was used for several projects, which have public code available and can serve as an additional point of reference complementing the documentation. Projects using version >= 0.3.0 are:
+
+ * `Spatially Regularized Parametric Map Reconstruction for Fast Magnetic Resonance Fingerprinting <https://github.com/fabianbalsiger/mrf-reconstruction-media2020>`_: Code for the Medical Image Analysis paper by Balsiger et al. with data handling and evaluation.
+ * `Medical Image Analysis Laboratory <https://github.com/ubern-mia/MIALab>`_: Code for a MSc-level lecture at the University of Bern with image filtering and evaluation.
+
+References
+----------
+
 .. [VanEssen2013] Van Essen, D. C., Smith, S. M., Barch, D. M., Behrens, T. E. J., Yacoub, E., Ugurbil, K., & WU-Minn HCP Consortium. (2013). The WU-Minn Human Connectome Project: An overview. NeuroImage, 80, 62–79. https://doi.org/10.1016/j.neuroimage.2013.05.041
 
 .. [Fischl2012] Fischl, B. (2012). FreeSurfer. NeuroImage, 62(2), 774–781. https://doi.org/10.1016/j.neuroimage.2012.01.021
