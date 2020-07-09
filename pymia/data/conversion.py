@@ -4,24 +4,22 @@ The main purpose of this module is the conversion between SimpleITK images and n
 """
 import typing
 
-import SimpleITK as sitk
 import numpy as np
+import SimpleITK as sitk
 
 
 class ImageProperties:
-    """Represents ITK image properties.
-
-    Holds common ITK image meta-data such as the size, origin, spacing, and direction.
-
-    See Also:
-        SimpleITK provides `itk::simple::Image::CopyInformation`_ to copy image information.
-
-    .. _itk::simple::Image::CopyInformation:
-        https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1Image.html#afa8a4757400c414e809d1767ee616bd0
-    """
 
     def __init__(self, image: sitk.Image):
-        """Initializes a new instance of the ImageProperties class.
+        """Represents ITK image properties.
+
+        Holds common ITK image meta-data such as the size, origin, spacing, and direction.
+
+        See Also:
+            SimpleITK provides `itk::simple::Image::CopyInformation`_ to copy image information.
+
+        .. _itk::simple::Image::CopyInformation:
+            https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1Image.html#afa8a4757400c414e809d1767ee616bd0
 
         Args:
             image (sitk.Image): The image whose properties to hold.

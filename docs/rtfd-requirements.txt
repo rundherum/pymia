@@ -1,7 +1,7 @@
 # packages needed for building on rtfd.org
 
 h5py
-matplotlib >= 2.0.2
 numpy >= 1.12.1
 SimpleITK >= 1.0.0
-vtk
+nbsphinx >= 0.7.1
+sphinx-copybutton >= 0.2.12

@@ -4,15 +4,14 @@ import os
 import h5py
 import numpy as np
 
+import pymia.data.definition as defs
 import pymia.data.indexexpression as expr
-import pymia.data.definition as df
 
 
-class Reader(metaclass=abc.ABCMeta):
-    """Represents the abstract dataset reader."""
+class Reader(abc.ABC):
 
     def __init__(self, file_path: str) -> None:
-        """Initializes a new instance.
+        """Abstract dataset reader.
 
         Args:
             file_path(str): The path to the dataset file.
@@ -40,11 +39,11 @@ class Reader(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def get_shape(self, entry: str) -> list:
+    def get_shape(self, subject_index: int) -> list:
         """Get the shape from an entry.
 
         Args:
-            entry(str): The dataset entry.
+            subject_index(int): The index of the subject.
 
         Returns:
             list: The shape of each dimension.
@@ -61,7 +60,7 @@ class Reader(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def read(self, entry: str, index: expr.IndexExpression=None):
+    def read(self, entry: str, index: expr.IndexExpression = None):
         """Read a dataset entry.
 
         Args:
@@ -99,28 +98,32 @@ class Reader(metaclass=abc.ABCMeta):
 class Hdf5Reader(Reader):
     """Represents the dataset reader for HDF5 files."""
 
-    def __init__(self, file_path: str, category='images') -> None:
+    def __init__(self, file_path: str, category=defs.KEY_IMAGES) -> None:
         """Initializes a new instance.
 
         Args:
             file_path(str): The path to the dataset file.
-            category(str): The category of an entry that contains data of all subjects
+            category(str): The category of an entry that defines the shape request
         """
         super().__init__(file_path)
         self.h5 = None  # type: h5py.File
         self.category = category
 
     def get_subject_entries(self) -> list:
-        group = df.DATA_PLACEHOLDER.format(self.category)
-        return ['{}/{}'.format(group, k) for k in sorted(self.h5[group].keys())]
+        """see :meth:`.Reader.get_subject_entries`"""
+        nb_subjects = len(self.get_subjects())
+        return [defs.subject_index_to_str(i, nb_subjects) for i in range(nb_subjects)]
 
-    def get_shape(self, entry: str) -> list:
-        return self.h5[entry].shape
+    def get_shape(self, subject_index: int) -> list:
+        """see :meth:`.Reader.get_shape`"""
+        return self.read(defs.LOC_SHAPE_PLACEHOLDER.format(self.category), expr.IndexExpression(subject_index)).tolist()
 
     def get_subjects(self) -> list:
-        return self.read(df.SUBJECT)
+        """see :meth:`.Reader.get_subjects`"""
+        return self.read(defs.LOC_SUBJECT)
 
-    def read(self, entry: str, index: expr.IndexExpression=None):
+    def read(self, entry: str, index: expr.IndexExpression = None):
+        """see :meth:`.Reader.read`"""
         if index is None:
             data = self.h5[entry][()]  # need () instead of util.IndexExpression(None) [which is equal to slice(None)]
         else:
@@ -133,19 +136,22 @@ class Hdf5Reader(Reader):
         return data
 
     def has(self, entry: str) -> bool:
+        """see :meth:`.Reader.has`"""
         return entry in self.h5
 
     def open(self):
+        """see :meth:`.Reader.open`"""
         self.h5 = h5py.File(self.file_path, mode='r', libver='latest')
 
     def close(self):
+        """see :meth:`.Reader.close`"""
         if self.h5 is not None:
             self.h5.close()
             self.h5 = None
 
 
-def get_reader(file_path: str, direct_open: bool=False) -> Reader:
-    """ Get the dataset reader corresponding to the file extension.
+def get_reader(file_path: str, direct_open: bool = False) -> Reader:
+    """Get the dataset reader corresponding to the file extension.
 
     Args:
         file_path(str): The path to the dataset file.
@@ -166,3 +172,5 @@ def get_reader(file_path: str, direct_open: bool=False) -> Reader:
 
 
 reader_registry = {'.h5': Hdf5Reader, '.hdf5': Hdf5Reader}
+"""Registry defining the mapping between file extension and :class:`.Reader` class. 
+    Alternative writers need to be added to this registry in order to use :func:`.get_reader`."""

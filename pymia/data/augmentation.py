@@ -17,15 +17,16 @@ See Also:
 import typing
 
 import numpy as np
-
-import pymia.data.transformation as tfm
 import SimpleITK as sitk
+
+import pymia.data.definition as defs
+import pymia.data.transformation as tfm
 
 
 class RandomCrop(tfm.Transform):
 
-    def __init__(self, shape: typing.Union[int, tuple], axis: typing.Union[int, tuple]=None,
-                 p: float=1.0, entries=('images', 'labels')):
+    def __init__(self, shape: typing.Union[int, tuple], axis: typing.Union[int, tuple] = None,
+                 p: float = 1.0, entries=(defs.KEY_IMAGES, defs.KEY_LABELS)):
         """Randomly crops the sample to the specified shape.
 
         The sample shape must be bigger than the crop shape.
@@ -38,11 +39,12 @@ class RandomCrop(tfm.Transform):
                 If axis is not defined, the cropping will be applied from the first dimension onwards of the sample.
                 Use None to exclude an axis or define axis to specify the axis/axes to crop.
                 E.g.:
-                    shape=256 with the default axis parameter results in a shape of 256 x ...
-                    shape=(256, 128) with the default axis parameter results in a shape of 256 x 128 x ...
-                    shape=(None, 256) with the default axis parameter results in a shape of <as before> x 256 x ...
-                    shape=(256, 128) with axis=(1, 0) results in a shape of 128 x 256 x ...
-                    shape=(None, 128, 256) with axis=(1, 2, 0) results in a shape of 256 x <as before> x 256 x ...
+
+                - shape=256 with the default axis parameter results in a shape of 256 x ...
+                - shape=(256, 128) with the default axis parameter results in a shape of 256 x 128 x ...
+                - shape=(None, 256) with the default axis parameter results in a shape of <as before> x 256 x ...
+                - shape=(256, 128) with axis=(1, 0) results in a shape of 128 x 256 x ...
+                - shape=(None, 128, 256) with axis=(1, 2, 0) results in a shape of 256 x <as before> x 256 x ...
             axis (int, tuple): Axis or axes to which the shape int or tuple correspond(s) to.
                 If defined, must have the same length as shape.
             p (float): The probability of the cropping to be applied.
@@ -87,10 +89,10 @@ class RandomCrop(tfm.Transform):
 
 class RandomElasticDeformation(tfm.Transform):
 
-    def __init__(self, num_control_points: int=4, deformation_sigma=15,
-                 interpolators: tuple=(sitk.sitkBSpline, sitk.sitkNearestNeighbor),
-                 spatial_rank: int=2, fill_value: float=0.0,
-                 p: float=0.5, entries=('images', 'labels')):
+    def __init__(self, num_control_points: int = 4, deformation_sigma=15,
+                 interpolators: tuple = (sitk.sitkBSpline, sitk.sitkNearestNeighbor),
+                 spatial_rank: int = 2, fill_value: float = 0.0,
+                 p: float = 0.5, entries=(defs.KEY_IMAGES, defs.KEY_LABELS)):
         """Randomly transforms the sample elastically.
 
         Notes:
@@ -164,7 +166,7 @@ class RandomElasticDeformation(tfm.Transform):
 
 class RandomMirror(tfm.Transform):
 
-    def __init__(self, axis: int=-2, p: float=1.0, entries=('images', 'labels')):
+    def __init__(self, axis: int = -2, p: float = 1.0, entries=(defs.KEY_IMAGES, defs.KEY_LABELS)):
         """Randomly mirrors the sample along a given axis.
 
         Args:
@@ -192,7 +194,7 @@ class RandomMirror(tfm.Transform):
 
 class RandomRotation90(tfm.Transform):
 
-    def __init__(self, axes: typing.Tuple[int]=(-3, -2), p: float=1.0, entries=('images', 'labels')):
+    def __init__(self, axes: typing.Tuple[int] = (-3, -2), p: float = 1.0, entries=(defs.KEY_IMAGES, defs.KEY_LABELS)):
         """Randomly rotates the sample 90, 180, or 270 degrees in the plane specified by axes.
 
         Raises:
@@ -205,7 +207,7 @@ class RandomRotation90(tfm.Transform):
             entries (tuple): The sample's entries to apply the rotation to.
         """
         super().__init__()
-        if len(axes) !=2:
+        if len(axes) != 2:
             raise ValueError('axes must be of length two')
 
         self.axes = axes
@@ -234,9 +236,8 @@ class RandomRotation90(tfm.Transform):
 
 class RandomShift(tfm.Transform):
 
-    def __init__(self, shift: typing.Union[int, tuple], axis: typing.Union[int, tuple]=None,
-                 mode: str='mirror', fill: float=0.0,
-                 p: float=1.0, entries=('images', 'labels')):
+    def __init__(self, shift: typing.Union[int, tuple], axis: typing.Union[int, tuple] = None,
+                 p: float = 1.0, entries=(defs.KEY_IMAGES, defs.KEY_LABELS)):
         """Randomly shifts the sample along axes by a value from the interval [-p * size(axis), +p * size(axis)],
         where p is the percentage of shifting and size(axis) is the size along an axis.
 
@@ -245,11 +246,12 @@ class RandomShift(tfm.Transform):
                 If axis is not defined, the shifting will be applied from the first dimension onwards of the sample.
                 Use None to exclude an axis or define axis to specify the axis/axes to crop.
                 E.g.:
-                    shift=0.2 with the default axis parameter shifts the sample along the 1st axis.
-                    shift=(0.2, 0.1) with the default axis parameter shifts the sample along the 1st and 2nd axes.
-                    shift=(None, 0.2) with the default axis parameter shifts the sample along the 2st axis.
-                    shift=(0.2, 0.1) with axis=(1, 0) shifts the sample along the 1st and 2nd axes.
-                    shift=(None, 0.1, 0.2) with axis=(1, 2, 0) shifts the sample along the 1st and 3rd axes.
+
+                - shift=0.2 with the default axis parameter shifts the sample along the 1st axis.
+                - shift=(0.2, 0.1) with the default axis parameter shifts the sample along the 1st and 2nd axes.
+                - shift=(None, 0.2) with the default axis parameter shifts the sample along the 2st axis.
+                - shift=(0.2, 0.1) with axis=(1, 0) shifts the sample along the 1st and 2nd axes.
+                - shift=(None, 0.1, 0.2) with axis=(1, 2, 0) shifts the sample along the 1st and 3rd axes.
             axis (int, tuple): Axis or axes to which the shift int or tuple correspond(s) to.
                 If defined, must have the same length as shape.
             p (float): The probability of the shift to be applied.
@@ -257,7 +259,7 @@ class RandomShift(tfm.Transform):
         """
         super().__init__()
         if isinstance(shift, int):
-            shape = (shift, )
+            shift = (shift, )
 
         if axis is None:
             axis = tuple(range(len(shift)))

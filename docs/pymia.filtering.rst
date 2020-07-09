@@ -1,7 +1,13 @@
-Filtering and manipulation (:mod:`pymia.filtering` package)
-===========================================================
+.. module:: pymia.filtering
 
-This package contains various image filters and image manipulation functions.
+Filtering (:mod:`pymia.filtering` package)
+==========================================
+
+The filtering package provides basic image filter and manipulation functions.
+
+All filters in the :mod:`pymia.filtering` package implement the :class:`pymia.filtering.filter.Filter` interface,
+and can be used to set up a pipeline with the :class:`pymia.filtering.filter.FilterPipeline`.
+Refer to :ref:`Filter pipelines <example-filtering1>` for a code example.
 
 Filter pipeline (:mod:`pymia.filtering.filter` module)
 ------------------------------------------------------

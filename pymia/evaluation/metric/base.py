@@ -1,3 +1,4 @@
+"""The base module provides metric base classes."""
 import abc
 
 import numpy as np
@@ -9,34 +10,41 @@ class NotComputableMetricWarning(RuntimeWarning):
 
 
 class ConfusionMatrix:
-    """Represents a confusion matrix (or error matrix)."""
 
-    def __init__(self, prediction, label):
-        """Initializes a new instance of the ConfusionMatrix class."""
+    def __init__(self, prediction: np.ndarray, reference: np.ndarray):
+        """Represents a confusion matrix (or error matrix).
+
+        Args:
+            prediction (np.ndarray): The prediction binary array.
+            reference (np.ndarray): The reference binary array.
+        """
 
         # true positive (tp): we predict a label of 1 (positive), and the true label is 1
-        self.tp = np.sum(np.logical_and(prediction == 1, label == 1))
+        self.tp = np.sum(np.logical_and(prediction == 1, reference == 1))
         # true negative (tn): we predict a label of 0 (negative), and the true label is 0
-        self.tn = np.sum(np.logical_and(prediction == 0, label == 0))
+        self.tn = np.sum(np.logical_and(prediction == 0, reference == 0))
         # false positive (fp): we predict a label of 1 (positive), but the true label is 0
-        self.fp = np.sum(np.logical_and(prediction == 1, label == 0))
+        self.fp = np.sum(np.logical_and(prediction == 1, reference == 0))
         # false negative (fn): we predict a label of 0 (negative), but the true label is 1
-        self.fn = np.sum(np.logical_and(prediction == 0, label == 1))
+        self.fn = np.sum(np.logical_and(prediction == 0, reference == 1))
 
         self.n = prediction.size
 
 
 class Distances:
-    """Represents distances for distance metrics.
 
-    See Also:
-        - Nikolov et al., 2018 Deep learning to achieve clinically applicable segmentation of head and neck anatomy for
-        radiotherapy. `arXiv <https://arxiv.org/abs/1809.04430>`_
-        - `Original implementation <https://github.com/deepmind/surface-distance>`_
-    """
-    
-    def __init__(self, prediction, label, spacing):
-        """Initializes a new instance of the Distances class."""
+    def __init__(self, prediction: np.ndarray, reference: np.ndarray, spacing: tuple):
+        """Represents distances for distance metrics.
+
+        Args:
+            prediction (np.ndarray): The prediction binary array.
+            reference (np.ndarray): The reference binary array.
+            spacing (tuple): The spacing in mm of each dimension.
+
+        See Also:
+            - Nikolov, S., Blackwell, S., Mendes, R., De Fauw, J., Meyer, C., Hughes, C., … Ronneberger, O. (2018). Deep learning to achieve clinically applicable segmentation of head and neck anatomy for radiotherapy. http://arxiv.org/abs/1809.04430
+            - `Original implementation <https://github.com/deepmind/surface-distance>`_
+        """
 
         self.distances_gt_to_pred = None
         self.distances_pred_to_gt = None
@@ -301,7 +309,7 @@ class Distances:
             [[0.125, 0.125, 0.125]],
             [[0, 0, 0]]]
 
-        self._calculate(prediction, label, spacing)
+        self._calculate(prediction, reference, spacing)
 
     def _calculate(self, segmentation_arr, ground_truth_arr, spacing):
         if segmentation_arr.ndim == 2 and ground_truth_arr.ndim == 2 and len(spacing) == 2:
@@ -364,12 +372,12 @@ class Distances:
         cropmask_pred = np.zeros((bbox_max - bbox_min) + 2, np.uint8)
 
         cropmask_gt[0:-1, 0:-1, 0:-1] = ground_truth_arr[bbox_min[0]:bbox_max[0] + 1,
-                                        bbox_min[1]:bbox_max[1] + 1,
-                                        bbox_min[2]:bbox_max[2] + 1]
+                                                         bbox_min[1]:bbox_max[1] + 1,
+                                                         bbox_min[2]:bbox_max[2] + 1]
 
         cropmask_pred[0:-1, 0:-1, 0:-1] = segmentation_arr[bbox_min[0]:bbox_max[0] + 1,
-                                          bbox_min[1]:bbox_max[1] + 1,
-                                          bbox_min[2]:bbox_max[2] + 1]
+                                                           bbox_min[1]:bbox_max[1] + 1,
+                                                           bbox_min[2]:bbox_max[2] + 1]
 
         # compute the neighbour code (local binary pattern) for each voxel
         # the resulting arrays are spacially shifted by minus half a voxel in each
@@ -433,11 +441,10 @@ class Distances:
         self.surfel_areas_pred = surfel_areas_pred
 
 
-class IMetric(abc.ABC):
-    """Represents an evaluation metric."""
+class Metric(abc.ABC):
 
-    def __init__(self, metric: str = 'IMetric'):
-        """Initializes a new instance of the IMetric class.
+    def __init__(self, metric: str = 'Metric'):
+        """Metric base class.
 
         Args:
             metric (str): The identification string of the metric.
@@ -447,7 +454,6 @@ class IMetric(abc.ABC):
     @abc.abstractmethod
     def calculate(self):
         """Calculates the metric."""
-
         raise NotImplementedError
 
     def __str__(self):
@@ -459,11 +465,10 @@ class IMetric(abc.ABC):
         return '{self.metric}'.format(self=self)
 
 
-class IConfusionMatrixMetric(IMetric):
-    """Represents an evaluation metric based on the confusion matrix."""
+class ConfusionMatrixMetric(Metric):
 
-    def __init__(self, metric: str = 'IConfusionMatrixMetric'):
-        """Initializes a new instance of the IConfusionMatrixMetric class.
+    def __init__(self, metric: str = 'ConfusionMatrixMetric'):
+        """Represents a metric based on the confusion matrix.
 
         Args:
             metric (str): The identification string of the metric.
@@ -471,18 +476,11 @@ class IConfusionMatrixMetric(IMetric):
         super().__init__(metric)
         self.confusion_matrix = None  # ConfusionMatrix
 
-    @abc.abstractmethod
-    def calculate(self):
-        """Calculates the metric."""
 
-        raise NotImplementedError
+class DistanceMetric(Metric):
 
-
-class IDistanceMetric(IMetric):
-    """Represents an evaluation metric based on distances."""
-
-    def __init__(self, metric: str = 'IDistanceMetric'):
-        """Initializes a new instance of the IDistanceMetric class.
+    def __init__(self, metric: str = 'DistanceMetric'):
+        """Represents a metric based on distances.
 
         Args:
             metric (str): The identification string of the metric.
@@ -490,61 +488,39 @@ class IDistanceMetric(IMetric):
         super().__init__(metric)
         self.distances = None  # Distances
 
-    @abc.abstractmethod
-    def calculate(self):
-        """Calculates the metric."""
 
-        raise NotImplementedError
+class SimpleITKImageMetric(Metric):
 
-
-class ISimpleITKImageMetric(IMetric):
-    """Represents an evaluation metric based on SimpleITK images."""
-
-    def __init__(self, metric: str = 'ISimpleITKImageMetric'):
-        """Initializes a new instance of the ISimpleITKImageMetric class.
+    def __init__(self, metric: str = 'SimpleITKImageMetric'):
+        """Represents a metric based on SimpleITK images.
 
         Args:
             metric (str): The identification string of the metric.
         """
         super().__init__(metric)
-        self.ground_truth = None  # SimpleITK.Image
-        self.segmentation = None  # SimpleITK.Image
-
-    @abc.abstractmethod
-    def calculate(self):
-        """Calculates the metric."""
-
-        raise NotImplementedError
+        self.reference = None  # SimpleITK.Image
+        self.prediction = None  # SimpleITK.Image
 
 
-class INumpyArrayMetric(IMetric):
-    """Represents an evaluation metric based on numpy arrays."""
+class NumpyArrayMetric(Metric):
 
-    def __init__(self, metric: str = 'INumpyArrayMetric'):
-        """Initializes a new instance of the INumpyArrayMetric class.
+    def __init__(self, metric: str = 'NumpyArrayMetric'):
+        """Represents a metric based on numpy arrays.
 
         Args:
             metric (str): The identification string of the metric.
         """
         super().__init__(metric)
-        self.ground_truth = None  # np.ndarray
-        self.segmentation = None  # np.ndarray
-
-    @abc.abstractmethod
-    def calculate(self):
-        """Calculates the metric."""
-
-        raise NotImplementedError
+        self.reference = None  # np.ndarray
+        self.prediction = None  # np.ndarray
 
 
-class Information(IMetric):
-    """Represents an information.
-
-    Can be used to add an additional column of information to an evaluator.
-    """
+class Information(Metric):
 
     def __init__(self, column_name: str, value: str):
-        """Initializes a new instance of the Information class.
+        """Represents an information "metric".
+
+        Can be used to add an additional column of information to an evaluator.
 
         Args:
             column_name (str): The identification string of the information.

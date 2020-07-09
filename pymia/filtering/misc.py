@@ -1,8 +1,8 @@
-"""The misc (miscellaneous) module contains filters, which don't have a classical purpose."""
-import subprocess
+"""The misc (miscellaneous) module provides filters, which don't have a classical purpose."""
 import os
+import subprocess
 import tempfile
-import typing as t
+import typing
 
 import numpy as np
 import SimpleITK as sitk
@@ -10,25 +10,24 @@ import SimpleITK as sitk
 import pymia.filtering.filter as pymia_fltr
 
 
-class Relabel(pymia_fltr.IFilter):
-    """Relabels the labels in the file by the provided rule"""
+class Relabel(pymia_fltr.Filter):
 
-    def __init__(self, label_changes: t.Dict[int, t.Union[int, tuple]]) -> None:
-        """Initializes a new instance of the LargestNComponents class.
+    def __init__(self, label_changes: typing.Dict[int, typing.Union[int, tuple]]) -> None:
+        """Represents a relabel filter.
 
         Args:
-            label_changes(Dict[int, Union[int, tuple]]): Label change rule where the key is the new label and
-                the value the existing (can be multiple)
+            label_changes(typing.Dict[int, typing.Union[int, tuple]]): Label change rule where the key is the new label
+                and the value the existing (can be multiple) label.
         """
         super().__init__()
         self.label_changes = label_changes
 
-    def execute(self, image: sitk.Image, params: pymia_fltr.IFilterParams = None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: pymia_fltr.FilterParams = None) -> sitk.Image:
         """Executes the relabeling of the label image.
 
         Args:
-            image (sitk.Image): The image.
-            params (IFilterParams): The parameters (unused).
+            image (sitk.Image): The image to filter.
+            params (FilterParams): The filter parameters (unused).
 
         Returns:
             sitk.Image: The filtered image.
@@ -56,11 +55,10 @@ class Relabel(pymia_fltr.IFilter):
             .format(self=self, label_changes='; '.join(str_list))
 
 
-class SizeCorrectionParams(pymia_fltr.IFilterParams):
-    """Size (shape) correction filter parameters."""
+class SizeCorrectionParams(pymia_fltr.FilterParams):
 
     def __init__(self, reference_shape: tuple) -> None:
-        """Initializes a new instance of the SizeCorrectionParams class.
+        """Represents size (shape) correction filter parameters used by the :class:`.SizeCorrection` filter.
 
         Args:
             reference_shape (tuple): The reference or target shape.
@@ -69,26 +67,25 @@ class SizeCorrectionParams(pymia_fltr.IFilterParams):
         self.reference_shape = reference_shape
 
 
-class SizeCorrectionFilter(pymia_fltr.IFilter):
-    """A method to correct shape/size difference."""
+class SizeCorrection(pymia_fltr.Filter):
 
-    def __init__(self, two_sided=True, pad_constant=0.0) -> None:
-        """ Initializes a new instance of the SizeCorrectionFilter class.
+    def __init__(self, two_sided: bool = True, pad_constant: float = 0.0) -> None:
+        """Represents a filter to correct the shape/size by padding or cropping.
 
         Args:
-            two_sided (bool): whether the cropping and padding should be applied on one or both side of the dimension.
-            pad_constant (int): constant used for padding
+            two_sided (bool): Indicates whether the cropping and padding should be applied on one or both side(s) of the dimension.
+            pad_constant (float): The constant value used for padding.
         """
         super().__init__()
         self.two_sided = two_sided
         self.pad_constant = pad_constant
 
     def execute(self, image: sitk.Image, params: SizeCorrectionParams = None) -> sitk.Image:
-        """Executes the shape/size correction by help of padding and cropping.
+        """Executes the shape/size correction by padding or cropping.
 
         Args:
-            image (sitk.Image): The image.
-            params (SizeCorrectionParams): The parameters containing the reference (target) shape.
+            image (sitk.Image): The image to filter.
+            params (SizeCorrectionParams): The filter parameters containing the reference (target) shape.
 
         Returns:
             sitk.Image: The filtered image.
@@ -139,23 +136,23 @@ class SizeCorrectionFilter(pymia_fltr.IFilter):
             .format(self=self)
 
 
-class CmdlineExecutorParams(pymia_fltr.IFilterParams):
-    """Command line executor filter parameters."""
+class CmdlineExecutorParams(pymia_fltr.FilterParams):
 
-    def __init__(self, arguments: t.List[str]) -> None:
-        """Initializes a new instance of the CmdlineExecutorParams class.
+    def __init__(self, arguments: typing.List[str]) -> None:
+        """Command line executor filter parameters used by the :class:`.CmdlineExecutor` filter.
 
         Args:
-            arguments (t.List[str]): Additional arguments for the command line execution.
+            arguments (typing.List[str]): Additional arguments for the command line execution.
         """
         self.arguments = arguments
 
 
-class CmdlineExecutor(pymia_fltr.IFilter):
-    """Represents a command line executable."""
+class CmdlineExecutor(pymia_fltr.Filter):
 
     def __init__(self, executable_path: str):
-        """Initializes a new instance of the CmdlineExecutor class.
+        """Represents a command line executable.
+
+        Use this filter to execute for instance a C++ command line program, which loads and image, processes, and saves it.
 
         Args:
             executable_path (str): The path to the executable to run.
@@ -163,11 +160,11 @@ class CmdlineExecutor(pymia_fltr.IFilter):
         super().__init__()
         self.executable_path = executable_path
 
-    def execute(self, image: sitk.Image, params: CmdlineExecutorParams=None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: CmdlineExecutorParams = None) -> sitk.Image:
         """Executes a command line program.
 
         Args:
-            image (SimpleITK.Image): The image.
+            image (sitk.Image): The image to filter.
             params (CmdlineExecutorParams): The execution specific command line parameters.
 
         Returns:
@@ -177,11 +174,11 @@ class CmdlineExecutor(pymia_fltr.IFilter):
         temp_in = os.path.join(temp_dir, 'in.nii')
         sitk.WriteImage(image, temp_in)
         temp_out = os.path.join(temp_dir, 'out.nii')
-        
+
         cmd = [self.executable_path, temp_in, temp_out]
         if params is not None:
             cmd = cmd + params.arguments
-        
+
         subprocess.run(cmd, check=True)
         out_image = sitk.ReadImage(temp_out, image.GetPixelID())
 

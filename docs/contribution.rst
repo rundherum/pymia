@@ -4,13 +4,13 @@ Contribution
 ============
 
 Contributors are highly welcome on all levels such as new features, improvements, bug fixes, and documentation.
-Please read this chapter carefully to hold a certain standard in code quality.
+Please read this guide carefully to hold a certain standard in code quality.
 
-Code Style
+Code style
 ----------
 We follow the `PEP 8 -- Style Guide for Python Code <https://www.python.org/dev/peps/pep-0008/>`_.
 
-Code Documentation
+Code documentation
 ------------------
 Please document your code. Each package, module, class, and function should have a comment.
 We use `Google style docstrings <http://google.github.io/styleguide/pyguide.html#Comments>`_, and you can find
@@ -18,15 +18,14 @@ a great example `here <http://sphinxcontrib-napoleon.readthedocs.io/en/latest/ex
 For major changes, it might also be good to update the documentation you are currently reading.
 It is generated with `Sphinx <http://www.sphinx-doc.org>`_, and you can find the source files in the ``./docs`` directory.
 
-Code Tests
+Code tests
 ----------
 You do write tests, don't you? They are located in the ``./test`` directory.
 
-Commit Messages
+Commit messages
 ---------------
 The commit messages follow the
-`AngularJS Git Commit Message Conventions <https://gist.github.com/stephenparish/9941e89d80e2bc58a153>`_
-with the following format::
+`AngularJS Git Commit Message Conventions <https://gist.github.com/stephenparish/9941e89d80e2bc58a153>`_ format::
 
     <type>(<scope>): <subject>
     <BLANK LINE>

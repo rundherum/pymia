@@ -1,36 +1,58 @@
 import abc
-import typing as t
+import typing
 
 import numpy as np
 
 import pymia.data.indexexpression as expr
 
 
-class IndexingStrategy(metaclass=abc.ABCMeta):
+class IndexingStrategy(abc.ABC):
+    """Interface for indexing strategies that can be applied to images.
+
+    .. automethod:: __call__
+    .. automethod:: __repr__
+    """
 
     @abc.abstractmethod
-    def __call__(self, shape) -> t.List[expr.IndexExpression]:
-        # return list of indexes by giving shape
+    def __call__(self, shape: tuple) -> typing.List[expr.IndexExpression]:
+        """Calculate the indexes for a given shape
+
+        Args:
+            shape (tuple): The shape to determine the indexes for.
+
+        Returns:
+            list: The list of :class:`.IndexExpression` instances defining the indexes for an image shape.
+        """
         pass
 
     def __repr__(self) -> str:
+        """
+        Returns:
+            str: Representation of the strategy. Should include attributes such that it uniquely defines the strategy.
+        """
         return self.__class__.__name__
 
 
 class EmptyIndexing(IndexingStrategy):
+    """An empty indexing strategy. This is useful when a strategy is required but entire images should be extracted."""
 
-    def __call__(self, shape) -> t.List[expr.IndexExpression]:
+    def __call__(self, shape) -> typing.List[expr.IndexExpression]:
         return [expr.IndexExpression()]
 
 
 class SliceIndexing(IndexingStrategy):
 
-    def __init__(self, slice_axis: t.Union[int, tuple]=0) -> None:
+    def __init__(self, slice_axis: typing.Union[int, tuple] = 0) -> None:
+        """Strategy to generate a slice-wise indexing.
+
+        Args:
+            slice_axis (int, tuple): The axis to be sliced. Multi-axis slicing can be achieved by providing a tuple of axes.
+        """
         if isinstance(slice_axis, int):
             slice_axis = (slice_axis, )
         self.slice_axis = slice_axis
 
-    def __call__(self, shape) -> t.List[expr.IndexExpression]:
+    def __call__(self, shape) -> typing.List[expr.IndexExpression]:
         indexing = []
         for axis in self.slice_axis:
             indexing.extend(expr.IndexExpression(i, axis) for i in range(shape[axis]))
@@ -42,8 +64,8 @@ class SliceIndexing(IndexingStrategy):
 
 class VoxelWiseIndexing(IndexingStrategy):
 
-    def __init__(self, image_dimension: int=3):
-        """Initializes a new instance of the VoxelWiseIndexing class.
+    def __init__(self, image_dimension: int = 3):
+        """Strategy to generate indices for every voxel of an image.
 
         Args:
             image_dimension (int): The image dimension without the dimension of the voxels itself.
@@ -52,7 +74,7 @@ class VoxelWiseIndexing(IndexingStrategy):
         self.indexing = None
         self.image_dimension = image_dimension
 
-    def __call__(self, shape) -> t.List[expr.IndexExpression]:
+    def __call__(self, shape) -> typing.List[expr.IndexExpression]:
         if self.shape == shape:
             return self.indexing
 
@@ -68,10 +90,10 @@ class VoxelWiseIndexing(IndexingStrategy):
 class PatchWiseIndexing(IndexingStrategy):
 
     def __init__(self, patch_shape: tuple, ignore_incomplete=True) -> None:
-        """
+        """Strategy to generate indices for patches (sub-volumes) of an image.
 
         Args:
-            patch_shape (tuple):
+            patch_shape (tuple): The patch shape.
             ignore_incomplete (bool): If even division of image by patch shape ignore incomplete patch on True.
                 Boundary condition.
         """
@@ -82,7 +104,7 @@ class PatchWiseIndexing(IndexingStrategy):
         self.prev_shape = None
         self.prev_indexing = None
 
-    def __call__(self, shape) -> t.List[expr.IndexExpression]:
+    def __call__(self, shape) -> typing.List[expr.IndexExpression]:
         if shape == self.prev_shape:
             return self.prev_indexing
 

@@ -1,7 +1,5 @@
 h5py
-matplotlib
 numpy
-SimpleITK
-pyyaml
+scikit-image
 scipy
-torch
+SimpleITK

@@ -8,7 +8,7 @@ class TestSizeCorrection(unittest.TestCase):
 
     def test_no_param(self):
         image = sitk.Image(3, 3, sitk.sitkUInt8)
-        corrector = m.SizeCorrectionFilter()
+        corrector = m.SizeCorrection()
         self.assertRaises(ValueError, corrector.execute, image)
 
     def test_2d(self):
@@ -17,7 +17,7 @@ class TestSizeCorrection(unittest.TestCase):
         values = np.random.randint(0, 10, in_shape[::-1])  # since dimesions are switched in itk
         image = sitk.GetImageFromArray(values)
 
-        corrector = m.SizeCorrectionFilter()
+        corrector = m.SizeCorrection()
         corr_image = corrector.execute(image, params=m.SizeCorrectionParams(reference_shape))
 
         self.assertEqual(corr_image.GetSize(), reference_shape)
@@ -30,7 +30,7 @@ class TestSizeCorrection(unittest.TestCase):
         values = np.random.randint(0, 10, in_shape[::-1])  # since dimesions are switched in itk
         image = sitk.GetImageFromArray(values)
 
-        corrector = m.SizeCorrectionFilter()
+        corrector = m.SizeCorrection()
         corr_image = corrector.execute(image, params=m.SizeCorrectionParams(reference_shape))
 
         self.assertEqual(corr_image.GetSize(), reference_shape)
@@ -43,7 +43,7 @@ class TestSizeCorrection(unittest.TestCase):
         values = np.random.randint(0, 10, in_shape[::-1])  # since dimesions are switched in itk
         image = sitk.GetImageFromArray(values)
 
-        corrector = m.SizeCorrectionFilter()
+        corrector = m.SizeCorrection()
         corr_image = corrector.execute(image, params=m.SizeCorrectionParams(reference_shape))
 
         self.assertEqual(corr_image.GetSize(), reference_shape)
@@ -56,7 +56,7 @@ class TestSizeCorrection(unittest.TestCase):
         values = np.random.randint(0, 10, in_shape[::-1])  # since dimesions are switched in itk
         image = sitk.GetImageFromArray(values)
 
-        corrector = m.SizeCorrectionFilter(two_sided=False)
+        corrector = m.SizeCorrection(two_sided=False)
         corr_image = corrector.execute(image, params=m.SizeCorrectionParams(reference_shape))
 
         self.assertEqual(corr_image.GetSize(), reference_shape)
@@ -69,7 +69,7 @@ class TestSizeCorrection(unittest.TestCase):
         values = np.ones(in_shape[::-1])   # since dimesions are switched in itk
         image = sitk.GetImageFromArray(values)
 
-        corrector = m.SizeCorrectionFilter(pad_constant=1)
+        corrector = m.SizeCorrection(pad_constant=1)
         corr_image = corrector.execute(image, params=m.SizeCorrectionParams(reference_shape))
 
         self.assertEqual(corr_image.GetSize(), reference_shape)

@@ -1,7 +1,11 @@
 # Created by .ignore support plugin (hsz.mobi)
 
 ### Project specific
-examples/dataset/out/*
+examples/example-data/Subject*
+examples/example-data/*.csv
+examples/example-data/*.h5
+examples/example-data/log/*
+misc/benchmark_data/
 
 ### Python template
 # Byte-compiled / optimized / DLL files
@@ -70,6 +74,7 @@ instance/
 # Sphinx documentation
 docs/_build/
 docs/_static/
+docs/*.ipynb
 
 # PyBuilder
 target/

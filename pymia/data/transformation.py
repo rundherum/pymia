@@ -2,7 +2,8 @@ import abc
 import typing
 
 import numpy as np
-import torch
+
+import pymia.data.definition as defs
 
 
 ENTRY_NOT_EXTRACTED_ERR_MSG = 'Transform can not be applied because entry "{}" was not extracted'
@@ -65,7 +66,7 @@ class LoopEntryTransform(Transform, abc.ABC):
 
 class IntensityRescale(LoopEntryTransform):
 
-    def __init__(self, lower, upper, loop_axis=None, entries=('images',)) -> None:
+    def __init__(self, lower, upper, loop_axis=None, entries=(defs.KEY_IMAGES, )) -> None:
         super().__init__(loop_axis=loop_axis, entries=entries)
         self.lower = lower
         self.upper = upper
@@ -85,7 +86,7 @@ class IntensityRescale(LoopEntryTransform):
 
 class IntensityNormalization(LoopEntryTransform):
 
-    def __init__(self, loop_axis=None, entries=('images',)) -> None:
+    def __init__(self, loop_axis=None, entries=(defs.KEY_IMAGES, )) -> None:
         super().__init__(loop_axis=loop_axis, entries=entries)
         self.normalize_fn = self._normalize
 
@@ -101,7 +102,7 @@ class IntensityNormalization(LoopEntryTransform):
 
 class LambdaTransform(LoopEntryTransform):
 
-    def __init__(self, lambda_fn, loop_axis=None, entries=('images',)) -> None:
+    def __init__(self, lambda_fn, loop_axis=None, entries=(defs.KEY_IMAGES, )) -> None:
         super().__init__(loop_axis=loop_axis, entries=entries)
         self.lambda_fn = lambda_fn
 
@@ -111,8 +112,8 @@ class LambdaTransform(LoopEntryTransform):
 
 class ClipPercentile(LoopEntryTransform):
 
-    def __init__(self, upper_percentile: float, lower_percentile: float=None,
-                 loop_axis=None, entries=('images',)) -> None:
+    def __init__(self, upper_percentile: float, lower_percentile: float = None,
+                 loop_axis=None, entries=(defs.KEY_IMAGES, )) -> None:
         super().__init__(loop_axis=loop_axis, entries=entries)
         self.upper_percentile = upper_percentile
         if lower_percentile is None:
@@ -132,7 +133,7 @@ class ClipPercentile(LoopEntryTransform):
 
 class Relabel(LoopEntryTransform):
 
-    def __init__(self, label_changes: typing.Dict[int, int], entries=('labels',)) -> None:
+    def __init__(self, label_changes: typing.Dict[int, int], entries=(defs.KEY_LABELS, )) -> None:
         super().__init__(loop_axis=None, entries=entries)
         self.label_changes = label_changes
 
@@ -149,7 +150,7 @@ class Reshape(LoopEntryTransform):
 
         Args:
             shapes (dict): A dict with keys being the entries and the values the new shapes of the entries.
-                E.g. shapes = {'images': (-1, 4), 'labels' : (-1, 1)}
+                E.g. shapes = {defs.KEY_IMAGES: (-1, 4), defs.KEY_LABELS : (-1, 1)}
         """
         super().__init__(loop_axis=None, entries=tuple(shapes.keys()))
         self.shapes = shapes
@@ -158,18 +159,9 @@ class Reshape(LoopEntryTransform):
         return np.reshape(np_entry, self.shapes[entry])
 
 
-class ToTorchTensor(LoopEntryTransform):
-
-    def __init__(self, entries=('images', 'labels')) -> None:
-        super().__init__(loop_axis=None, entries=entries)
-
-    def transform_entry(self, np_entry, entry, loop_i=None) -> np.ndarray:
-        return torch.from_numpy(np_entry)
-
-
 class Permute(LoopEntryTransform):
 
-    def __init__(self, permutation: tuple, entries=('images', 'labels')) -> None:
+    def __init__(self, permutation: tuple, entries=(defs.KEY_IMAGES, defs.KEY_LABELS)) -> None:
         super().__init__(loop_axis=None, entries=entries)
         self.permutation = permutation
 
@@ -179,7 +171,7 @@ class Permute(LoopEntryTransform):
 
 class Squeeze(LoopEntryTransform):
 
-    def __init__(self, entries=('images', 'labels'), squeeze_axis=None) -> None:
+    def __init__(self, entries=(defs.KEY_IMAGES, defs.KEY_LABELS), squeeze_axis=None) -> None:
         super().__init__(loop_axis=None, entries=entries)
         self.squeeze_axis = squeeze_axis
 
@@ -189,7 +181,7 @@ class Squeeze(LoopEntryTransform):
 
 class UnSqueeze(LoopEntryTransform):
 
-    def __init__(self, axis=-1, entries=('images', 'labels')) -> None:
+    def __init__(self, axis=-1, entries=(defs.KEY_IMAGES, defs.KEY_LABELS)) -> None:
         super().__init__(loop_axis=None, entries=entries)
         self.axis = axis
 
@@ -203,8 +195,8 @@ class SizeCorrection(Transform):
     Corrects the size, i.e. shape, of an array to a given reference shape.
     """
 
-    def __init__(self, shape: typing.Tuple[typing.Union[None, int], ...], pad_value: int=0,
-                 entries=('images', 'labels')) -> None:
+    def __init__(self, shape: typing.Tuple[typing.Union[None, int], ...], pad_value: int = 0,
+                 entries=(defs.KEY_IMAGES, defs.KEY_LABELS)) -> None:
         """Initializes a new instance of the SizeCorrection class.
 
         Args:
@@ -252,8 +244,8 @@ class SizeCorrection(Transform):
 
 class Mask(Transform):
 
-    def __init__(self, mask_key: str, mask_value: int=0, masking_value: float=0,
-                 loop_axis=None, entries=('images', 'labels')) -> None:
+    def __init__(self, mask_key: str, mask_value: int = 0, masking_value: float = 0.0,
+                 loop_axis=None, entries=(defs.KEY_IMAGES, defs.KEY_LABELS)) -> None:
         super().__init__()
         self.mask_key = mask_key
         self.mask_value = mask_value
@@ -285,7 +277,7 @@ class Mask(Transform):
 
 class RandomCrop(LoopEntryTransform):
 
-    def __init__(self, size: tuple, loop_axis=None, entries=('images', 'labels')) -> None:
+    def __init__(self, size: tuple, loop_axis=None, entries=(defs.KEY_IMAGES, defs.KEY_LABELS)) -> None:
         super().__init__(loop_axis, entries)
         self.size = size
         self.slices = None

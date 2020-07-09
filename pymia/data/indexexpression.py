@@ -1,16 +1,25 @@
 import typing as t
 
 
-# todo: could maybe be replaced or wrapper with numpy.s_
+# note: might be replaced with or wrap numpy.s_
 class IndexExpression:
 
-    def __init__(self, indexing: t.Union[int, tuple, t.List[int], t.List[tuple], t.List[list]]=None,
-                 axis: t.Union[int, tuple]=None) -> None:
+    def __init__(self, indexing: t.Union[int, tuple, t.List[int], t.List[tuple], t.List[list]] = None,
+                 axis: t.Union[int, tuple] = None) -> None:
+        """Defines the indexing of a chunk of raw data in the dataset.
+
+        Args:
+            indexing (int, tuple, list): The indexing. If :obj:`int` or list of :obj:`int`, individual entries of and axis
+                are indexed. If :obj:`tuple` or list of :obj:`tuple`, the axis should be sliced.
+            axis (int, tuple): The axis/axes to the corresponding indexing. If :obj:`tuple`, the length has to be equal to the
+                list length of :obj:`indexing`
+        """
         self.expression = None
+        """list of :obj:`slice` objects defining the slicing each axis"""
         self.set_indexing(indexing, axis)
 
     def set_indexing(self, indexing: t.Union[int, tuple, slice, t.List[int], t.List[tuple], t.List[list]],
-                     axis: t.Union[int, tuple]=None):
+                     axis: t.Union[int, tuple] = None):
         if indexing is None:
             self.expression = slice(None)
             return
@@ -39,6 +48,11 @@ class IndexExpression:
         self.expression = tuple(expr)
 
     def get_indexing(self):
+        """
+        Returns:
+            list: a list tuples defining the indexing (i.e., None, index, (start, stop)) at each axis. Can be used to generate
+            a new index expression.
+        """
         indexing = []
         # todo(alainjungo): handle case when self.expression is of type slice
         for index in self.expression:

@@ -1,20 +1,16 @@
-"""The post-processing module contains classes for image filtering mostly applied after a classification.
-
-Image post-processing aims to alter images such that they depict a desired representation.
-"""
+"""The post-processing module provides filters for image post-processing."""
 import SimpleITK as sitk
 
 import pymia.filtering.filter as pymia_fltr
 
 
-class BinaryThreshold(pymia_fltr.IFilter):
-    """Represents a binary threshold image filter."""
+class BinaryThreshold(pymia_fltr.Filter):
 
     def __init__(self, threshold: float):
-        """Initializes a new instance of the BinaryThreshold class.
+        """Represents a binary threshold image filter.
 
         Args:
-            threshold: The threshold value.
+            threshold (float): The threshold value.
         """
         super().__init__()
         self.threshold = threshold
@@ -23,12 +19,12 @@ class BinaryThreshold(pymia_fltr.IFilter):
         self.filter.SetOutsideValue(1)
         self.filter.SetUpperThreshold(self.threshold)
 
-    def execute(self, image: sitk.Image, params: pymia_fltr.IFilterParams = None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: pymia_fltr.FilterParams = None) -> sitk.Image:
         """Executes the binary threshold filter on an image.
 
         Args:
-            image (sitk.Image): The image.
-            params (IFilterParams): The parameters (unused).
+            image (sitk.Image): The image to filter.
+            params (FilterParams): The filter parameters (unused).
 
         Returns:
             sitk.Image: The filtered image.
@@ -36,17 +32,15 @@ class BinaryThreshold(pymia_fltr.IFilter):
         return self.filter.Execute(image)
 
 
-class LargestNConnectedComponents(pymia_fltr.IFilter):
-    """Represents a largest N connected components filter.
-
-    Extracts the largest N connected components from a label image.
-    By default the N components will all have the value 1 in the output image.
-    Use the `consecutive_component_labels` option such that the largest has value 1,
-    the second largest has value 2, etc. Background is always assumed to be 0.
-    """
+class LargestNConnectedComponents(pymia_fltr.Filter):
 
     def __init__(self, number_of_components: int = 1, consecutive_component_labels: bool = False):
-        """Initializes a new instance of the LargestNComponents class.
+        """Represents a largest N connected components filter.
+
+        Extracts the largest N connected components from a label image.
+        By default the N components will all have the value 1 in the output image.
+        Use the `consecutive_component_labels` option such that the largest has value 1,
+        the second largest has value 2, etc. Background is always assumed to be 0.
 
         Args:
             number_of_components (int): The number of largest components to extract.
@@ -61,12 +55,12 @@ class LargestNConnectedComponents(pymia_fltr.IFilter):
         self.number_of_components = number_of_components
         self.consecutive_component_labels = consecutive_component_labels
 
-    def execute(self, image: sitk.Image, params: pymia_fltr.IFilterParams = None) -> sitk.Image:
+    def execute(self, image: sitk.Image, params: pymia_fltr.FilterParams = None) -> sitk.Image:
         """Executes the largest N connected components filter on an image.
 
         Args:
-            image (sitk.Image): The image.
-            params (IFilterParams): The parameters (unused).
+            image (sitk.Image): The image to filter.
+            params (FilterParams): The filter parameters (unused).
 
         Returns:
             sitk.Image: The filtered image.
