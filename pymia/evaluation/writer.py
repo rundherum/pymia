@@ -149,7 +149,7 @@ class CSVWriter(Writer):
                         value = next(
                             (r.value for r in results if r.id_ == id_ and r.label == label and r.metric == metric),
                             None)
-                        row.append(value if value else 'n/a')
+                        row.append(value if value is not None else 'n/a')
                     writer.writerow(row)
 
 
@@ -190,7 +190,7 @@ class ConsoleWriter(Writer):
                     value = next(
                         (r.value for r in results if r.id_ == id_ and r.label == label and r.metric == metric),
                         None)
-                    if value:
+                    if value is not None:
                         # format float with given precision
                         row.append(value if isinstance(value, str) else f'{value:.{self.precision}f}')
                     else:
