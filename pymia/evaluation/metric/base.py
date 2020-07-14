@@ -465,7 +465,7 @@ class Metric(abc.ABC):
         return '{self.metric}'.format(self=self)
 
 
-class ConfusionMatrixMetric(Metric):
+class ConfusionMatrixMetric(Metric, abc.ABC):
 
     def __init__(self, metric: str = 'ConfusionMatrixMetric'):
         """Represents a metric based on the confusion matrix.
@@ -477,7 +477,7 @@ class ConfusionMatrixMetric(Metric):
         self.confusion_matrix = None  # ConfusionMatrix
 
 
-class DistanceMetric(Metric):
+class DistanceMetric(Metric, abc.ABC):
 
     def __init__(self, metric: str = 'DistanceMetric'):
         """Represents a metric based on distances.
@@ -489,20 +489,7 @@ class DistanceMetric(Metric):
         self.distances = None  # Distances
 
 
-class SimpleITKImageMetric(Metric):
-
-    def __init__(self, metric: str = 'SimpleITKImageMetric'):
-        """Represents a metric based on SimpleITK images.
-
-        Args:
-            metric (str): The identification string of the metric.
-        """
-        super().__init__(metric)
-        self.reference = None  # SimpleITK.Image
-        self.prediction = None  # SimpleITK.Image
-
-
-class NumpyArrayMetric(Metric):
+class NumpyArrayMetric(Metric, abc.ABC):
 
     def __init__(self, metric: str = 'NumpyArrayMetric'):
         """Represents a metric based on numpy arrays.
@@ -513,6 +500,18 @@ class NumpyArrayMetric(Metric):
         super().__init__(metric)
         self.reference = None  # np.ndarray
         self.prediction = None  # np.ndarray
+
+
+class SpacingMetric(NumpyArrayMetric, abc.ABC):
+
+    def __init__(self, metric: str = 'SpacingMetric'):
+        """Represents a metric based on images with a physical spacing.
+
+        Args:
+            metric (str): The identification string of the metric.
+        """
+        super().__init__(metric)
+        self.spacing = None  # tuple
 
 
 class Information(Metric):

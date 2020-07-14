@@ -6,11 +6,11 @@ import warnings
 import numpy as np
 import SimpleITK as sitk
 
-from .base import (ConfusionMatrixMetric, DistanceMetric, SimpleITKImageMetric, NumpyArrayMetric,
+from .base import (ConfusionMatrixMetric, DistanceMetric, SpacingMetric, NumpyArrayMetric,
                    NotComputableMetricWarning)
 
 
-class AreaMetric(SimpleITKImageMetric, abc.ABC):
+class AreaMetric(SpacingMetric, abc.ABC):
 
     def __init__(self, metric: str = 'AREA'):
         """Represents an area metric base class.
@@ -20,25 +20,24 @@ class AreaMetric(SimpleITKImageMetric, abc.ABC):
         """
         super().__init__(metric)
 
-    @staticmethod
-    def _calculate_area(image: sitk.Image, slice_number: int = -1) -> float:
-        """Calculates the area of a slice in a label image.
+    def _calculate_area(self, image: np.ndarray, slice_number: int = -1) -> float:
+        """Calculates the area of a slice in a binary image.
 
         Args:
-            image (sitk.Image): The 3-D label image.
+            image (np.ndarray): The binary 2-D or 3-D image. 3-D images must be of shape (Z, Y, X), meaning image slices as the
+                first dimension.
             slice_number (int): The slice number to calculate the area.
                 Defaults to -1, which will calculate the area on the intermediate slice.
         """
+        if image.ndim == 2:
+            return image.sum() * self.spacing[0] * self.spacing[1]
+        else:
+            if slice_number == -1:
+                slice_number = image.shape[0] // 2  # use the intermediate slice
+            return image[slice_number, ...].sum() * self.spacing[1] * self.spacing[2]
 
-        img_arr = sitk.GetArrayFromImage(image)
 
-        if slice_number == -1:
-            slice_number = int(img_arr.shape[0] / 2)  # use the intermediate slice
-
-        return img_arr[slice_number, ...].sum() * image.GetSpacing()[0] * image.GetSpacing()[1]
-
-
-class VolumeMetric(SimpleITKImageMetric, abc.ABC):
+class VolumeMetric(SpacingMetric, abc.ABC):
 
     def __init__(self, metric: str = 'VOL'):
         """Represents a volume metric base class.
@@ -48,16 +47,15 @@ class VolumeMetric(SimpleITKImageMetric, abc.ABC):
         """
         super().__init__(metric)
 
-    @staticmethod
-    def _calculate_volume(image: sitk.Image) -> float:
+    def _calculate_volume(self, image: np.ndarray) -> float:
         """Calculates the volume of a label image.
 
         Args:
-            image (sitk.Image): The 3-D label image.
+            image (np.ndarray): The binary 3-D label image.
         """
 
-        voxel_volume = np.prod(image.GetSpacing())
-        number_of_voxels = sitk.GetArrayFromImage(image).sum()
+        voxel_volume = np.prod(self.spacing)
+        number_of_voxels = image.sum()
 
         return number_of_voxels * voxel_volume
 
@@ -153,7 +151,7 @@ class AreaUnderCurve(ConfusionMatrixMetric):
         return (true_positive_rate - false_positive_rate + 1) / 2
 
 
-class AverageDistance(SimpleITKImageMetric):
+class AverageDistance(SpacingMetric):
 
     def __init__(self, metric: str = 'AVGDIST'):
         """Represents an average (Hausdorff) distance metric.
@@ -176,17 +174,22 @@ class AverageDistance(SimpleITKImageMetric):
     def calculate(self):
         """Calculates the average (Hausdorff) distance."""
 
-        if np.count_nonzero(sitk.GetArrayFromImage(self.reference)) == 0:
+        if np.count_nonzero(self.reference) == 0:
             warnings.warn('Unable to compute average distance due to empty reference mask, returning inf',
                           NotComputableMetricWarning)
             return float('inf')
-        if np.count_nonzero(sitk.GetArrayFromImage(self.prediction)) == 0:
+        if np.count_nonzero(self.prediction) == 0:
             warnings.warn('Unable to compute average distance due to empty prediction mask, returning inf',
                           NotComputableMetricWarning)
             return float('inf')
 
+        img_pred = sitk.GetImageFromArray(self.prediction)
+        img_pred.SetSpacing(self.spacing[::-1])
+        img_ref = sitk.GetImageFromArray(self.reference)
+        img_ref.SetSpacing(self.spacing[::-1])
+
         distance_filter = sitk.HausdorffDistanceImageFilter()
-        distance_filter.Execute(self.reference, self.prediction)
+        distance_filter.Execute(img_pred, img_ref)
         return distance_filter.GetAverageHausdorffDistance()
 
 

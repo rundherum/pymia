@@ -1,5 +1,5 @@
-from .base import (ConfusionMatrix, Distances, Metric, ConfusionMatrixMetric, DistanceMetric, SimpleITKImageMetric,
-                   NumpyArrayMetric, Information, NotComputableMetricWarning)
+from .base import (ConfusionMatrix, Distances, Metric, ConfusionMatrixMetric, DistanceMetric,
+                   NumpyArrayMetric, SpacingMetric, Information, NotComputableMetricWarning)
 from .metric import (get_segmentation_metrics, get_regression_metrics, get_overlap_metrics,
                      get_distance_metrics, get_classical_metrics)
 from .categorical import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageDistance, CohenKappaCoefficient,
