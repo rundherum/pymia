@@ -3,7 +3,7 @@
 Change history
 ==============
 
-0.3.0 (2020-07-10)
+0.3.0 (2020-07-14)
 ------------------
 
  * :mod:`pymia.data` package now supports PyTorch and TensorFlow. A few classes have been renamed and refactored.
