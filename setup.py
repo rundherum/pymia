@@ -17,6 +17,7 @@ with open(os.path.join('README.rst'), 'r', encoding='utf-8') as f:
 REQUIRED_PACKAGES = [
     'h5py >= 2.10.0',
     'numpy >= 1.12.1',
+    'scikit-image >= 0.17.2'
     'scipy >= 1.3.2',
     'SimpleITK >= 1.2.3'
 ]
