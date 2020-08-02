@@ -1,5 +1,6 @@
 # packages needed for building on rtfd.org
 
+pillow>=6.2.0  # fixes RTD error "error: Pillow 5.4.1 is installed but pillow>=6.2.0 is required by {'matplotlib'}"
 h5py >= 2.10.0
 numpy >= 1.12.1
 scikit-image >= 0.17.2
