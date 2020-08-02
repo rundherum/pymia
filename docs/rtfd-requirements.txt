@@ -1,7 +1,9 @@
 # packages needed for building on rtfd.org
 
-h5py
+h5py >= 2.10.0
 numpy >= 1.12.1
-SimpleITK >= 1.0.0
+scikit-image >= 0.17.2
+scipy >= 1.3.2
+SimpleITK >= 1.2.3
 nbsphinx >= 0.7.1
 sphinx-copybutton >= 0.2.12
