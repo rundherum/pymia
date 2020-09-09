@@ -72,7 +72,6 @@ class BiasFieldCorrector(pymia_fltr.Filter):
             str: String representation.
         """
         return 'BiasFieldCorrector:\n' \
-               ' shrink_factor:         {self.shrink_factor}\n' \
                ' convergence_threshold: {self.convergence_threshold}\n' \
                ' max_iterations:        {self.max_iterations}\n' \
                ' fullwidth_at_halfmax:  {self.fullwidth_at_halfmax}\n' \
