@@ -60,7 +60,7 @@ def main(hdf_file, log_dir):
     )
     assembler = assm.SubjectAssembler(valid_dataset)
 
-    # torch specific handling
+    # tensorflow specific handling
     train_gen_fn = pymia_tf.get_tf_generator(train_dataset)
     tf_train_dataset = tf.data.Dataset.from_generator(generator=train_gen_fn,
                                                       output_types={defs.KEY_IMAGES: tf.float32,
