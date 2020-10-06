@@ -1,7 +1,6 @@
 import argparse
 import os
 import sys
-sys.path.append('./helper')
 
 import numpy as np
 import tensorflow as tf
@@ -15,7 +14,9 @@ import pymia.data.definition as defs
 import pymia.data.extraction as extr
 import pymia.data.backends.tensorflow as pymia_tf
 
-import helper.unet_keras as unet
+sys.path.append('./helper')
+import helper.unet_tf as unet
+
 
 def main(hdf_file, log_dir):
     # initialize the evaluator with the metrics and the labels to evaluate
@@ -33,7 +34,7 @@ def main(hdf_file, log_dir):
     console_writer = writer.ConsoleStatisticsWriter(functions=functions)
 
     # initialize TensorBoard writer
-    summary_writer = tf.summary.create_file_writer(os.path.join(log_dir, 'logging-example-torch'))
+    summary_writer = tf.summary.create_file_writer(os.path.join(log_dir, 'logging-example-tensorflow'))
 
     # setup the training datasource
     train_subjects, valid_subjects = ['Subject_1', 'Subject_2', 'Subject_3'], ['Subject_4']
@@ -75,14 +76,7 @@ def main(hdf_file, log_dir):
                                                                     defs.KEY_SAMPLE_INDEX: tf.int64})
     tf_valid_dataset = tf_valid_dataset.batch(batch_size)
 
-    # u_net = unet.get_unet((217, 181, 2), num_classes=6, dropout=0.0, filters=16, num_layers=4)
-
-    u_net = tf.keras.Sequential([
-        tf.keras.layers.Conv2D(16, kernel_size=3, padding='same', activation='relu'),
-        tf.keras.layers.Conv2D(16, kernel_size=3, padding='same', activation='relu'),
-        tf.keras.layers.Conv2D(16, kernel_size=3, padding='same', activation='relu'),
-        tf.keras.layers.Conv2D(6, kernel_size=1, padding='same', activation=None)]
-    )
+    u_net = unet.build_model(channels=2, num_classes=6, layer_depth=3, filters_root=16)
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=1e-3)
     train_loss = tf.keras.metrics.Mean('train_loss', dtype=tf.float32)
@@ -138,8 +132,9 @@ def main(hdf_file, log_dir):
         # calculate mean and standard deviation of each metric
         results = statistics_aggregator.calculate(evaluator.results)
         # log to TensorBoard into category train
-        for result in results:
-            tf.summary.scalar(f'valid/{result.metric}-{result.id_}', result.value, epoch)
+        with summary_writer.as_default():
+            for result in results:
+                tf.summary.scalar(f'valid/{result.metric}-{result.id_}', result.value, epoch)
 
         console_writer.write(evaluator.results)
 
