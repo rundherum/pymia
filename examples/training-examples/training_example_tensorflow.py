@@ -42,9 +42,9 @@ def main(hdf_file, log_dir):
     extractor = extr.DataExtractor(categories=(defs.KEY_IMAGES, defs.KEY_LABELS))
     indexing_strategy = extr.SliceIndexing()
 
-    augmentation_transforms = [augm.RandomRotation90(axes=(-2, -1)), augm.RandomMirror()]
+    augmentation_transforms = [augm.RandomElasticDeformation(), augm.RandomMirror()]
     transforms = [tfm.Squeeze(entries=(defs.KEY_LABELS,))]
-    train_transforms = tfm.ComposeTransform(transforms + augmentation_transforms)
+    train_transforms = tfm.ComposeTransform(augmentation_transforms + transforms)
     train_dataset = extr.PymiaDatasource(hdf_file, indexing_strategy, extractor, train_transforms,
                                          subject_subset=train_subjects)
 
