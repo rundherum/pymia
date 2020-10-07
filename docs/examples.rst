@@ -28,6 +28,7 @@ Projects using pymia
 pymia was used for several projects, which have public code available and can serve as an additional point of reference complementing the documentation. Projects using version >= 0.3.0 are:
 
  * `Spatially Regularized Parametric Map Reconstruction for Fast Magnetic Resonance Fingerprinting <https://github.com/fabianbalsiger/mrf-reconstruction-media2020>`_: Code for the Medical Image Analysis paper by Balsiger et al. with data handling and evaluation.
+ * `Learning Bloch Simulations for MR Fingerprinting by Invertible Neural Networks <https://github.com/fabianbalsiger/mrf-reconstruction-mlmir2020>`_: Code for the  MLMIR 2020 paper by Balsiger and Jungo et al. with evaluation.
  * `Medical Image Analysis Laboratory <https://github.com/ubern-mia/MIALab>`_: Code for a MSc-level lecture at the University of Bern with image filtering and evaluation.
 
 References
