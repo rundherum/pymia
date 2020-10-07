@@ -43,6 +43,9 @@ shutil.copyfile(os.path.join(basedir, 'examples', 'evaluation', 'logging.ipynb')
 shutil.copyfile(os.path.join(basedir, 'examples', 'filtering', 'basic.ipynb'),
                 os.path.join(basedir, 'docs', 'examples.filtering.basic.ipynb'))
 
+shutil.copyfile(os.path.join(basedir, 'examples', 'augmentation', 'basic.ipynb'),
+                os.path.join(basedir, 'docs', 'examples.augmentation.basic.ipynb'))
+
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.

@@ -13,8 +13,10 @@ The following examples illustrate the intended use of pymia:
     examples.evaluation.basic
     examples.evaluation.logging
     examples.filtering.basic
+    examples.augmentation.basic
 
 The examples are available as Jupyter notebooks and Python scripts on `GitHub <https://github.com/rundherum/pymia/tree/master/examples/>`_ or directly rendered in the documentation by following the links above.
+Furthermore, there exist complete training scripts in TensorFlow and PyTorch at `GitHub <https://github.com/rundherum/pymia/tree/master/examples/training-examples>`_.
 For all examples, 3 tesla MR images of the head of four healthy subjects from the Human Connectome Project (HCP) [VanEssen2013]_ are used.
 Each subject has four 3-D images (in the MetaImage and Nifty format) and demographic information provided as a text file.
 The images are a T1-weighted MR image, a T2-weighted MR image, a label image (ground truth), and a brain mask image.
