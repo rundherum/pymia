@@ -32,7 +32,8 @@ class BatchgeneratorsTransform(tfm.Transform):
             sample[entry] = np.expand_dims(np_entry, 0)
 
         # apply batchgenerators transforms
-        sample = self.transforms(**sample)  # todo: make loop over transforms
+        for t in self.transforms:
+            sample = t(**sample)
 
         # squeeze samples back to original format
         for entry in self.entries:
@@ -80,12 +81,14 @@ def plot_sample(plot_dir: str, id_: str, sample: dict):
 
 
 def main(hdf_file, plot_dir):
+    os.makedirs(plot_dir, exist_ok=True)
+
     # setup the datasource
     extractor = extr.DataExtractor(categories=(defs.KEY_IMAGES, defs.KEY_LABELS))
     indexing_strategy = extr.SliceIndexing()
     dataset = extr.PymiaDatasource(hdf_file, indexing_strategy, extractor)
 
-    seed = 42
+    seed = 1
     np.random.seed(seed)
     sample_idx = 55
 
@@ -106,6 +109,17 @@ def main(hdf_file, plot_dir):
     sample = dataset[sample_idx]
     plot_sample(plot_dir, 'pymia', sample)
 
+    # augmentation with batchgenerators
+    transforms_augmentation = [BatchgeneratorsTransform([
+        bg_tfm.spatial_transforms.MirrorTransform(axes=(0, 1), data_key=defs.KEY_IMAGES, label_key=defs.KEY_LABELS),
+        bg_tfm.noise_transforms.GaussianBlurTransform(blur_sigma=(0.2, 1.0), data_key=defs.KEY_IMAGES, label_key=defs.KEY_LABELS),
+    ])]
+    train_transforms = tfm.ComposeTransform(
+        transforms_before_augmentation + transforms_augmentation + transforms_after_augmentation)
+    dataset.set_transform(train_transforms)
+    sample = dataset[sample_idx]
+    plot_sample(plot_dir, 'batchgenerators', sample)
+
     # augmentation with TorchIO
     transforms_augmentation = [TorchIOTransform(
         [tio.RandomFlip(axes=('LR'), flip_probability=1.0, keys=(defs.KEY_IMAGES, defs.KEY_LABELS), seed=seed),
@@ -117,16 +131,6 @@ def main(hdf_file, plot_dir):
     dataset.set_transform(train_transforms)
     sample = dataset[sample_idx]
     plot_sample(plot_dir, 'torchio', sample)
-
-    # augmentation with batchgenerators
-    transforms_augmentation = [BatchgeneratorsTransform(
-        bg_tfm.spatial_transforms.Rot90Transform(axes=(0, 1), data_key=defs.KEY_IMAGES, label_key=defs.KEY_LABELS,
-                                                 p_per_sample=1.0))]
-    train_transforms = tfm.ComposeTransform(
-        transforms_before_augmentation + transforms_augmentation + transforms_after_augmentation)
-    dataset.set_transform(train_transforms)
-    sample = dataset[sample_idx]
-    plot_sample(plot_dir, 'batchgenerators', sample)
 
 
 if __name__ == '__main__':
@@ -147,7 +151,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--plot_dir',
         type=str,
-        default='../example-data/log',
+        default='../example-data/augmentation',
         help='Path to the plotting directory.'
     )
 
