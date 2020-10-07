@@ -80,31 +80,30 @@ def plot_sample(plot_dir: str, id_: str, sample: dict):
 
 
 def main(hdf_file, plot_dir):
-    seed = 42
-    np.random.seed(seed)
-
     # setup the datasource
-    subjects = ['Subject_1', 'Subject_2', 'Subject_3']
     extractor = extr.DataExtractor(categories=(defs.KEY_IMAGES, defs.KEY_LABELS))
     indexing_strategy = extr.SliceIndexing()
-    sample_idx = 22
-    train_dataset = extr.PymiaDatasource(hdf_file, indexing_strategy, extractor, subject_subset=subjects)
+    dataset = extr.PymiaDatasource(hdf_file, indexing_strategy, extractor)
+
+    seed = 42
+    np.random.seed(seed)
+    sample_idx = 55
 
     # set up transformations without augmentation
     transforms_augmentation = []
-    transforms_before_augmentation = [tfm.Permute(permutation=(2, 0, 1)), ]
+    transforms_before_augmentation = [tfm.Permute(permutation=(2, 0, 1)), ]  # to have the channel-dimension first
     transforms_after_augmentation = [tfm.Squeeze(entries=(defs.KEY_LABELS,)), ]  # get rid of the channel-dimension for the labels
     train_transforms = tfm.ComposeTransform(transforms_before_augmentation + transforms_augmentation + transforms_after_augmentation)
-    train_dataset.set_transform(train_transforms)
-    sample = train_dataset[sample_idx]
+    dataset.set_transform(train_transforms)
+    sample = dataset[sample_idx]
     plot_sample(plot_dir, 'none', sample)
 
     # augmentation with pymia
     transforms_augmentation = [augm.RandomRotation90(axes=(-2, -1)), augm.RandomMirror()]
     train_transforms = tfm.ComposeTransform(
         transforms_before_augmentation + transforms_augmentation + transforms_after_augmentation)
-    train_dataset.set_transform(train_transforms)
-    sample = train_dataset[sample_idx]
+    dataset.set_transform(train_transforms)
+    sample = dataset[sample_idx]
     plot_sample(plot_dir, 'pymia', sample)
 
     # augmentation with TorchIO
@@ -115,8 +114,8 @@ def main(hdf_file, plot_dir):
          ])]
     train_transforms = tfm.ComposeTransform(
         transforms_before_augmentation + transforms_augmentation + transforms_after_augmentation)
-    train_dataset.set_transform(train_transforms)
-    sample = train_dataset[sample_idx]
+    dataset.set_transform(train_transforms)
+    sample = dataset[sample_idx]
     plot_sample(plot_dir, 'torchio', sample)
 
     # augmentation with batchgenerators
@@ -125,8 +124,8 @@ def main(hdf_file, plot_dir):
                                                  p_per_sample=1.0))]
     train_transforms = tfm.ComposeTransform(
         transforms_before_augmentation + transforms_augmentation + transforms_after_augmentation)
-    train_dataset.set_transform(train_transforms)
-    sample = train_dataset[sample_idx]
+    dataset.set_transform(train_transforms)
+    sample = dataset[sample_idx]
     plot_sample(plot_dir, 'batchgenerators', sample)
 
 
