@@ -15,6 +15,7 @@ See Also:
     https://github.com/MIC-DKFZ/batchgenerators
 """
 import typing
+import warnings
 
 import numpy as np
 import SimpleITK as sitk
@@ -225,10 +226,11 @@ class RandomRotation90(tfm.Transform):
                 raise ValueError(tfm.ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
 
             if sample[entry].shape[self.axes[0]] != sample[entry].shape[self.axes[1]]:
-                raise UserWarning('entry "{}" has unequal in-plane dimensions ({}, {}). \
-                Random 90 degree rotations might produce undesired results.'.format(entry,
-                                                                                    sample[entry].shape[self.axes[0]],
-                                                                                    sample[entry].shape[self.axes[1]]))
+                warnings.warn(f'entry "{entry}" has unequal in-plane dimensions ({sample[entry].shape[self.axes[0]]}, '
+                              f'{sample[entry].shape[self.axes[1]]}). '
+                              'Random 90 degree rotation might produce undesired results. Verify the output!',
+                              RuntimeWarning)
+
             sample[entry] = np.rot90(sample[entry], k, axes=self.axes).copy()
 
         return sample
