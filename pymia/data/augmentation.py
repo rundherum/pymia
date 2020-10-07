@@ -90,7 +90,7 @@ class RandomCrop(tfm.Transform):
 
 class RandomElasticDeformation(tfm.Transform):
 
-    def __init__(self, num_control_points: int = 4, deformation_sigma=15,
+    def __init__(self, num_control_points: int = 4, deformation_sigma: float = 5.0,
                  interpolators: tuple = (sitk.sitkBSpline, sitk.sitkNearestNeighbor),
                  spatial_rank: int = 2, fill_value: float = 0.0,
                  p: float = 0.5, entries=(defs.KEY_IMAGES, defs.KEY_LABELS)):
@@ -104,7 +104,7 @@ class RandomElasticDeformation(tfm.Transform):
 
         Args:
             num_control_points (int): The number of control points for the b-spline mesh.
-            deformation_sigma: The maximum deformation along the deformation mesh.
+            deformation_sigma (float): The maximum deformation along the deformation mesh.
             interpolators (tuple): The SimpleITK interpolators to use for each entry in entries.
             spatial_rank (int): The spatial rank (dimension) of the sample.
             fill_value (float): The fill value for the resampling.
