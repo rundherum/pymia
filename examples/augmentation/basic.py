@@ -15,12 +15,31 @@ import pymia.data.extraction as extr
 class BatchgeneratorsTransform(tfm.Transform):
     """Example wrapper for `batchgenerators <https://github.com/MIC-DKFZ/batchgenerators>`_ transformations."""
 
-    def __init__(self, transforms: list) -> None:
+    def __init__(self, transforms, entries=(defs.KEY_IMAGES, defs.KEY_LABELS)) -> None:
         super().__init__()
         self.transforms = transforms
+        self.entries = entries
 
     def __call__(self, sample: dict) -> dict:
-        return self.transforms(**sample)
+        # unsqueeze samples to add a batch dimensions, as required by batchgenerators
+        for entry in self.entries:
+            if entry not in sample:
+                if tfm.raise_error_if_entry_not_extracted:
+                    raise ValueError(tfm.ENTRY_NOT_EXTRACTED_ERR_MSG.format(entry))
+                continue
+
+            np_entry = tfm.check_and_return(sample[entry], np.ndarray)
+            sample[entry] = np.expand_dims(np_entry, 0)
+
+        # apply batchgenerators transforms
+        sample = self.transforms(**sample)  # todo: make loop over transforms
+
+        # squeeze samples back to original format
+        for entry in self.entries:
+            np_entry = tfm.check_and_return(sample[entry], np.ndarray)
+            sample[entry] = np_entry.squeeze(0)
+
+        return sample
 
 
 class TorchIOTransform(tfm.Transform):
@@ -102,7 +121,8 @@ def main(hdf_file, plot_dir):
 
     # augmentation with batchgenerators
     transforms_augmentation = [BatchgeneratorsTransform(
-        bg_tfm.spatial_transforms.Rot90Transform(axes=(0,), data_key=defs.KEY_IMAGES, label_key=defs.KEY_LABELS, p_per_sample=1.0))]
+        bg_tfm.spatial_transforms.Rot90Transform(axes=(0, 1), data_key=defs.KEY_IMAGES, label_key=defs.KEY_LABELS,
+                                                 p_per_sample=1.0))]
     train_transforms = tfm.ComposeTransform(
         transforms_before_augmentation + transforms_augmentation + transforms_after_augmentation)
     train_dataset.set_transform(train_transforms)
