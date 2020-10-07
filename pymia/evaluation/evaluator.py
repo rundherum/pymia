@@ -108,6 +108,12 @@ class SegmentationEvaluator(Evaluator):
         prediction_array = sitk.GetArrayFromImage(prediction) if isinstance(prediction, sitk.Image) else prediction
         reference_array = sitk.GetArrayFromImage(reference) if isinstance(reference, sitk.Image) else reference
 
+        if not (issubclass(prediction_array.dtype.type, np.integer) or prediction_array.dtype == np.bool):
+            raise ValueError('Prediction is not of type integer')
+
+        if not (issubclass(reference_array.dtype.type, np.integer) or prediction_array.dtype == np.bool):
+            raise ValueError('Reference is not of type integer')
+
         for label, label_str in self.labels.items():
             # get only current label
             prediction_of_label = np.in1d(prediction_array.ravel(), label, True).reshape(prediction_array.shape).astype(np.uint8)
