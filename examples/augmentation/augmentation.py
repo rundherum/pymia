@@ -61,6 +61,9 @@ def plot_sample(plot_dir: str, id_: str, sample: dict):
 
 
 def main(hdf_file, plot_dir):
+    seed = 42
+    np.random.seed(seed)
+
     # setup the datasource
     subjects = ['Subject_1', 'Subject_2', 'Subject_3']
     extractor = extr.DataExtractor(categories=(defs.KEY_IMAGES, defs.KEY_LABELS))
@@ -78,16 +81,19 @@ def main(hdf_file, plot_dir):
     plot_sample(plot_dir, 'none', sample)
 
     # augmentation with pymia
-    # transforms_augmentation = [augm.RandomRotation90(), augm.RandomMirror()]
-    # train_transforms = tfm.ComposeTransform(
-    #     transforms_before_augmentation + transforms_augmentation + transforms_after_augmentation)
-    # train_dataset.set_transform(train_transforms)
-    # sample = train_dataset[sample_idx]
-    # plot_sample(plot_dir, 'pymia', sample)
+    transforms_augmentation = [augm.RandomRotation90(axes=(-2, -1)), augm.RandomMirror()]
+    train_transforms = tfm.ComposeTransform(
+        transforms_before_augmentation + transforms_augmentation + transforms_after_augmentation)
+    train_dataset.set_transform(train_transforms)
+    sample = train_dataset[sample_idx]
+    plot_sample(plot_dir, 'pymia', sample)
 
     # augmentation with TorchIO
     transforms_augmentation = [TorchIOTransform(
-        [tio.RandomFlip(axes=('LR'), flip_probability=1.0, keys=(defs.KEY_IMAGES, defs.KEY_LABELS))])]
+        [tio.RandomFlip(axes=('LR'), flip_probability=1.0, keys=(defs.KEY_IMAGES, defs.KEY_LABELS), seed=seed),
+         tio.RandomAffine(scales=(0.9, 1.2), degrees=(10), isotropic=False, default_pad_value='otsu',
+                          image_interpolation='NEAREST', keys=(defs.KEY_IMAGES, defs.KEY_LABELS), seed=seed),
+         ])]
     train_transforms = tfm.ComposeTransform(
         transforms_before_augmentation + transforms_augmentation + transforms_after_augmentation)
     train_dataset.set_transform(train_transforms)
@@ -96,7 +102,7 @@ def main(hdf_file, plot_dir):
 
     # augmentation with batchgenerators
     transforms_augmentation = [BatchgeneratorsTransform(
-        bg_tfm.spatial_transforms.Rot90Transform(axes=(0,), data_key=defs.KEY_IMAGES, label_key=defs.KEY_LABELS, p_per_sample=1.))]
+        bg_tfm.spatial_transforms.Rot90Transform(axes=(0,), data_key=defs.KEY_IMAGES, label_key=defs.KEY_LABELS, p_per_sample=1.0))]
     train_transforms = tfm.ComposeTransform(
         transforms_before_augmentation + transforms_augmentation + transforms_after_augmentation)
     train_dataset.set_transform(train_transforms)
