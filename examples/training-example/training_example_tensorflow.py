@@ -6,6 +6,7 @@ import numpy as np
 import tensorflow as tf
 
 import pymia.data.assembler as assm
+import pymia.data.augmentation as augm
 import pymia.data.transformation as tfm
 import pymia.evaluation.metric as metric
 import pymia.evaluation.evaluator as eval_
@@ -41,8 +42,7 @@ def main(hdf_file, log_dir):
     extractor = extr.DataExtractor(categories=(defs.KEY_IMAGES, defs.KEY_LABELS))
     indexing_strategy = extr.SliceIndexing()
 
-    # augmentation_transforms = [augm.RandomRotation90(), augm.RandomMirror()]
-    augmentation_transforms = []
+    augmentation_transforms = [augm.RandomRotation90(), augm.RandomMirror()]
     transforms = [tfm.Squeeze(entries=(defs.KEY_LABELS,))]
     train_transforms = tfm.ComposeTransform(transforms + augmentation_transforms)
     train_dataset = extr.PymiaDatasource(hdf_file, indexing_strategy, extractor, train_transforms,
@@ -148,7 +148,7 @@ if __name__ == '__main__':
     Parse the arguments and run the program.
     """
 
-    parser = argparse.ArgumentParser(description='Creation')
+    parser = argparse.ArgumentParser(description='Training example TensorFlow')
 
     parser.add_argument(
         '--hdf_file',

@@ -11,8 +11,8 @@ import torch.optim as optim
 import torch
 
 import pymia.data.assembler as assm
-import pymia.data.transformation as tfm
 import pymia.data.augmentation as augm
+import pymia.data.transformation as tfm
 import pymia.evaluation.metric as metric
 import pymia.evaluation.evaluator as eval_
 import pymia.evaluation.writer as writer
@@ -49,8 +49,7 @@ def main(hdf_file, log_dir):
     extractor = extr.DataExtractor(categories=(defs.KEY_IMAGES, defs.KEY_LABELS))
     indexing_strategy = extr.SliceIndexing()
 
-    # augmentation_transforms = [augm.RandomRotation90(), augm.RandomMirror()]
-    augmentation_transforms = []
+    augmentation_transforms = [augm.RandomRotation90(), augm.RandomMirror()]
     transforms = [tfm.Permute(permutation=(2, 0, 1)), tfm.Squeeze(entries=(defs.KEY_LABELS,))]
     train_transforms = tfm.ComposeTransform(transforms + augmentation_transforms)
     train_dataset = extr.PymiaDatasource(hdf_file, indexing_strategy, extractor, train_transforms,
@@ -74,24 +73,24 @@ def main(hdf_file, log_dir):
     pytorch_valid_dataset = pymia_torch.PytorchDatasetAdapter(valid_dataset)
     valid_loader = torch_data.dataloader.DataLoader(pytorch_valid_dataset, batch_size=16, shuffle=False)
 
-    dummy_network = unet.UNetModel(ch_in=2, ch_out=6, n_channels=16, n_pooling=3).to(device)
+    u_net = unet.UNetModel(ch_in=2, ch_out=6, n_channels=16, n_pooling=3).to(device)
 
-    print(dummy_network)
+    print(u_net)
 
-    optimizer = optim.Adam(dummy_network.parameters(), lr=1e-3)
+    optimizer = optim.Adam(u_net.parameters(), lr=1e-3)
     train_batches = len(train_loader)
 
     # looping over the data in the dataset
     epochs = 100
     for epoch in range(epochs):
-        dummy_network.train()
+        u_net.train()
         print(f'Epoch {epoch + 1}/{epochs}')
 
         # training
         print('training')
         for i, batch in enumerate(train_loader):
             x, y = batch[defs.KEY_IMAGES].to(device), batch[defs.KEY_LABELS].to(device).long()
-            logits = dummy_network(x)
+            logits = u_net(x)
 
             optimizer.zero_grad()
             loss = F.cross_entropy(logits, y)
@@ -104,12 +103,12 @@ def main(hdf_file, log_dir):
         # validation
         print('validation')
         with torch.no_grad():
-            dummy_network.eval()
+            u_net.eval()
             valid_batches = len(valid_loader)
             for i, batch in enumerate(valid_loader):
                 x, sample_indices = batch[defs.KEY_IMAGES].to(device), batch[defs.KEY_SAMPLE_INDEX]
 
-                logits = dummy_network(x)
+                logits = u_net(x)
                 prediction = logits.argmax(dim=1, keepdim=True)
 
                 numpy_prediction = prediction.cpu().numpy().transpose((0, 2, 3, 1))
@@ -144,7 +143,7 @@ if __name__ == '__main__':
     Parse the arguments and run the program.
     """
 
-    parser = argparse.ArgumentParser(description='Creation')
+    parser = argparse.ArgumentParser(description='Training example PyTorch')
 
     parser.add_argument(
         '--hdf_file',
