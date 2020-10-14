@@ -14,7 +14,7 @@ Thank you very much, guys!
 
 Open source code
 ----------------
-Parts of pymia base on some open source code, which we acknowledge hereby:
+Parts of pymia base on open source code, which we acknowledge hereby:
 
  - Some distance metrics in the :mod:`pymia.evaluation.metric` package are taken from https://github.com/deepmind/surface-distance.
  - The :mod:`pymia.evaluation.metric` package is largely inspired by https://github.com/Visceral-Project/EvaluateSegmentation.

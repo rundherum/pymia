@@ -4,7 +4,7 @@ Data (:mod:`pymia.data` package)
 ================================
 
 This data package provides data handling functionality for machine learning (especially deep learning) projects.
-The concept of the evaluation package is illustrated in the figure below.
+The concept of the data package is illustrated in the figure below.
 
 .. image:: ./images/fig-data.png
   :width: 800
