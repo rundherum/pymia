@@ -2,6 +2,19 @@
 
 Change history
 ==============
+The change history lists the most important changes and is not an exhaustive list.
+
+Upcoming
+------------------
+
+ * :class:`.SegmentationEvaluator` now verifies the input (reference and prediction) to be integer or boolean
+ * Extended the :ref:`examples <examples>` with augmentation and training (U-Net) scripts
+
+
+0.3.1 (2020-08-02)
+------------------
+
+ * Fixed missing dependency in ``setup.py``
 
 0.3.0 (2020-07-14)
 ------------------
