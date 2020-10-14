@@ -50,7 +50,7 @@ If you use pymia for your research, please acknowledge it accordingly by citing:
 
 .. code-block:: none
 
-    Jungo, A., Scheidegger, O., Reyes, M., & Balsiger, F. (2020). pymia: A Python package for data handling and evaluation in deep learning-based medical image analysis. ArXiv preprint.
+    Jungo, A., Scheidegger, O., Reyes, M., & Balsiger, F. (2020). pymia: A Python package for data handling and evaluation in deep learning-based medical image analysis. ArXiv preprint 2010.03639.
 
 
 BibTeX entry:
@@ -59,7 +59,7 @@ BibTeX entry:
 
     @article{Jungo2020a,
     archivePrefix = {arXiv},
-    arxivId = {TBD},
+    arxivId = {2010.03639},
     author = {Jungo, Alain and Scheidegger, Olivier and Reyes, Mauricio and Balsiger, Fabian},
     journal = {arXiv preprint},
     title = {{pymia: A Python package for data handling and evaluation in deep learning-based medical image analysis}},
