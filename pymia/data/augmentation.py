@@ -4,12 +4,12 @@ The data augmentation bases on the transformation concept (see :class:`pymia.dat
 and can easily be incorporated into the data loading process.
 
 Warnings:
-The augmentation relies on the random number generator of `numpy`. If you want to obtain reproducible result,
-set numpy's seed prior to executing any augmentation:
+    The augmentation relies on the random number generator of `numpy`. If you want to obtain reproducible result,
+    set numpy's seed prior to executing any augmentation:
 
->>> import numpy as np
->>> your_seed = 0
->>> np.random.seed(your_seed)
+    >>> import numpy as np
+    >>> your_seed = 0
+    >>> np.random.seed(your_seed)
 
 See Also:
     https://github.com/MIC-DKFZ/batchgenerators
