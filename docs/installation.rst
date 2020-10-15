@@ -70,8 +70,6 @@ Run Sphinx in the pymia root directory to create the documentation:
    - The documentation is now available under ``./docs/_build/index.html``
 
 .. note::
-   To build the documentation including :mod:`pymia.data.backends`, the installation of PyTorch (:bash:`pip install torch`) and TensorFlow (:bash:`pip install tensorflow`) are required.
-
-   It might further be required to install `pandoc <https://pandoc.org/>`_.
+   To build the documentation, it might be required to install `pandoc <https://pandoc.org/>`_.
 
    In case of the warning `WARNING: LaTeX command 'latex' cannot be run (needed for math display), check the imgmath_latex setting`, set the `imgmath_latex <http://www.sphinx-doc.org/en/master/usage/extensions/math.html#confval-imgmath_latex>`_ setting in the ``./docs/conf.py`` file.
