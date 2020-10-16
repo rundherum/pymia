@@ -4,7 +4,7 @@ The data augmentation bases on the transformation concept (see :class:`pymia.dat
 and can easily be incorporated into the data loading process.
 
 See Also:
-    The pymia documentation features an `example for augmentation <https://pymia.readthedocs.io/en/latest/examples.augmentation.basic.html>`_,
+    The pymia documentation features an code example for `Augmentation <https://pymia.readthedocs.io/en/latest/examples.augmentation.basic.html>`_,
     which shows how to apply data augmentation in conjunction with the :mod:`pymia.data` package.
     Besides transformations from the :mod:`pymia.data.augmentation` module, transformations from the Python packages `batchgenerators <https://github.com/MIC-DKFZ/batchgenerators>`_ and `TorchIO <https://github.com/fepegar/torchio/>`_ are integrated.
 
