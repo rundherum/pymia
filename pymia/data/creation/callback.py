@@ -58,17 +58,14 @@ class ComposeCallback(Callback):
         self.callbacks = callbacks
 
     def on_start(self, params: dict):
-        """See :meth:`.Callback.on_start`."""
         for c in self.callbacks:
             c.on_start(params)
 
     def on_end(self, params: dict):
-        """See :meth:`.Callback.on_end`."""
         for c in self.callbacks:
             c.on_end(params)
 
     def on_subject(self, params: dict):
-        """See :meth:`.Callback.on_subject`."""
         for c in self.callbacks:
             c.on_subject(params)
 
@@ -77,17 +74,14 @@ class MonitoringCallback(Callback):
     """Callback that monitors the dataset creation process by logging the progress to the console."""
 
     def on_start(self, params: dict):
-        """See :meth:`.Callback.on_start`."""
         print('start dataset creation')
 
     def on_subject(self, params: dict):
-        """See :meth:`.Callback.on_subject`."""
         index = params[defs.KEY_SUBJECT_INDEX]
         subject_files = params[defs.KEY_SUBJECT_FILES]
         print('[{}/{}] {}'.format(index + 1, len(subject_files), subject_files[index].subject))
 
     def on_end(self, params: dict):
-        """See :meth:`.Callback.on_end`."""
         print('dataset creation finished')
 
 
@@ -102,7 +96,6 @@ class WriteDataCallback(Callback):
         self.writer = writer
 
     def on_subject(self, params: dict):
-        """See :meth:`.Callback.on_subject`."""
         subject_files = params[defs.KEY_SUBJECT_FILES]
         subject_index = params[defs.KEY_SUBJECT_INDEX]
 
@@ -125,13 +118,11 @@ class WriteEssentialCallback(Callback):
         self.reserved_for_shape = False
 
     def on_start(self, params: dict):
-        """See :meth:`.Callback.on_start`."""
         subject_count = len(params[defs.KEY_SUBJECT_FILES])
         self.writer.reserve(defs.LOC_SUBJECT, (subject_count,), str)
         self.reserved_for_shape = False
 
     def on_subject(self, params: dict):
-        """See :meth:`.Callback.on_subject`."""
         subject_files = params[defs.KEY_SUBJECT_FILES]
         subject_index = params[defs.KEY_SUBJECT_INDEX]
 
@@ -165,7 +156,6 @@ class WriteImageInformationCallback(Callback):
         self.new_subject = False
 
     def on_start(self, params: dict):
-        """See :meth:`.Callback.on_start`."""
         subject_count = len(params[defs.KEY_SUBJECT_FILES])
         self.writer.reserve(defs.LOC_IMGPROP_SHAPE, (subject_count, 3), dtype=np.uint16)
         self.writer.reserve(defs.LOC_IMGPROP_ORIGIN, (subject_count, 3), dtype=np.float)
@@ -173,7 +163,6 @@ class WriteImageInformationCallback(Callback):
         self.writer.reserve(defs.LOC_IMGPROP_SPACING, (subject_count, 3), dtype=np.float)
 
     def on_subject(self, params: dict):
-        """See :meth:`.Callback.on_subject`."""
         subject_index = params[defs.KEY_SUBJECT_INDEX]
         properties = params[defs.KEY_PLACEHOLDER_PROPERTIES.format(self.category)]  # type: conv.ImageProperties
 
@@ -194,7 +183,6 @@ class WriteNamesCallback(Callback):
         self.writer = writer
 
     def on_start(self, params: dict):
-        """See :meth:`.Callback.on_start`."""
         for category in params[defs.KEY_CATEGORIES]:
             self.writer.write(defs.LOC_NAMES_PLACEHOLDER.format(category),
                               params[defs.KEY_PLACEHOLDER_NAMES.format(category)], dtype='str')
@@ -218,7 +206,6 @@ class WriteFilesCallback(Callback):
         return os.path.commonpath([get_subject_common(sf) for sf in subject_files])
 
     def on_start(self, params: dict):
-        """See :meth:`.Callback.on_start`."""
         subject_files = params[defs.KEY_SUBJECT_FILES]
         self.file_root = self._get_common_path(subject_files)
         if os.path.isfile(self.file_root):  # only the case if only one file
@@ -230,7 +217,6 @@ class WriteFilesCallback(Callback):
                                 (len(subject_files), len(params[defs.KEY_PLACEHOLDER_NAMES.format(category)])), dtype='str')
 
     def on_subject(self, params: dict):
-        """See :meth:`.Callback.on_subject`."""
         subject_index = params[defs.KEY_SUBJECT_INDEX]
         subject_files = params[defs.KEY_SUBJECT_FILES]
 
