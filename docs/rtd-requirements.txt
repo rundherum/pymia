@@ -1,0 +1,4 @@
+# packages needed for building on readthedocs.io
+
+nbsphinx >= 0.7.1
+sphinx-copybutton >= 0.2.12
