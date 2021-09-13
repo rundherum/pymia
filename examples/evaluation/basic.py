@@ -35,7 +35,7 @@ def main(data_dir: str, result_file: str, result_summary_file: str):
         prediction = ground_truth
         for label_val in labels.keys():
             # erode each label we are going to evaluate
-            prediction = sitk.BinaryErode(prediction, 1, sitk.sitkBall, 0, label_val)
+            prediction = sitk.BinaryErode(prediction, [1] * prediction.GetDimension(), sitk.sitkBall, 0, label_val)
 
         # evaluate the "prediction" against the ground truth
         evaluator.evaluate(prediction, ground_truth, subject_id)
