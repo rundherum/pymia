@@ -45,6 +45,7 @@ class ComposeExtractor(Extractor):
 
 
 class NamesExtractor(Extractor):
+
     def __init__(self, cache: bool = True, categories=(defs.KEY_IMAGES, defs.KEY_LABELS)) -> None:
         """Extracts the names of the entries within a category (e.g. "Flair", "T1" for the category "images").
 
@@ -71,7 +72,7 @@ class NamesExtractor(Extractor):
             d = self.cached_result
 
         for k, v in d.items():
-            extracted[k] = v
+            extracted[k] = _convert_to_string(v)
 
     def _extract(self, reader: rd.Reader):
         d = {}
@@ -93,7 +94,7 @@ class SubjectExtractor(Extractor):
         """see :meth:`.Extractor.extract`"""
         extracted[defs.KEY_SUBJECT_INDEX] = params[defs.KEY_SUBJECT_INDEX]
         subject_index_expr = expr.IndexExpression(params[defs.KEY_SUBJECT_INDEX])
-        extracted[defs.KEY_SUBJECT] = reader.read(defs.LOC_SUBJECT, subject_index_expr)
+        extracted[defs.KEY_SUBJECT] = _convert_to_string(reader.read(defs.LOC_SUBJECT, subject_index_expr))
 
 
 class IndexingExtractor(Extractor):
@@ -195,11 +196,11 @@ class FilesExtractor(Extractor):
         else:
             file_root = self.cached_file_root
 
-        extracted[defs.KEY_FILE_ROOT] = file_root
+        extracted[defs.KEY_FILE_ROOT] = _convert_to_string(file_root)
 
         for category in self.categories:
-            extracted[defs.KEY_PLACEHOLDER_FILES.format(category)] = reader.read(defs.LOC_FILES_PLACEHOLDER.format(category),
-                                                                                 subject_index_expr)
+            extracted[defs.KEY_PLACEHOLDER_FILES.format(category)] = _convert_to_string(
+                reader.read(defs.LOC_FILES_PLACEHOLDER.format(category), subject_index_expr))
 
 
 class SelectiveDataExtractor(Extractor):
@@ -466,12 +467,12 @@ class FilesystemDataExtractor(Extractor):
         subject_index_expr = expr.IndexExpression(params[defs.KEY_SUBJECT_INDEX])
 
         if self.cached_file_root is None:
-            self.cached_file_root = reader.read(defs.LOC_FILES_ROOT)
+            self.cached_file_root = _convert_to_string(reader.read(defs.LOC_FILES_ROOT))
 
         file_root = self.cached_file_root
 
         for category in self.categories:
-            rel_file_paths = reader.read(defs.LOC_FILES_PLACEHOLDER.format(category), subject_index_expr)
+            rel_file_paths = _convert_to_string(reader.read(defs.LOC_FILES_PLACEHOLDER.format(category), subject_index_expr))
 
             loaded = []
             for rel_file_path in rel_file_paths:
@@ -481,3 +482,22 @@ class FilesystemDataExtractor(Extractor):
             if not self.ignore_indexing:
                 data = data[index_expr.expression]
             extracted[category] = data
+
+
+def _convert_to_string(data):
+    """Converts extracted string data from bytes to string, as strings are handled as bytes since h5py >= 3.0.
+
+    The function has been introduced as part of an `issue <https://github.com/rundherum/pymia/issues/40>`_.
+
+    Args:
+        data: The data to be converted; either :obj:`bytes` or list of :obj:`bytes`.
+
+    Returns:
+        The converted data as :obj:`str` or list of :obj:`str`.
+    """
+    if isinstance(data, bytes):
+        return data.decode('utf-8')
+    elif isinstance(data, list):
+        return [_convert_to_string(d) for d in data]
+    else:
+        return data
