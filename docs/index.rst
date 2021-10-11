@@ -1,4 +1,7 @@
-.. include:: ../README.rst
+pymia is an open-source Python (py) package for deep learning-based medical image analysis (mia).
+The package addresses two main parts of deep learning pipelines: data handling and evaluation.
+The package itself is independent of the deep learning framework used but can easily be integrated into TensorFlow and PyTorch pipelines.
+Therefore, pymia is highly flexible, allows for fast prototyping, and reduces the burden of implementing data handling and evaluation.
 
 Main Features
 =============
@@ -46,24 +49,24 @@ If you are new to pymia, here are a few guides to get you up to speed right away
 
 Citation
 ========
-If you use pymia for your research, please acknowledge it accordingly by citing:
+If you use pymia for your research, please acknowledge it accordingly by citing our paper:
 
-.. code-block:: none
-
-    Jungo, A., Scheidegger, O., Reyes, M., & Balsiger, F. (2020). pymia: A Python package for data handling and evaluation in deep learning-based medical image analysis. ArXiv preprint 2010.03639.
+`Jungo, A., Scheidegger, O., Reyes, M., & Balsiger, F. (2021). pymia: A Python package for data handling and evaluation in deep learning-based medical image analysis. Computer Methods and Programs in Biomedicine, 198, 105796 <https://doi.org/10.1016/j.cmpb.2020.105796>`_
 
 
 BibTeX entry:
 
 .. code-block:: none
 
-    @article{Jungo2020a,
-    archivePrefix = {arXiv},
-    arxivId = {2010.03639},
+    @article{Jungo2021a,
     author = {Jungo, Alain and Scheidegger, Olivier and Reyes, Mauricio and Balsiger, Fabian},
-    journal = {arXiv preprint},
+    doi = {10.1016/j.cmpb.2020.105796},
+    issn = {01692607},
+    journal = {Computer Methods and Programs in Biomedicine},
+    pages = {105796},
     title = {{pymia: A Python package for data handling and evaluation in deep learning-based medical image analysis}},
-    year = {2020}
+    volume = {198},
+    year = {2021},
     }
 
 
