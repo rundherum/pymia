@@ -24,6 +24,7 @@ LOC_DATA_PLACEHOLDER = 'data/{}'
 KEY_SUBJECT_FILES = 'subject_files'  #:
 KEY_CATEGORIES = 'categories'  #:
 KEY_PLACEHOLDER_NAMES = '{}_names'  #:
+KEY_PLACEHOLDER_NAMES_SELECTED = '{}_names_selected'  #:
 KEY_PLACEHOLDER_PROPERTIES = '{}_properties'  #:
 KEY_PLACEHOLDER_FILES = '{}_files'  #:
 KEY_FILE_ROOT = 'file_root'  #:

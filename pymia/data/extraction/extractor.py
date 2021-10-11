@@ -208,15 +208,14 @@ class SelectiveDataExtractor(Extractor):
     def __init__(self, selection=None, category: str = defs.KEY_LABELS) -> None:
         """Extracts data of a given category selectively.
 
-        Adds :obj:`category` as key to :obj:`extracted`.
+        Adds :obj:`category` as key to :obj:`extracted`, as well as
+
+        - :const:`pymia.data.definition.KEY_PLACEHOLDER_NAMES_SELECTED` with :obj:`selection` content
 
         Args:
             selection (str, tuple): Entries (e.g., "T1", "T2") within the category to select.
                 If selection is None, the class has the same behaviour as the DataExtractor and selects all entries.
             category (str): The category (e.g. "images") to extract data from.
-
-        Note:
-            Requires results of :class:`NamesExtractor` in :obj:`extracted`.
         """
         super().__init__()
         self.subject_entries = None
@@ -226,10 +225,14 @@ class SelectiveDataExtractor(Extractor):
         self.selection = selection
         self.category = category
 
+        self.names_extractor = None  # used in case that the names of the entries of the category are not extracted
+
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
         """see :meth:`.Extractor.extract`"""
         if defs.KEY_PLACEHOLDER_NAMES.format(self.category) not in extracted:
-            raise ValueError('selection of labels requires label_names to be extracted (use NamesExtractor)')
+            if self.names_extractor is None:
+                self.names_extractor = NamesExtractor(cache=True, categories=(self.category, ))
+            self.names_extractor.extract(reader, {}, extracted)
 
         if self.subject_entries is None:
             self.subject_entries = reader.get_subject_entries()
@@ -242,13 +245,14 @@ class SelectiveDataExtractor(Extractor):
 
         index_str = self.subject_entries[subject_index]
         data = reader.read('{}/{}'.format(defs.LOC_DATA_PLACEHOLDER.format(self.category), index_str), index_expr)
-        label_names = extracted[defs.KEY_PLACEHOLDER_NAMES.format(self.category)]  # type: list
+        entry_names = extracted[defs.KEY_PLACEHOLDER_NAMES.format(self.category)]  # type: list
 
         if self.selection is None:
             extracted[self.category] = data
         else:
-            selection_indices = np.array([label_names.index(s) for s in self.selection])
+            selection_indices = np.array([entry_names.index(s) for s in self.selection])
             extracted[self.category] = np.take(data, selection_indices, axis=-1)
+            extracted[defs.KEY_PLACEHOLDER_NAMES_SELECTED.format(self.category)] = list(self.selection)
 
 
 class RandomDataExtractor(Extractor):
