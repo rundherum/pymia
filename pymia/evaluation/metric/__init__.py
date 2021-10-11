@@ -1,5 +1,6 @@
 from .base import (ConfusionMatrix, Distances, Metric, ConfusionMatrixMetric, DistanceMetric,
-                   NumpyArrayMetric, SpacingMetric, Information, NotComputableMetricWarning)
+                   NumpyArrayMetric, SpacingMetric, Information, NotComputableMetricWarning,
+                   is_categorical_data, is_valid_categorical_data)
 from .metric import (get_segmentation_metrics, get_regression_metrics, get_overlap_metrics,
                      get_distance_metrics, get_classical_metrics)
 from .categorical import (Accuracy, AdjustedRandIndex, AreaUnderCurve, AverageDistance, CohenKappaCoefficient,

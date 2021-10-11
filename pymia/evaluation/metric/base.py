@@ -531,3 +531,21 @@ class Information(Metric):
     def calculate(self):
         """Outputs the value of the information."""
         return self.value
+
+
+def is_categorical_data(data: np.ndarray) -> bool:
+    """Checks whether a NumPy array is of categorical data, i.e., an array of type integer or boolean.
+
+        Returns:
+            bool: True if the data is categorical; otherwise, False.
+    """
+    return np.issubdtype(data.dtype, np.integer) or np.issubdtype(data.dtype, np.bool)
+
+
+def is_valid_categorical_data(data: np.ndarray) -> bool:
+    """Checks whether a NumPy array contains only zeros and ones.
+
+        Returns:
+            bool: True if the data contains only zeros and ones; otherwise, False.
+    """
+    return not np.any((data < 0) | (data > 1))
