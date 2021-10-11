@@ -25,15 +25,15 @@ Extraction of the data from this dataset is possible in nearly every desired for
 The prediction of the neural network can, if necessary, be assembled back to the format before extraction. 
 The evaluation package allows to evaluate predictions against references using a vast amount of metrics. It can be used stand-alone (solid) or for performance monitoring during training (dashed).
 
-<img src="https://raw.githubusercontent.com/rundherum/pymia/master/docs/images/fig-overview.png" alt="The pymia package in the deep learning environment" width="75%">
+<img src="https://raw.githubusercontent.com/rundherum/pymia/master/docs/images/fig-overview.png" alt="The pymia package in the deep learning environment">
 
 Getting Started
 ---------------
 
 If you are new to pymia, here are a few guides to get you up to speed right away:
 
- - [Installation](https://pymia.readthedocs.io/en/latest/installation.html): helps you installing pymia - or simply run `pip install pymia`
- - [Examples](https://pymia.readthedocs.io/en/latest/examples.html) give you an overview of pymia's intended use. Jupyter notebooks and Python scripts are available at [./examples](https://github.com/rundherum/pymia/tree/master/examples/).
+ - [Installation](https://pymia.readthedocs.io/en/latest/installation.html) for installation instructions - or simply run `pip install pymia`
+ - [Examples](https://pymia.readthedocs.io/en/latest/examples.html) give you an overview of pymia's intended use. Jupyter notebooks and Python scripts are available in the directory [./examples](https://github.com/rundherum/pymia/tree/master/examples/).
  - [Do you want to contribute?](https://pymia.readthedocs.io/en/latest/contribution.html)
  - [Change history](https://pymia.readthedocs.io/en/latest/history.html)
  - [Acknowledgments](https://pymia.readthedocs.io/en/latest/acknowledgment.html)
