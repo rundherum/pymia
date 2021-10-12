@@ -19,14 +19,14 @@ At the end of this example you find examples for the following additional use ca
 * Extracting from a metadata dataset
 
 .. tip::
-    This example is available as Jupyter notebook at `./examples/data/extraction_assembly.ipynb` and Python scripts for PyTorch and TensorFlow at at `./examples/data/extraction_assembly.py` and `./examples/data/extraction_assembly_tensorflow.py`, respectively.
+    This example is available as Jupyter notebook at `./examples/data/extraction_assembly.ipynb <https://github.com/rundherum/pymia/blob/master/examples/data/extraction_assembly.ipynb>`_ and Python scripts for PyTorch and TensorFlow at at `./examples/data/extraction_assembly.py <https://github.com/rundherum/pymia/blob/master/examples/data/extraction_assembly.py>`_ and `./examples/data/extraction_assembly_tensorflow.py <https://github.com/rundherum/pymia/blob/master/examples/data/extraction_assembly_tensorflow.py>`_, respectively.
 
-    The extraction of 3-D patches is available as Python script at `./examples/data/extraction_assembly_3dpatch.py`.
+    The extraction of 3-D patches is available as Python script at `./examples/data/extraction_assembly_3dpatch.py <https://github.com/rundherum/pymia/blob/master/examples/data/extraction_assembly_3dpatch.py>`_.
 
 .. note::
     To be able to run this example:
 
-    - Get the example data by executing `./examples/example-data/pull_example_data.py`.
+    - Get the example data by executing `./examples/example-data/pull_example_data.py <https://github.com/rundherum/pymia/blob/master/examples/example-data/pull_example_data.py>`_.
 
 
 Code walkthrough

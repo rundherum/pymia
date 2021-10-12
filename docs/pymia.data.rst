@@ -14,7 +14,7 @@ The three main components of the data package are creation, extraction, and asse
 
 **Creation**
 
-The creation of a dataset is managed by the :class:`.Traverser` class, which processes the data of every subject (case) iteratively. It employs :class:`.Load` and :class:`.Callback` classes to load the raw data and write it to the dataset. :class:`.Transform` classes can be used to apply modifications to the data, e.g., an intensity normalization. For the ease of usage, the defaults :func:`.get_default_callbacks` and :class:`.LoadDefault` are implemented, which cover the most fundamental cases.
+The creation of a dataset is managed by the :class:`.Traverser` class, which processes the data of every subject (case) iteratively. It employs :class:`.Load` and :class:`.Callback` classes to load the raw data and write it to the dataset. :class:`.Transform` classes can be used to apply modifications to the data, e.g., an intensity normalization. For the ease of usage, the defaults :func:`.get_default_callbacks` and :class:`.LoadDefault` are implemented, which cover the most fundamental cases. The code example :ref:`Creation of a dataset <example-data1>` illustrates how to create a dataset.
 
 .. image:: ./images/fig-data-creation.png
   :width: 200
@@ -23,7 +23,7 @@ The creation of a dataset is managed by the :class:`.Traverser` class, which pro
 
 **Extraction**
 
-Data extraction from the dataset is managed by the :class:`.PymiaDatasource` class, which provides a flexible interface for retrieving data, or chunks of data, to form training samples. An :class:`.IndexingStrategy` is used to define how the data is indexed, meaning accessing, for instance, an image slice or a 3-D patch of an 3-D image. :class:`.Extractor` classes extract the data from the dataset, and :class:`.Transform` classes can be used to alter the extracted data.
+Data extraction from the dataset is managed by the :class:`.PymiaDatasource` class, which provides a flexible interface for retrieving data, or chunks of data, to form training samples. An :class:`.IndexingStrategy` is used to define how the data is indexed, meaning accessing, for instance, an image slice or a 3-D patch of an 3-D image. :class:`.Extractor` classes extract the data from the dataset, and :class:`.Transform` classes can be used to alter the extracted data. The code example :ref:`Data extraction and assembly <example-data2>` illustrates how to extract data.
 
 .. image:: ./images/fig-data-extraction.png
   :width: 200
@@ -32,7 +32,7 @@ Data extraction from the dataset is managed by the :class:`.PymiaDatasource` cla
 
 **Assembly**
 
-The :class:`.Assembler` class manages the assembly of the predicted neural network outputs by using the identical indexing that was employed to extract the data by the :class:`.PymiaDatasource` class.
+The :class:`.Assembler` class manages the assembly of the predicted neural network outputs by using the identical indexing that was employed to extract the data by the :class:`.PymiaDatasource` class. The code example :ref:`Data extraction and assembly <example-data2>` illustrates how to assemble data.
 
 .. image:: ./images/fig-data-assembly.png
   :width: 200

@@ -3,16 +3,18 @@
 The data augmentation bases on the transformation concept (see :class:`pymia.data.transformation.Transform`)
 and can easily be incorporated into the data loading process.
 
-Warnings:
-The augmentation relies on the random number generator of `numpy`. If you want to obtain reproducible result,
-set numpy's seed prior to executing any augmentation:
-
->>> import numpy as np
->>> your_seed = 0
->>> np.random.seed(your_seed)
-
 See Also:
-    https://github.com/MIC-DKFZ/batchgenerators
+    The pymia documentation features an code example for `Augmentation <https://pymia.readthedocs.io/en/latest/examples.augmentation.basic.html>`_,
+    which shows how to apply data augmentation in conjunction with the :mod:`pymia.data` package.
+    Besides transformations from the :mod:`pymia.data.augmentation` module, transformations from the Python packages `batchgenerators <https://github.com/MIC-DKFZ/batchgenerators>`_ and `TorchIO <https://github.com/fepegar/torchio/>`_ are integrated.
+
+Warnings:
+    The augmentation relies on the random number generator of ``numpy``. If you want to obtain reproducible result,
+    set numpy's seed prior to executing any augmentation:
+
+    >>> import numpy as np
+    >>> your_seed = 0
+    >>> np.random.seed(your_seed)
 """
 import typing
 import warnings

@@ -75,7 +75,6 @@ class SubjectAssembler(Assembler):
 
     def add_batch(self, to_assemble: typing.Union[np.ndarray, typing.Dict[str, np.ndarray]], sample_indices: np.ndarray,
                   last_batch=False, **kwargs):
-        """see :meth:`Assembler.add_batch`"""
         if not isinstance(to_assemble, dict):
             to_assemble = {'__prediction': to_assemble}
 

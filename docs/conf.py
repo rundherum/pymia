@@ -31,8 +31,13 @@ with open(os.path.join(basedir, 'pymia', '__version__.py'), 'r', encoding='utf-8
     exec(f.read(), about)
 
 # -- Copy example Jupyter notebooks for documentation building
+shutil.copyfile(os.path.join(basedir, 'examples', 'augmentation', 'basic.ipynb'),
+                os.path.join(basedir, 'docs', 'examples.augmentation.basic.ipynb'))
+
 shutil.copyfile(os.path.join(basedir, 'examples', 'data', 'creation.ipynb'),
                 os.path.join(basedir, 'docs', 'examples.data.creation.ipynb'))
+
+# examples.data.extraction_assembly.ipynb not copied as there exists a rst file
 
 shutil.copyfile(os.path.join(basedir, 'examples', 'evaluation', 'basic.ipynb'),
                 os.path.join(basedir, 'docs', 'examples.evaluation.basic.ipynb'))
@@ -42,9 +47,6 @@ shutil.copyfile(os.path.join(basedir, 'examples', 'evaluation', 'logging.ipynb')
 
 shutil.copyfile(os.path.join(basedir, 'examples', 'filtering', 'basic.ipynb'),
                 os.path.join(basedir, 'docs', 'examples.filtering.basic.ipynb'))
-
-shutil.copyfile(os.path.join(basedir, 'examples', 'augmentation', 'basic.ipynb'),
-                os.path.join(basedir, 'docs', 'examples.augmentation.basic.ipynb'))
 
 # -- General configuration ------------------------------------------------
 
@@ -104,6 +106,9 @@ language = None
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+
+# modules to be mocked
+autodoc_mock_imports = ['tensorflow', 'torch']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'default'

@@ -11,7 +11,7 @@ about = {}
 with open(os.path.join(directory, 'pymia', '__version__.py'), 'r', encoding='utf-8') as f:
     exec(f.read(), about)
 
-with open(os.path.join('README.rst'), 'r', encoding='utf-8') as f:
+with open(os.path.join('README.md'), 'r', encoding='utf-8') as f:
     readme = f.read()
 
 REQUIRED_PACKAGES = [
