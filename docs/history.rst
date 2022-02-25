@@ -4,12 +4,12 @@ Change history
 ==============
 The change history lists the most important changes and is not an exhaustive list.
 
-Upcoming
+0.3.2 (2022-02-25)
 ------------------
 
- * :class:`.SegmentationEvaluator` now verifies the input (reference and prediction) to be integer or boolean
- * Extended the :ref:`examples <examples>` with augmentation and training (U-Net) scripts
-
+ * Minor bugfixes and usability improvements
+ * U-Net training examples in PyTorch and TensorFlow, see :ref:`examples <examples>`
+ * Improved documentation
 
 0.3.1 (2020-08-02)
 ------------------
