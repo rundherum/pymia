@@ -69,7 +69,7 @@ if __name__ == '__main__':
     Parse the arguments and run the program.
     """
 
-    parser = argparse.ArgumentParser(description='Creation')
+    parser = argparse.ArgumentParser(description='Extraction and assembly 3-D patch')
 
     parser.add_argument(
         '--hdf_file',
