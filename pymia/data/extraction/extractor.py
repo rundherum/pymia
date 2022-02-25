@@ -249,10 +249,14 @@ class SelectiveDataExtractor(Extractor):
         entry_names = extracted[defs.KEY_PLACEHOLDER_NAMES.format(self.category)]  # type: list
 
         if self.selection is None:
-            extracted[self.category] = data
+            extracted[self.category] = byte_converter.convert_to_string(data)
         else:
             selection_indices = np.array([entry_names.index(s) for s in self.selection])
             extracted[self.category] = np.take(data, selection_indices, axis=-1)
+            if isinstance(data, list):
+                # convert back to list
+                extracted[self.category] = byte_converter.convert_to_string(extracted[self.category].tolist())
+
             extracted[defs.KEY_PLACEHOLDER_NAMES_SELECTED.format(self.category)] = list(self.selection)
 
 
@@ -307,6 +311,9 @@ class RandomDataExtractor(Extractor):
 
         random_index = [np.random.choice(selection_indices)]  # as list to keep the last dimension with np.take
         extracted[self.category] = np.take(data, random_index, axis=-1)
+        if isinstance(data, list):
+            # convert back to list
+            extracted[self.category] = byte_converter.convert_to_string(extracted[self.category].tolist())
         extracted[defs.KEY_PLACEHOLDER_NAMES_SELECTED.format(self.category)] = [entry_names[random_index[0]]]
 
 
