@@ -239,7 +239,7 @@ class SelectiveDataExtractor(Extractor):
             self.subject_entries = reader.get_subject_entries()
 
         if not reader.has(defs.LOC_DATA_PLACEHOLDER.format(self.category)):
-            raise ValueError('SelectiveDataExtractor requires {} to exist'.format(self.category))
+            raise ValueError(f'SelectiveDataExtractor requires {self.category} to exist')
 
         subject_index = params[defs.KEY_SUBJECT_INDEX]
         index_expr = params[defs.KEY_INDEX_EXPR]
@@ -263,13 +263,12 @@ class RandomDataExtractor(Extractor):
 
         Adds :obj:`category` as key to :obj:`extracted`.
 
+        - :const:`pymia.data.definition.KEY_PLACEHOLDER_NAMES_SELECTED` with :obj:`selection` content
+
         Args:
             selection (str, tuple): Entries (e.g., "T1", "T2") within the category to select an entry randomly from.
                 If selection is None, an entry from all entries is randomly selected.
             category (str): The category (e.g. "images") to extract data from.
-
-        Note:
-            Requires results of :class:`NamesExtractor` in :obj:`extracted`.
         """
         super().__init__()
         self.subject_entries = None
@@ -279,32 +278,36 @@ class RandomDataExtractor(Extractor):
         self.selection = selection
         self.category = category
 
+        self.names_extractor = None  # used in case that the names of the entries of the category are not extracted
+
     def extract(self, reader: rd.Reader, params: dict, extracted: dict) -> None:
         """see :meth:`.Extractor.extract`"""
         if defs.KEY_PLACEHOLDER_NAMES.format(self.category) not in extracted:
-            raise ValueError('selection of labels requires label_names to be extracted (use NamesExtractor)')
+            if self.names_extractor is None:
+                self.names_extractor = NamesExtractor(cache=True, categories=(self.category,))
+            self.names_extractor.extract(reader, {}, extracted)
 
         if self.subject_entries is None:
             self.subject_entries = reader.get_subject_entries()
 
         if not reader.has(defs.LOC_DATA_PLACEHOLDER.format(self.category)):
-            raise ValueError('SelectiveDataExtractor requires {} to exist'.format(self.category))
+            raise ValueError(f'SelectiveDataExtractor requires {self.category} to exist')
 
         subject_index = params[defs.KEY_SUBJECT_INDEX]
         index_expr = params[defs.KEY_INDEX_EXPR]
 
         index_str = self.subject_entries[subject_index]
         data = reader.read('{}/{}'.format(defs.LOC_DATA_PLACEHOLDER.format(self.category), index_str), index_expr)
-        label_names = extracted[defs.KEY_PLACEHOLDER_NAMES.format(self.category)]  # type: list
+        entry_names = extracted[defs.KEY_PLACEHOLDER_NAMES.format(self.category)]  # type: list
 
         if self.selection is None:
-            selection_indices = np.array(range(len(label_names)))
+            selection_indices = np.array(range(len(entry_names)))
         else:
-            selection_indices = np.array([label_names.index(s) for s in self.selection])
+            selection_indices = np.array([entry_names.index(s) for s in self.selection])
 
         random_index = [np.random.choice(selection_indices)]  # as list to keep the last dimension with np.take
         extracted[self.category] = np.take(data, random_index, axis=-1)
-        # todo(fabianbalsiger): add names selected similar to SelectiveDataExtractor
+        extracted[defs.KEY_PLACEHOLDER_NAMES_SELECTED.format(self.category)] = [entry_names[random_index[0]]]
 
 
 class ImagePropertyShapeExtractor(Extractor):
