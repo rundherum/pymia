@@ -8,6 +8,7 @@ import SimpleITK as sitk
 
 import pymia.data.conversion as conv
 import pymia.data.definition as defs
+import pymia.data.extraction.byte_converter as byte_converter
 import pymia.data.indexexpression as expr
 from . import reader as rd
 
@@ -72,7 +73,7 @@ class NamesExtractor(Extractor):
             d = self.cached_result
 
         for k, v in d.items():
-            extracted[k] = _convert_to_string(v)
+            extracted[k] = byte_converter.convert_to_string(v)
 
     def _extract(self, reader: rd.Reader):
         d = {}
@@ -94,7 +95,7 @@ class SubjectExtractor(Extractor):
         """see :meth:`.Extractor.extract`"""
         extracted[defs.KEY_SUBJECT_INDEX] = params[defs.KEY_SUBJECT_INDEX]
         subject_index_expr = expr.IndexExpression(params[defs.KEY_SUBJECT_INDEX])
-        extracted[defs.KEY_SUBJECT] = _convert_to_string(reader.read(defs.LOC_SUBJECT, subject_index_expr))
+        extracted[defs.KEY_SUBJECT] = byte_converter.convert_to_string(reader.read(defs.LOC_SUBJECT, subject_index_expr))
 
 
 class IndexingExtractor(Extractor):
@@ -196,10 +197,10 @@ class FilesExtractor(Extractor):
         else:
             file_root = self.cached_file_root
 
-        extracted[defs.KEY_FILE_ROOT] = _convert_to_string(file_root)
+        extracted[defs.KEY_FILE_ROOT] = byte_converter.convert_to_string(file_root)
 
         for category in self.categories:
-            extracted[defs.KEY_PLACEHOLDER_FILES.format(category)] = _convert_to_string(
+            extracted[defs.KEY_PLACEHOLDER_FILES.format(category)] = byte_converter.convert_to_string(
                 reader.read(defs.LOC_FILES_PLACEHOLDER.format(category), subject_index_expr))
 
 
@@ -303,6 +304,7 @@ class RandomDataExtractor(Extractor):
 
         random_index = [np.random.choice(selection_indices)]  # as list to keep the last dimension with np.take
         extracted[self.category] = np.take(data, random_index, axis=-1)
+        # todo(fabianbalsiger): add names selected similar to SelectiveDataExtractor
 
 
 class ImagePropertyShapeExtractor(Extractor):
@@ -364,7 +366,7 @@ class DataExtractor(Extractor):
                 data = reader.read('{}/{}'.format(defs.LOC_DATA_PLACEHOLDER.format(category), index_str))
             else:
                 data = reader.read('{}/{}'.format(defs.LOC_DATA_PLACEHOLDER.format(category), index_str), index_expr)
-            extracted[category] = data
+            extracted[category] = byte_converter.convert_to_string(data)
 
 
 class PadDataExtractor(Extractor):
@@ -471,12 +473,12 @@ class FilesystemDataExtractor(Extractor):
         subject_index_expr = expr.IndexExpression(params[defs.KEY_SUBJECT_INDEX])
 
         if self.cached_file_root is None:
-            self.cached_file_root = _convert_to_string(reader.read(defs.LOC_FILES_ROOT))
+            self.cached_file_root = byte_converter.convert_to_string(reader.read(defs.LOC_FILES_ROOT))
 
         file_root = self.cached_file_root
 
         for category in self.categories:
-            rel_file_paths = _convert_to_string(reader.read(defs.LOC_FILES_PLACEHOLDER.format(category), subject_index_expr))
+            rel_file_paths = byte_converter.convert_to_string(reader.read(defs.LOC_FILES_PLACEHOLDER.format(category), subject_index_expr))
 
             loaded = []
             for rel_file_path in rel_file_paths:
@@ -487,21 +489,3 @@ class FilesystemDataExtractor(Extractor):
                 data = data[index_expr.expression]
             extracted[category] = data
 
-
-def _convert_to_string(data):
-    """Converts extracted string data from bytes to string, as strings are handled as bytes since h5py >= 3.0.
-
-    The function has been introduced as part of an `issue <https://github.com/rundherum/pymia/issues/40>`_.
-
-    Args:
-        data: The data to be converted; either :obj:`bytes` or list of :obj:`bytes`.
-
-    Returns:
-        The converted data as :obj:`str` or list of :obj:`str`.
-    """
-    if isinstance(data, bytes):
-        return data.decode('utf-8')
-    elif isinstance(data, list):
-        return [_convert_to_string(d) for d in data]
-    else:
-        return data

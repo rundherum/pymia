@@ -5,6 +5,7 @@ import h5py
 import numpy as np
 
 import pymia.data.definition as defs
+import pymia.data.extraction.byte_converter as byte_converter
 import pymia.data.indexexpression as expr
 
 
@@ -120,7 +121,7 @@ class Hdf5Reader(Reader):
 
     def get_subjects(self) -> list:
         """see :meth:`.Reader.get_subjects`"""
-        return self.read(defs.LOC_SUBJECT)
+        return byte_converter.convert_to_string(self.read(defs.LOC_SUBJECT))
 
     def read(self, entry: str, index: expr.IndexExpression = None):
         """see :meth:`.Reader.read`"""
