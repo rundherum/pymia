@@ -4,6 +4,12 @@ Change history
 ==============
 The change history lists the most important changes and is not an exhaustive list.
 
+0.3.3 (2024-09-26)
+------------------
+
+ * Fix Jaccard metric computation on empty masks #49
+ * Fix the read the docs build
+
 0.3.2 (2022-02-25)
 ------------------
 
