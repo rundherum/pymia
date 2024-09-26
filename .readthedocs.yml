@@ -1,10 +1,16 @@
-# Read the Docs configuration file
+# Read the Docs configuration file for Sphinx projects
 # See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
 
 # Required
 version: 2
 
-# Build documentation in the docs/ directory with Sphinx
+# Set the OS, Python version and other tools you might need
+build:
+  os: ubuntu-lts-latest
+  tools:
+    python: "3.9"
+
+# Build documentation in the "docs/" directory with Sphinx
 sphinx:
   configuration: docs/conf.py
 
@@ -14,9 +20,8 @@ formats:
   - htmlzip
   - pdf
 
-# Set the version of Python and requirements required to build your docs
+# Declare the Python requirements required to build the docs
 python:
-  version: 3.7
   install:
       - requirements: docs/rtd-requirements.txt
       - requirements: requirements.txt

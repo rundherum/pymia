@@ -1,5 +1,5 @@
 # packages needed for building on readthedocs.io
 
-sphinx >= 3.2.1
-nbsphinx >= 0.7.1
-sphinx-copybutton >= 0.2.12
+sphinx >= 7.4.7
+nbsphinx >= 0.9.5
+sphinx-copybutton >= 0.5.2
