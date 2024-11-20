@@ -403,13 +403,13 @@ class Distances:
             distmap_gt = ndimage.morphology.distance_transform_edt(
                 ~borders_gt, sampling=spacing)
         else:
-            distmap_gt = np.Inf * np.ones(borders_gt.shape)
+            distmap_gt = np.inf * np.ones(borders_gt.shape)
 
         if borders_pred.any():
             distmap_pred = ndimage.morphology.distance_transform_edt(
                 ~borders_pred, sampling=spacing)
         else:
-            distmap_pred = np.Inf * np.ones(borders_pred.shape)
+            distmap_pred = np.inf * np.ones(borders_pred.shape)
 
         # compute the area of each surface element
         surface_area_map_gt = neighbour_code_to_surface_area[neighbour_code_map_gt]
