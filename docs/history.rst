@@ -4,6 +4,11 @@ Change history
 ==============
 The change history lists the most important changes and is not an exhaustive list.
 
+0.3.4 (2024-11-22)
+------------------
+
+ * Fix dependency on numpy v1 by using ``np.Inf`` instead of ``np.inf`` #52
+
 0.3.3 (2024-09-26)
 ------------------
 
