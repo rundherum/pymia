@@ -16,6 +16,15 @@ import numpy as np
 import pymia.evaluation.evaluator as evaluator
 
 
+def _csv_output_path(path: str) -> str:
+    """Return the CSV output path for a filename or an existing directory."""
+    if path.lower().endswith('.csv'):
+        return path
+    if os.path.isdir(path):
+        return os.path.join(path, '.csv')
+    return path + '.csv'
+
+
 class Writer(abc.ABC):
     """Represents an evaluation results writer base class."""
 
@@ -112,16 +121,14 @@ class CSVWriter(Writer):
         """Represents a CSV file evaluation results writer.
 
         Args:
-            path (str): The CSV file path.
+            path (str): The CSV file path. A missing .csv extension is appended
+                to the filename. For an existing directory without that
+                extension, the output is a file named .csv inside it.
             delimiter (str): The CSV column delimiter.
         """
         super().__init__()
-        self.path = path
+        self.path = _csv_output_path(path)
         self.delimiter = delimiter
-
-        # check file extension
-        if not self.path.lower().endswith('.csv'):
-            self.path = os.path.join(self.path, '.csv')
 
     def write(self, results: typing.List[evaluator.Result], **kwargs):
         """Writes the evaluation results to a CSV file.
@@ -206,18 +213,16 @@ class CSVStatisticsWriter(Writer):
         """Represents a CSV file evaluation results statistics writer.
 
         Args:
-            path (str): The CSV file path.
+            path (str): The CSV file path. A missing .csv extension is appended
+                to the filename. For an existing directory without that
+                extension, the output is a file named .csv inside it.
             delimiter (str): The CSV column delimiter.
             functions (dict): The functions to calculate the statistics.
         """
         super().__init__()
         self.aggregator = StatisticsAggregator(functions)
-        self.path = path
+        self.path = _csv_output_path(path)
         self.delimiter = delimiter
-
-        # check file extension
-        if not self.path.lower().endswith('.csv'):
-            self.path = os.path.join(self.path, '.csv')
 
     def write(self, results: typing.List[evaluator.Result], **kwargs):
         """Writes the evaluation statistic results (e.g., mean and standard deviation of a metric over all cases).
